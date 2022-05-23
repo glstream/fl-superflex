@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block header %}
+
+{% endblock %}
+{%block content%}
+<h2>{% block title %}Shares{% endblock %}</h2>
+{% for league in leagues %}
+<form method="post" class="form-inline">
+    <table class="table">
+
+        <tbody>
+            <div class="row row-bottom-margin">
+                <tr>
+                    <td>{{league[4]}}</td>
+                    <td>
+                        <div class="col-md-12 text-left">
+                            {% if league[3] in leagues_ran %}
+                            <a href="{{ url_for('leagues.all_players_async', session_id=session_id, user_id=user_id, league_id=league[3])}}"
+                                class=" btn btn-outline-success btn-sm" role="button" aria-pressed="true">Load</a>
+                            <button class="btn btn-outline-danger btn-sm" type="submit" name="league_data"
+                                value="{{league[0],league[1],league[3],}}">Refresh</button>
+                            {%else%}
+                            <button class="btn btn-outline-primary btn-sm" type="submit" name="league_data"
+                                value="{{league[0],league[1],league[3],}}">Run</button>
+                            {%endif%}
+                        </div>
+            </div>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+
+
+<!-- <div class="alignCenter">
+    <a href="/username={{user_name}}/league/leaguename={{league[0]}}">{{league[0]}}</a>
+</div> -->
+{% endfor %}
+{% endblock %}

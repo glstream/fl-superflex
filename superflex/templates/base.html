@@ -1,0 +1,28 @@
+<!doctype html>
+<header>
+    {% block header %}Dynastyr{% endblock %}
+    <title>{% block title %}- Dynastr{% endblock %} </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</header>
+
+<body>
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom">
+        <h5 class="my-0 mr-md-auto font-weight-normal">Dynastr</h5>
+        <nav class="my-2 my-md-0 mr-md-3 align-items-center">
+            <a class="p-2 text-dark" href="{{url_for('leagues.select_league')}}">Leagues</a>
+            <a class="p-2 text-dark" href="{{url_for('leagues.my_leagues')}}">Shares</a>
+        </nav>
+        <a class="btn btn-outline-primary" href="{{url_for('leagues.index')}}">User Name</a>
+    </div>
+
+    <section class="content">
+
+        {% for m1 in get_flashed_messages() %}
+        <div class="flash">{{ m1 }}</div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+    </section>
+</body>

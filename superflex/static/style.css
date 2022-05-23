@@ -1,0 +1,342 @@
+html {
+  font-family: sans-serif;
+  background: #eee;
+  padding: 1rem;
+}
+
+body {
+  margin: 0 auto;
+  background: white;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+tr:nth-child(even) {
+  background-color: #c2c7c9;
+  text-align: right;
+}
+
+thead {
+  background-color: #778386;
+  text-align: right;
+}
+
+td,
+th {
+  border: 1px solid #070606;
+  text-align: left;
+  padding: 8px;
+}
+
+.content {
+  padding: 0 1rem 1rem;
+}
+
+.content>header {
+  /* border-bottom: 1px solid lightgray; */
+  display: flex;
+  align-items: flex-end;
+}
+
+.content>header h1 {
+  flex: auto;
+  margin: 1rem 0 0.25rem 0;
+}
+
+.flash {
+  margin: 1em 0;
+  padding: 1em;
+  background: #caa6f6;
+  border: 1px solid #377ba8;
+}
+
+.post>header {
+  display: flex;
+  align-items: flex-end;
+  font-size: 0.85em;
+}
+
+.post>header>div:first-of-type {
+  flex: auto;
+}
+
+.post>header h1 {
+  font-size: 1.5em;
+  margin-bottom: 0;
+}
+
+.post .about {
+  color: slategray;
+  font-style: italic;
+}
+
+.post .body {
+  white-space: pre-line;
+}
+
+.content:last-child {
+  margin-bottom: 0;
+}
+
+.content form {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.content input,
+.content textarea {
+  margin-bottom: 1em;
+}
+
+.content textarea {
+  min-height: 12em;
+  resize: vertical;
+}
+
+input.danger {
+  color: #cc2f2e;
+}
+
+input[type=submit] {
+  align-self: start;
+  min-width: 10em;
+}
+
+.alignCenter {
+  align-content: center;
+  text-align: center;
+}
+
+
+
+.over-limit-0 {
+  text-align: center;
+  border: 1px solid white;
+  /* Green border */
+  background-color: rgb(41, 59, 247);
+  font-size: 12px;
+  color: white;
+}
+
+.over-limit-10 {
+  background-color: rgb(224, 243, 248);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: black;
+}
+
+.over-limit-20 {
+  background-color: rgb(244, 109, 67);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: black;
+}
+
+.over-limit-30 {
+  background-color: rgb(244, 109, 67);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: black;
+}
+
+.over-limit-40 {
+  background-color: rgb(244, 109, 67);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: black;
+}
+
+.over-limit-50 {
+  background-color: rgb(215, 48, 39);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: white;
+}
+
+.over-limit-60 {
+  background-color: rgb(215, 48, 39);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: white;
+}
+
+.over-limit-70 {
+  background-color: rgb(215, 48, 39);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: white;
+}
+
+.over-limit-80 {
+  background-color: rgb(165, 0, 38);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 12px;
+  color: white
+}
+
+.over-limit-90 {
+  background-color: rgb(165, 0, 38);
+  text-align: center;
+  border: 1px solid white;
+  font-size: 14px;
+  color: white
+}
+
+.table-all {
+  border: 1px solid black;
+  font-size: 14px;
+}
+
+.table-color {
+  border: 1px solid rgb(243, 247, 243);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-names {
+  border: 1px solid gray;
+  border-right: 1px solid white;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+  background-color: white;
+  border-color: white;
+  border-bottom-color: gray;
+}
+
+th.rotate>div {
+  transform:
+    /* Magic Numbers */
+    translate(2px, 55px)
+    /* 45 is really 360 - 45 */
+    rotate(270deg);
+  width: 25px;
+}
+
+/* th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 10px;
+} */
+
+.transparent {
+  color: white;
+  background-color: white;
+  border-color: white;
+  border-bottom: gray;
+}
+
+.RdYlBu .q0-3 {
+  fill: rgb(252, 141, 89)
+}
+
+.RdYlBu .q1-3 {
+  fill: rgb(255, 255, 191)
+}
+
+.RdYlBu .q2-3 {
+  fill: rgb(145, 191, 219)
+}
+
+.table td {
+  text-align: left;
+  border-style: hidden;
+  border-collapse: collapse;
+}
+
+.table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 500px;
+  border-spacing: 0;
+}
+
+tr td {
+  padding-top: 1em;
+}
+
+.row-bottom-margin {
+  margin-bottom: -20px;
+}
+
+.card {
+  margin-bottom: 25px;
+  margin-top: 25px;
+}
+
+.card-header {
+  border: none;
+  background-color: rgba(0, 0, 0, .8);
+}
+
+.text-right {
+  text-align: right;
+}
+
+
+/* .card-header {display:inline-block;}
+.card-row {display:inline-block;} */
+/* .card,
+.card-header,
+.card-body,
+.card-footer {
+  border-radius: 0px !important;
+  border: 1px solid;
+  border-bottom: 1px;
+} */
+
+.row {
+  margin-bottom: 2px;
+  margin-top: 2px;
+}
+
+a.right {
+  display: inline-block;
+  text-align: right;
+  width: 100%;
+}
+
+.avatar-player {
+  width: 38px;
+  height: 32px;
+  flex: 0 0 38px;
+  /* float: left; */
+  /* background: center center / cover rgb(239, 239, 239); */
+  border-radius: 50%;
+}
+
+html {
+
+  font-size: .75rem;
+}
+
+.list-group {
+  display: inline-block;
+}
