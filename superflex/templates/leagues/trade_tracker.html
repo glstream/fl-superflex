@@ -1,8 +1,4 @@
-{% extends 'base.html' %}
-{% block header %}
-
-{% endblock %}
-{%block content%}
+{% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 <h2>{% block title %}Trade Tracker{% endblock %}</h2>
 <div class="container">
     <div class="row justify-content-center">
@@ -18,10 +14,7 @@
             </ul>
         </div>
         <div class="col-md-6">
-            <div class="header">
-                <h3 style="padding:10px" class="title"></h3>
-            </div>
-            <table class="table table-bordered table-hover" style="border: 1px solid rgb(249, 248, 248) !important;">
+            <table class="table rounded table-hover">
                 <thead class="" style="text-align:center">
                     <tr>
                         <th scope="col">Manager</th>
@@ -34,7 +27,7 @@
                 <tbody style="text-align:center">
                     {% for summary in summary_table %}
 
-                    <tr style="border: 1px solid rgb(23, 22, 22) !important;">
+                    <tr style="">
                         <td scope="row" style="text-align:center">{{summary.display_name}}</td>
                         <td style="text-align:center">{{summary.total_add}}</td>
                         <td style="text-align:center">{{summary.total_drop}}</td>
@@ -50,8 +43,7 @@
             <div class="card-body">
                 <div class="list-group">
                     <form method="post" class="form-inline">
-                        <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings"
-                            value="{{session_id, user_id, league_id}}">Power
+                        <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings" value="{{session_id, user_id, league_id}}">Power
                             Rankings</button>
                         <br>
                         <button class="btn btn-outline-secondary btn-lg" disabled>Trade Tracker</button>
@@ -73,13 +65,10 @@
         <div class="row justify-content-center">
             <h6 class="text-center">{{transaction_id[1] | timestamp_convert }}
             </h6>
-            {% for k,v in trades_dict.items() if k == transaction_id[0] %}
-            {% for o,items in v.items() %}
+            {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
             <div class="card" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
                 <h5 class="text-left">{{o}}</h5>
-                {% for asset in items if asset.transaction_id == transaction_id[0] %}
-                {% if loop.index == 1 %}
-                {% set total = asset.owner_total %}
+                {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {% set total = asset.owner_total %}
                 <h4 class="text-right">{{total}}</h4>
 
                 {% endif %}
@@ -88,8 +77,7 @@
                         <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
                             <img class="avatar-player"
                                 src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                        </object>
-                        {{ asset.asset }} {{"{:,}".format(asset.sf_value)}}
+                        </object> {{ asset.asset }} {{"{:,}".format(asset.sf_value)}}
                     </li>
                     {% endfor %}
                 </ul>
