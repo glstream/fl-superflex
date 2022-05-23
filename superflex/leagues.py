@@ -11,7 +11,6 @@ from flask import (
     session,
     url_for,
 )
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from pathlib import Path
 from datetime import datetime

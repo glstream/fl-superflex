@@ -6,6 +6,7 @@
 {%block content%}
 
 <h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
+<br>
 <div class="container">
     <div class="row justify-content-center">
 
@@ -20,16 +21,16 @@
                 </li>
                 {% endfor %}
             </ul>
+
         </div>
         <div class="col-md-6">
 
             <div>
-                <table class="table table-bordered table-hover"
-                    style="border: 1px solid rgb(249, 248, 248) !important;">
+                <table class="table rounded table-hover">
                     <thead class="" style="text-align:center">
                         <tr>
                             <th scope="col">Manager</th>
-                            <th scope="col">Overall</th>
+                            <th>Overall</th>
                             <th>QB</th>
                             <th>RB</th>
                             <th>WR</th>
@@ -37,10 +38,9 @@
                             <th>PICKS</th>
                         </tr>
                     </thead>
-                    <tbody style="text-align:center">
+                    <tbody>
                         {% for owner in owners %}
-
-                        <tr style="border: 1px solid rgb(23, 22, 22) !important;">
+                        <tr>
                             <td scope="row" style="text-align:center">{{owner.display_name}}</td>
                             <td style="text-align:center">{{owner.total_rank | suffix}}</td>
                             {% for i, k in aps.items()%}
