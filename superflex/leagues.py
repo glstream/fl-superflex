@@ -1,4 +1,4 @@
-import functools, aiohttp, asyncio, os, json, requests, uuid
+import functools, asyncio, os, json, requests, uuid
 import socket
 
 from flask import (
@@ -634,49 +634,49 @@ async def concurent_players(calls, call_name: str = "get_players"):
     await asyncio.gather(*tasks)
 
 
-async def con_gather(session_id, user_id, league_id, call_name: str = "get_leagues"):
+# async def con_gather(session_id, user_id, league_id, call_name: str = "get_leagues"):
 
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    if call_name == "get_leagues":
-        user_ids = [i[0] for i in league_managers(league_id, user_id)]
-    calls = (
-        [i[0] for i in league_managers(league_id, user_id)]
-        if call_name == "get_leagues"
-        else call_id
-    )
-    leagues_connector = aiohttp.TCPConnector(limit=100)
-    async with aiohttp.ClientSession(
-        connector=leagues_connector, trust_env=True
-    ) as session:
-        tasks = [
-            asyncio.create_task(get_api(session, call, call_name)) for call in calls
-        ]
-        await asyncio.gather(*tasks)
+#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+#     if call_name == "get_leagues":
+#         user_ids = [i[0] for i in league_managers(league_id, user_id)]
+#     calls = (
+#         [i[0] for i in league_managers(league_id, user_id)]
+#         if call_name == "get_leagues"
+#         else call_id
+#     )
+#     leagues_connector = aiohttp.TCPConnector(limit=100)
+#     async with aiohttp.ClientSession(
+#         connector=leagues_connector, trust_env=True
+#     ) as session:
+#         tasks = [
+#             asyncio.create_task(get_api(session, call, call_name)) for call in calls
+#         ]
+#         await asyncio.gather(*tasks)
 
-        if len(league_ids) > 0:
-            roster_connector = aiohttp.TCPConnector(
-                limit=20, family=socket.AF_INET, verify_ssl=False
-            )
-            async with aiohttp.ClientSession(
-                connector=roster_connector, trust_env=True
-            ) as session:
-                tasks = [
-                    asyncio.create_task(get_players_api(session, league_id))
-                    for league_id in league_ids
-                ]
-                await asyncio.gather(*tasks)
+#         if len(league_ids) > 0:
+#             roster_connector = aiohttp.TCPConnector(
+#                 limit=20, family=socket.AF_INET, verify_ssl=False
+#             )
+#             async with aiohttp.ClientSession(
+#                 connector=roster_connector, trust_env=True
+#             ) as session:
+#                 tasks = [
+#                     asyncio.create_task(get_players_api(session, league_id))
+#                     for league_id in league_ids
+#                 ]
+#                 await asyncio.gather(*tasks)
 
-                # await concurent_players(league_ids)
+#                 # await concurent_players(league_ids)
 
-                print("user_ids:", user_ids)
-                print("user_id:", user_id)
-                print("session_id:", session_id)
-                print("league_id:", league_id)
-                print("user_id:", user_id)
-                owned_players = [i for i in players if i[1] in user_ids]
-                delete_players(session_id, league_id, user_id)
-                insert_players(owned_players, session_id, league_id, user_id)
-                # return render_template('leagues/all_players_sql.html', owned_players=owned_players, session_id=session_id, user_id=user_id, league_id=league_id)
+#                 print("user_ids:", user_ids)
+#                 print("user_id:", user_id)
+#                 print("session_id:", session_id)
+#                 print("league_id:", league_id)
+#                 print("user_id:", user_id)
+#                 owned_players = [i for i in players if i[1] in user_ids]
+#                 delete_players(session_id, league_id, user_id)
+#                 insert_players(owned_players, session_id, league_id, user_id)
+#                 # return render_template('leagues/all_players_sql.html', owned_players=owned_players, session_id=session_id, user_id=user_id, league_id=league_id)
 
 
 league_ids = []
