@@ -730,69 +730,72 @@ def index():
 
 @bp.route("/select_league", methods=["GET", "POST"])
 def select_league():
-    session_id = session["session_id"]
-    user_id = session["user_id"]
-    db = get_db()
+    if request.method == "GET" and session.get('session_id', None) is not None:
+        session_id = session["session_id"]
+        user_id = session["user_id"]
+        db = get_db()
 
-    if request.method == "POST":
-        if list(request.form)[0] == "sel_league_data":
-            league_data = eval(request.form["sel_league_data"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, session_id, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id)
+        if request.method == "POST":
+            if list(request.form)[0] == "sel_league_data":
+                league_data = eval(request.form["sel_league_data"])
+                session_id = league_data[0]
+                user_id = league_data[1]
+                league_id = league_data[2]
+                print("POST SELECT LEAGUE", league_id)
+                # delete data players and picks
+                clean_league_rosters(db, session_id, user_id, league_id)
+                clean_league_picks(db, session_id, league_id)
+                # insert managers names
+                managers = get_managers(league_id)
+                insert_managers(db, managers)
+                # insert data
+                insert_league_rosters(db, session_id, user_id, league_id)
+                total_owned_picks(db, league_id, session_id)
+                draft_positions(db, league_id)
 
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
+                return redirect(
+                    url_for(
+                        "leagues.get_league",
+                        session_id=session_id,
+                        league_id=league_id,
+                        user_id=user_id,
+                    )
                 )
-            )
-        elif list(request.form)[0] == "sel_trade_tracker":
-            league_data = eval(request.form["sel_trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
+            elif list(request.form)[0] == "sel_trade_tracker":
+                league_data = eval(request.form["sel_trade_tracker"])
+                session_id = league_data[0]
+                user_id = league_data[1]
+                league_id = league_data[2]
 
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id)
-            insert_trades(db, trades, league_id)
+                # insert managers names
+                managers = get_managers(league_id)
+                insert_managers(db, managers)
+                # delete traded players and picks
+                clean_player_trades(db, league_id)
+                clean_draft_trades(db, league_id)
+                # get trades
+                trades = get_trades(league_id, get_sleeper_state())
+                # insert trades draft Positions
+                draft_positions(db, league_id)
+                insert_trades(db, trades, league_id)
 
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
+                return redirect(
+                    url_for(
+                        "leagues.trade_tracker",
+                        session_id=session_id,
+                        league_id=league_id,
+                        user_id=user_id,
+                    )
                 )
-            )
 
-    cursor = db.execute(
-        f"select * from current_leagues where session_id = '{session_id}' and user_id ='{user_id}'"
-    )
-    leagues = cursor.fetchall()
-    if len(leagues) > 0:
-        return render_template("leagues/select_league.html", leagues=leagues)
+        cursor = db.execute(
+            f"select * from current_leagues where session_id = '{session_id}' and user_id ='{user_id}'"
+        )
+        leagues = cursor.fetchall()
+        if len(leagues) > 0:
+            return render_template("leagues/select_league.html", leagues=leagues)
+        else:
+            return redirect(url_for("leagues.index"))
     else:
         return redirect(url_for("leagues.index"))
 
