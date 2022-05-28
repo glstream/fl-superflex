@@ -184,6 +184,11 @@ def insert_managers(db, managers: list) -> None:
     return
 
 
+def is_user(user_name: str) -> bool:
+    res = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
+    return True if res.text != "null" else False
+
+
 def round_suffix(rank: int) -> str:
     ith = {1: "st", 2: "nd", 3: "rd"}.get(
         rank % 10 * (rank % 100 not in [11, 12, 13]), "th"
@@ -690,7 +695,7 @@ def index():
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
         return render_template("leagues/index.html", user_name=user_name)
-    if request.method == "POST":
+    if request.method == "POST" and is_user(request.form["username"]):
         session_id = session["session_id"] = str(uuid.uuid4())
         user_name = request.form["username"]
         user_id = session["user_id"] = get_user_id(user_name)
