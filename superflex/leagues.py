@@ -730,9 +730,12 @@ def index():
 
 @bp.route("/select_league", methods=["GET", "POST"])
 def select_league():
+    db = get_db()
+    if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
+        return redirect(url_for("leagues.index"))
+
     session_id = session["session_id"]
     user_id = session["user_id"]
-    db = get_db()
 
     if request.method == "POST":
         if list(request.form)[0] == "sel_league_data":
