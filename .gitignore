@@ -1,5 +1,5 @@
 /env
 /instance/dynastr.sqlite
-/superflex/__pycache__
+superflex/__pycache__/
 /instance
 instance/dynastr.sqlite

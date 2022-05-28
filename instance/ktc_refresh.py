@@ -22,7 +22,7 @@ res = requests.get(ktc_base)
 soup = BeautifulSoup(res.text, "html.parser")
 
 scripts = soup.find_all("script")
-script_var_array = scripts[6]
+script_var_array = scripts[7]
 
 # returning the string of the script tag for parsing
 players_script = script_var_array.contents[0]
