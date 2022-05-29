@@ -28,7 +28,7 @@ def n_user_id(user_name: str) -> str:
     return user_id
 
 
-def user_leagues(user_name: str, year="2022") -> list:
+def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
     owner_id = n_user_id(user_name)
     leagues_url = f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{year}"
     leagues_res = requests.get(leagues_url)
@@ -694,6 +694,7 @@ async def concurent_players(calls, call_name: str = "get_players"):
 league_ids = []
 league_metas = []
 players = []
+current_year = datetime.now().strftime("%Y")
 # START ROUTES
 
 
@@ -913,7 +914,7 @@ def get_league():
                            
                             
                     ) asset  
-                LEFT JOIN ktc_player_ranks ktc on replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff') = replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff')
+                LEFT JOIN ktc_player_ranks ktc on replace(replace(replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
                 ORDER BY asset.user_id, asset.position, asset.year, value desc
                 """
         )
@@ -1006,7 +1007,7 @@ def get_league():
                             where 1=1 
                             and dname.league_id = '{league_id}'   
                     ) asset  
-                left JOIN ktc_player_ranks ktc on replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff') = replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff')
+                left JOIN ktc_player_ranks ktc on replace(replace(replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
                 ORDER BY asset.user_id, asset.position, asset.year, value desc
                             )
                                                 group by 
@@ -1125,7 +1126,7 @@ def trade_tracker():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
-        current_season = 2022
+
         trades_cursor = db.execute(
             f"""select * 
                     from 
@@ -1153,7 +1154,7 @@ def trade_tracker():
                                     , p.player_id
                                     from player_trades pt
                                     inner join players p on pt.player_id = p.player_id
-                                    left join ktc_player_ranks ktc on replace(replace(replace(replace(p.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff') = replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff')
+                                    left join ktc_player_ranks ktc on replace(replace(replace(replace(replace(replace(p.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
                                     inner join draft_positions dp on pt.roster_id = dp.roster_id and dp.league_id = pt.league_id
                                     inner join managers m on dp.user_id = m.user_id
                                     where 1=1
@@ -1168,7 +1169,7 @@ def trade_tracker():
                                     ,a1.status_updated
                                     , a1.user_id
                                     , a1.transaction_type
-                                    , case when a1.season != '{current_season}' THEN replace(a1.asset, 'Mid', '') else a1.asset end as asset
+                                    , case when a1.season != '{current_year}' THEN replace(a1.asset, 'Mid', '') else a1.asset end as asset
                                     , ktc.sf_value 
                                     , m.display_name
                                     , null as player_id
@@ -1194,7 +1195,7 @@ def trade_tracker():
                                                 --and dpt.transaction_id IN ('832101872931274752')
                                                 
                                                 )  a1
-                                    inner join ktc_player_ranks ktc on replace(replace(replace(replace(a1.asset,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff') = replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff')
+                                    inner join ktc_player_ranks ktc on replace(replace(replace(replace(replace(replace(a1.asset,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
                                     inner join managers m on a1.user_id = m.user_id
                                     
                                     ) t1                              
@@ -1237,7 +1238,7 @@ def trade_tracker():
                                     , p.player_id
                                     from player_trades pt
                                     inner join players p on pt.player_id = p.player_id
-                                    left join ktc_player_ranks ktc on replace(replace(replace(replace(p.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff') = replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff')
+                                    left join ktc_player_ranks ktc on replace(replace(replace(replace(replace(replace(p.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
                                     inner join draft_positions dp on pt.roster_id = dp.roster_id and dp.league_id = pt.league_id
                                     inner join managers m on dp.user_id = m.user_id
                                     where 1=1
@@ -1278,7 +1279,7 @@ def trade_tracker():
                                                 --and transaction_type = 'add'
                                                 
                                                 )  a1
-                                    inner join ktc_player_ranks ktc on replace(replace(replace(replace(a1.asset,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff') = replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff')
+                                    inner join ktc_player_ranks ktc on replace(replace(replace(replace(replace(replace(a1.asset,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ktc.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
                                     inner join managers m on a1.user_id = m.user_id
                                     where 1=1 
                                     
