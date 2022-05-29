@@ -166,7 +166,6 @@ def get_managers(league_id: str) -> list:
         ["sleeper", i["user_id"], league_id, i["avatar"], i["display_name"]]
         for i in res.json()
     ]
-    print(manager_data)
 
     return manager_data
 
@@ -200,7 +199,7 @@ def clean_league_rosters(db, session_id: str, user_id: str, league_id: str) -> N
     delete_query = f"""DELETE FROM league_players where session_id = '{session_id}' and league_id = '{league_id}' """
     db.execute(delete_query)
     db.commit()
-    print("Players Deleted")
+    print("Players deleted.")
     return
 
 
@@ -208,7 +207,7 @@ def clean_player_trades(db, league_id: str) -> None:
     delete_query = f"""DELETE FROM player_trades where league_id = '{league_id}'"""
     db.execute(delete_query)
     db.commit()
-    print("Draft Picks Deleted")
+    print("Player trades deleted")
     return
 
 
@@ -216,7 +215,7 @@ def clean_draft_trades(db, league_id: str) -> None:
     delete_query = f"""DELETE FROM draft_pick_trades where league_id = '{league_id}'"""
     db.execute(delete_query)
     db.commit()
-    print("Draft Picks Trades Deleted")
+    print("Draft Picks Trades deleted")
     return
 
 
@@ -224,7 +223,7 @@ def clean_league_picks(db, session_id: str, league_id: str) -> None:
     delete_query = f"""DELETE FROM draft_picks where session_id = '{session_id}' and league_id = '{league_id}'"""
     db.execute(delete_query)
     db.commit()
-    print("Draft Picks Deleted")
+    print("Draft pick trades deleted")
     return
 
 
@@ -456,8 +455,9 @@ def total_owned_picks(
             db.commit()
 
 
-def draft_positions(db, league_id: str, draft_order: list = []) -> list:
+def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) -> list:
     draft_id = get_draft_id(league_id)
+    print("Draft_id", draft_id)
     draft = get_draft(draft_id["draft_id"])
 
     season = draft["season"]
@@ -465,10 +465,17 @@ def draft_positions(db, league_id: str, draft_order: list = []) -> list:
     roster_slot = {int(k): v for k, v in draft["slot_to_roster_id"].items()}
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
 
-    draft_order_dict = dict(
-        sorted(draft["draft_order"].items(), key=lambda item: item[1])
-    )
+    try:
+        draft_order_dict = dict(
+            sorted(draft["draft_order"].items(), key=lambda item: item[1])
+        )
+    except:
+        # if no draft is present then create all managers at mid level for picks
+        draft_order_dict = {i[0]: 5 for i in league_managers(league_id, user_id)}
+    print("draft_order_dict", draft_order_dict)
     draft_order_ = dict([(value, key) for key, value in draft_order_dict.items()])
+
+    print("draft_order", draft_order_)
 
     for draft_position, roster_id in rs_dict.items():
         if draft_position <= 4:
@@ -519,6 +526,7 @@ def insert_users(user_id: str, league_id: str):
         #         league_id,
         #         league_name,
         #         enrty_time])
+
         db.execute(
             """INSERT OR REPLACE INTO leagues (user_id, user_name, league_id, league_name, insert_date)
         VALUES (?,?,?,?,?)
@@ -691,7 +699,6 @@ players = []
 
 @bp.route("/", methods=("GET", "POST"))
 def index():
-    print(session.get("user_id", "NA"))
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
         return render_template("leagues/index.html", user_name=user_name)
@@ -703,7 +710,6 @@ def index():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         db = get_db()
         for league in leagues:
-            print(league)
             db.execute(
                 f"""INSERT OR REPLACE INTO current_leagues (session_id, user_id, user_name, league_id, league_name,avatar,total_rosters, insert_date)
                         VALUES (?,?,?,?,?,?,?,?)
@@ -748,7 +754,6 @@ def select_league():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
-            print("POST SELECT LEAGUE", league_id)
             # delete data players and picks
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
@@ -758,7 +763,7 @@ def select_league():
             # insert data
             insert_league_rosters(db, session_id, user_id, league_id)
             total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id)
+            draft_positions(db, league_id, user_id)
 
             return redirect(
                 url_for(
@@ -783,7 +788,7 @@ def select_league():
             # get trades
             trades = get_trades(league_id, get_sleeper_state())
             # insert trades draft Positions
-            draft_positions(db, league_id)
+            draft_positions(db, league_id, user_id)
             insert_trades(db, trades, league_id)
 
             return redirect(
@@ -826,7 +831,7 @@ def get_league():
             # get trades
             trades = get_trades(league_id, get_sleeper_state())
             # insert trades draft Positions
-            draft_positions(db, league_id)
+            draft_positions(db, league_id, user_id)
             insert_trades(db, trades, league_id)
 
             return redirect(
@@ -1073,7 +1078,7 @@ def my_leagues():
         )
 
     if len(leagues) > 0:
-        print(session_id)
+        # print(session_id)
         leagues_ran = [row[0] for row in leagues_ran]
         return render_template(
             "leagues/my_leagues.html",
@@ -1096,7 +1101,7 @@ def trade_tracker():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
-            print("POST SELECT LEAGUE", league_id)
+            # print("POST SELECT LEAGUE", league_id)
             # delete data players and picks
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
@@ -1106,7 +1111,7 @@ def trade_tracker():
             # insert data
             insert_league_rosters(db, session_id, user_id, league_id)
             total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id)
+            draft_positions(db, league_id, user_id)
 
             return redirect(
                 url_for(
