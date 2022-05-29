@@ -39,14 +39,17 @@
 
             </table>
         </div>
-        <div class="card border-0" style="width: 18rem;">
+        <div class="card border-0" style="width: 18em;">
             <div class="card-body">
                 <div class="list-group">
                     <form method="post" class="form-inline">
-                        <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings" value="{{session_id, user_id, league_id}}">Power
-                            Rankings</button>
-                        <br>
-                        <button class="btn btn-outline-secondary btn-lg" disabled>Trade Tracker</button>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings"
+                                value="{{session_id, user_id, league_id}}">Power
+                                Rankings</button>
+                            <br>
+                            <button class="btn btn-outline-secondary btn-lg" disabled>Trade Tracker</button>
+                        </div>
                 </div>
                 </form>
             </div>
@@ -68,7 +71,8 @@
             {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
             <div class="card" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
                 <h5 class="text-left">{{o}}</h5>
-                {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {% set total = asset.owner_total %}
+                {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {% set
+                total = asset.owner_total %}
                 <h4 class="text-right">{{total}}</h4>
 
                 {% endif %}

@@ -20,10 +20,10 @@
         <a class="btn btn-outline-primary" href="{{url_for('leagues.index')}}">User Name</a>
     </div>
 
-    <section class="content">
+    <div class="container">
         {% for message in get_flashed_messages() %}
         <div class="flash">{{ message }}</div>
         {% endfor %}
         {% block content %}{% endblock %}
-    </section>
+    </div>
 </body>

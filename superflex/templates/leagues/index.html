@@ -5,14 +5,15 @@
     KeepTradeCut to help you get a sense of where your team stands from a dynasty perspective.
     Enter your sleeper username below.</h5>
 <br>
-<div class="container my-5">
+<div class="container mb-3 justify-content-center" style="max-width: 540px;">
     <form method="post">
 
-        <div class="mb-3">
-            <label for="" class="form-label">Sleeper Username</label>
+        <div class="card mb-3 border-0" style="max-width: 540px;">
+            <label for="" class="form-label"><b>Sleeper Username</b></label>
             <input type="text" size="100" class="form-control input-lg" name="username" id="username"
                 value="{{ user_name[1] if user_name else request.form['username'] }}" required
                 placeholder="{{user_name[1] if user_name else 'User Name...'}}">
+            <br>
             <input type="submit" value="Submit">
             <p>Use username 'gray_matter' to preview features.</p>
         </div>
