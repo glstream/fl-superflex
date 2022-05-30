@@ -812,6 +812,7 @@ def select_league():
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = get_db()
+    date_ = datetime.now().strftime("%m-%d-%Y")
 
     if request.method == "POST":
         if list(request.form)[0] == "trade_tracker":
@@ -1036,6 +1037,7 @@ def get_league():
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
+            date_=date_,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1092,6 +1094,7 @@ def my_leagues():
 @bp.route("/trade_tracker", methods=["GET", "POST"])
 def trade_tracker():
     db = get_db()
+    date_ = datetime.now().strftime("%m-%d-%Y")
 
     if request.method == "POST":
         if list(request.form)[0] == "power_rankings":
@@ -1318,6 +1321,7 @@ def trade_tracker():
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
+            date_=date_,
         )
 
 
