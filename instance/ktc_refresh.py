@@ -5,10 +5,10 @@ from pathlib import Path
 import sqlite3, os
 from datetime import datetime
 
-top_dir = os.getcwd()
-flasker_db_name = os.path.join(top_dir, "dynastr.sqlite")
+# top_dir = os.getcwd()
+# flasker_db_name = os.path.join(top_dir, "dynastr.sqlite")
 
-con = sqlite3.connect(flasker_db_name)
+con = sqlite3.connect("/home/graymatter/fl-superflex/instance/dynastr.sqlite")
 cur = con.cursor()
 
 page = "0"
