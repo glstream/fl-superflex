@@ -974,7 +974,6 @@ def get_league():
                             , p.position
                             , p.age
                             , p.team
-                            -- , coalesce(ktc.sf_value,0) value
                             from league_players lp
                             inner join players p on lp.player_id = p.player_id
                             where 1=1
@@ -1126,6 +1125,8 @@ def trade_tracker():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        league_type = get_league_type(league_id)
+        print("LEAGUE_TYPE", league_type)
 
         trades_cursor = db.execute(
             f"""select * 
@@ -1137,10 +1138,10 @@ def trade_tracker():
                     , user_id
                     , transaction_type
                     , asset
-                    , sf_value
+                    , value
                     , display_name
                     , player_id sleeper_id
-                    , sum(sf_value) OVER (partition by transaction_id, user_id) owner_total
+                    , sum(value) OVER (partition by transaction_id, user_id) owner_total
                     , dense_rank() OVER (partition by transaction_id order by user_id) + dense_rank() OVER (partition by transaction_id order by user_id desc) - 1 num_managers
 
                     from   ( select pt.league_id
@@ -1149,7 +1150,7 @@ def trade_tracker():
                                     , dp.user_id
                                     , pt.transaction_type
                                     , p.full_name as asset
-                                    , coalesce(ktc.sf_value, 0) sf_value
+                                    , coalesce(ktc.{league_type}, 0) value
                                     , m.display_name
                                     , p.player_id
                                     from player_trades pt
@@ -1170,7 +1171,7 @@ def trade_tracker():
                                     , a1.user_id
                                     , a1.transaction_type
                                     , case when a1.season != '{current_year}' THEN replace(a1.asset, 'Mid', '') else a1.asset end as asset
-                                    , ktc.sf_value 
+                                    , ktc.{league_type} value
                                     , m.display_name
                                     , null as player_id
                                             from 
@@ -1201,17 +1202,17 @@ def trade_tracker():
                                     ) t1                              
                                     order by 
                                     status_updated desc
-                                    , sf_value  desc) t2
+                                    , value  desc) t2
                                     where t2.num_managers > 1
                                     order by t2.status_updated desc"""
         )
         analytics_cursor = db.execute(
             f""" select display_name
                     , count(distinct transaction_id) trades_cnt
-                    , sum(CASE WHEN transaction_type = 'add' THEN sf_value ELSE 0 END) as total_add
-                    , sum(CASE WHEN transaction_type = 'drop' THEN sf_value ELSE 0 END) as total_drop
-                    , sum(CASE WHEN transaction_type = 'add' THEN sf_value ELSE 0 END) - sum(CASE WHEN transaction_type = 'drop' THEN sf_value ELSE 0 END) total_diff
-                    , (sum(CASE WHEN transaction_type = 'add' THEN sf_value ELSE 0 END) - sum(CASE WHEN transaction_type = 'drop' THEN sf_value ELSE 0 END))/count(distinct transaction_id) as avg_per_trade
+                    , sum(CASE WHEN transaction_type = 'add' THEN value ELSE 0 END) as total_add
+                    , sum(CASE WHEN transaction_type = 'drop' THEN value ELSE 0 END) as total_drop
+                    , sum(CASE WHEN transaction_type = 'add' THEN value ELSE 0 END) - sum(CASE WHEN transaction_type = 'drop' THEN value ELSE 0 END) total_diff
+                    , (sum(CASE WHEN transaction_type = 'add' THEN value ELSE 0 END) - sum(CASE WHEN transaction_type = 'drop' THEN value ELSE 0 END))/count(distinct transaction_id) as avg_per_trade
                     
                     from 
                     (select
@@ -1221,10 +1222,10 @@ def trade_tracker():
                     , user_id
                     , transaction_type
                     , asset
-                    , sf_value
+                    , value
                     , display_name
                     , player_id
-                    , sum(sf_value) OVER (partition by transaction_id, user_id) owner_total
+                    , sum(value) OVER (partition by transaction_id, user_id) owner_total
                     , dense_rank() OVER (partition by transaction_id order by user_id) + dense_rank() OVER (partition by transaction_id order by user_id desc) - 1 num_managers
 
                     from   ( select pt.league_id
@@ -1233,7 +1234,7 @@ def trade_tracker():
                                     , dp.user_id
                                     , pt.transaction_type
                                     , p.full_name as asset
-                                    , coalesce(ktc.sf_value, 0) sf_value
+                                    , coalesce(ktc.{league_type}, 0) value
                                     , m.display_name
                                     , p.player_id
                                     from player_trades pt
@@ -1254,7 +1255,7 @@ def trade_tracker():
                                     , a1.user_id
                                     , a1.transaction_type
                                     , a1.asset
-                                    , ktc.sf_value 
+                                    , ktc.{league_type} value
                                     , m.display_name
                                     , null as player_id
                                             from 
@@ -1287,7 +1288,7 @@ def trade_tracker():
                                     ) t1                              
                                     order by 
                                     status_updated desc
-                                    , sf_value  desc) t2
+                                    , value  desc) t2
                                     where t2.num_managers > 1
                     group by display_name
                     order by trades_cnt desc
