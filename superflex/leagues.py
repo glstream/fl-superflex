@@ -458,7 +458,6 @@ def total_owned_picks(
 
 def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) -> list:
     draft_id = get_draft_id(league_id)
-    print("Draft_id", draft_id)
     draft = get_draft(draft_id["draft_id"])
 
     season = draft["season"]
@@ -473,10 +472,8 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     except:
         # if no draft is present then create all managers at mid level for picks
         draft_order_dict = {i[0]: 5 for i in league_managers(league_id, user_id)}
-    print("draft_order_dict", draft_order_dict)
-    draft_order_ = dict([(value, key) for key, value in draft_order_dict.items()])
 
-    print("draft_order", draft_order_)
+    draft_order_ = dict([(value, key) for key, value in draft_order_dict.items()])
 
     for draft_position, roster_id in rs_dict.items():
         if draft_position <= 4:
