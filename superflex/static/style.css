@@ -267,15 +267,31 @@ tr td {
   margin-bottom: -20px;
 }
 
-.card {
+.card-fr {
   margin-bottom: 25px;
   margin-top: 25px;
+  padding: 1.5em .5em .5em;
+  border-radius: 2em;
+  box-shadow: 0 5px 7px rgba(23, 120, 184, 0.2);
+  border: 2em;
+  border-style: solid;
+  border-width: 2px 2px 2px 2px;
+  border-color: rgb(10, 158, 180);
+  text-align: center;
 }
 
-.card-header {
+.btn-group.special {
+  display: flex;
+}
+
+.special .btn {
+  flex: 1
+}
+
+/* .card-header {
   border: none;
   background-color: rgba(0, 0, 0, .8);
-}
+} */
 
 .text-right {
   text-align: right;

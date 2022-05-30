@@ -74,7 +74,7 @@
         </h5>
         <br> {% for k, v in aps.items()%}
 
-        <div class="card" style="width: 20rem; margin-right: 3px;">
+        <div class="card-fr" style="width: 20rem; margin-right: 3px;">
             {% set position = k %}
             <div class="card-header bg-transparent">{{position}} Rank: {{owner[position+"_rank"] | suffix}}
                 {{"{:,}".format(owner[position+"_value"])}}

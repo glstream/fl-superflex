@@ -3,6 +3,7 @@ import os
 from flask import Flask
 import requests
 from datetime import datetime
+from flask import send_from_directory
 
 
 def create_app(test_config=None):
@@ -60,6 +61,14 @@ def create_app(test_config=None):
     def timestamp_convert(timestamp: int) -> str:
         trade_datetime = datetime.utcfromtimestamp(int(str(timestamp)[:10]))
         return trade_datetime.strftime("%m-%d-%Y")
+
+    @app.route("/favicon.ico")
+    def favicon():
+        return send_from_directory(
+            os.path.join(app.root_path, "static"),
+            "favicon.ico",
+            mimetype="image/vnd.microsoft.icon",
+        )
 
     from . import db, leagues
 
