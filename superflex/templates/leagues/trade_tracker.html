@@ -29,10 +29,10 @@
 
                     <tr style="">
                         <td scope="row" style="text-align:center">{{summary.display_name}}</td>
-                        <td style="text-align:center">{{summary.total_add}}</td>
-                        <td style="text-align:center">{{summary.total_drop}}</td>
-                        <td style="text-align:center">{{summary.total_diff}}</td>
-                        <td style="text-align:center">{{summary.avg_per_trade}}</td>
+                        <td style="text-align:center">{{"{:,}".format(summary.total_add)}}</td>
+                        <td style="text-align:center">{{"{:,}".format(summary.total_drop)}}</td>
+                        <td style="text-align:center">{{"{:,}".format(summary.total_diff)}}</td>
+                        <td style="text-align:center">{{"{:,}".format(summary.avg_per_trade)}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -66,8 +66,8 @@
 
     <div class="card border-0">
         <div class="row justify-content-center">
-            <h6 class="text-center">{{transaction_id[1] | timestamp_convert }}
-            </h6>
+            <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
+            </h4>
             {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
             <div class="card" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
                 <h5 class="text-left">{{o}}</h5>
@@ -81,7 +81,7 @@
                         <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
                             <img class="avatar-player"
                                 src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                        </object> {{ asset.asset }} {{"{:,}".format(asset.value)}}
+                        </object> {{ asset.asset }} &nbsp<b>{{"{:,}".format(asset.value)}}</b>
                     </li>
                     {% endfor %}
                 </ul>
