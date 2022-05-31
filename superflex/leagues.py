@@ -458,11 +458,14 @@ def total_owned_picks(
 
 def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) -> list:
     draft_id = get_draft_id(league_id)
+    print(draft_id)
     draft = get_draft(draft_id["draft_id"])
 
     season = draft["season"]
     rounds = draft["settings"]["rounds"]
-    roster_slot = {int(k): v for k, v in draft["slot_to_roster_id"].items()}
+    roster_slot = {
+        int(k): v for k, v in draft["slot_to_roster_id"].items() if v is not None
+    }
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
 
     try:
