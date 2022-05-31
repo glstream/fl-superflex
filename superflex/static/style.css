@@ -342,3 +342,10 @@ html {
   column-rule: dotted 1px #333;
   list-style-type: none;
 } */
+a:link {
+  text-decoration: none;
+}
+
+a {
+  font-size: 14px;
+}

@@ -14,12 +14,12 @@
 
 <body>
 
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom">
+    <div class="d-flex align-items-center p-3 mb-3 border-bottom">
         <img src="{{url_for('static', filename='SuperFlex.png')}}" width="30" height="30" alt="">
         <h5 class="my-0 mr-md-auto font-weight-normal" style="color:rgb(24, 195, 190);">Super</h5>
         <h5 class="my-0 mr-md-auto font-weight-normal" style="color:rgb(3, 174, 68);">Flex</h5>
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-4 text-dark" href="{{url_for('leagues.select_league')}}">Leagues</a>
+            <a id="Leagues" class="p-5 text-dark" href="{{url_for('leagues.select_league')}}">Leagues</a>
         </nav>
         <a class="btn btn-outline-primary" href="{{url_for('leagues.index')}}">User Name</a>
     </div>
