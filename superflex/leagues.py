@@ -458,7 +458,6 @@ def total_owned_picks(
 
 def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) -> list:
     draft_id = get_draft_id(league_id)
-    print(draft_id)
     draft = get_draft(draft_id["draft_id"])
 
     season = draft["season"]
