@@ -152,7 +152,7 @@ def get_traded_picks(league_id: str) -> list:
 
 def get_draft_id(league_id: str) -> str:
     draft = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/drafts")
-    draft_meta = draft.json()[-1]
+    draft_meta = draft.json()[0]
     return draft_meta
 
 
@@ -462,7 +462,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     draft = get_draft(draft_id["draft_id"])
 
     season = draft["season"]
-    rounds = draft["settings"]["rounds"]
+    rounds = draft_id["settings"]["rounds"]
     roster_slot = {
         int(k): v for k, v in draft["slot_to_roster_id"].items() if v is not None
     }
