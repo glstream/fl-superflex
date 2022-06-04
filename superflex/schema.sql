@@ -5,7 +5,8 @@
 DROP TABLE IF EXISTS owned_players;
 DROP TABLE IF EXISTS leagues;
 DROP TABLE IF EXISTS current_leagues;
--- DROP TABLE IF EXISTS ktc_player_ranks;
+-- DROP TABLE IF EXISTS ktc_player_ranks; 
+-- DROP TABLE IF EXISTS espn_player_projections;  
 -- DROP TABLE IF EXISTS fp_player_ranks;
 DROP TABLE IF EXISTS league_players;
 DROP TABLE IF EXISTS draft_positions;
@@ -122,6 +123,27 @@ CREATE TABLE IF NOT EXISTS ktc_player_ranks (
   sf_start_sit_positional_tier INTEGER,
   insert_date TEXT,
   PRIMARY KEY (ktc_player_id)
+);
+
+CREATE TABLE IF NOT EXISTS espn_player_projections (
+  player_name NOT NULL,
+  espn_player_id TEXT NOT NULL,
+  ppr_rank INT,
+  ppr_auction_value INT,
+  total_projection INT,
+  recs INT,
+  rec_yards INT,
+  rec_tds INT,
+  carries INT,
+  rush_yards INT,
+  rush_tds INT,
+  pass_attempts INT,
+  pass_completions INT,
+  pass_yards INT,
+  pass_tds INT,
+  pass_ints INT,
+  insert_date TEXT,
+  PRIMARY KEY (espn_player_id)
 );
 
 CREATE TABLE IF NOT EXISTS fp_player_ranks (
