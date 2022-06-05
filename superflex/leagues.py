@@ -717,6 +717,15 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
 
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+
             return redirect(
                 url_for(
                     "leagues.contender_rankings",
@@ -764,6 +773,31 @@ def get_league():
             return redirect(
                 url_for(
                     "leagues.trade_tracker",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "contender_rankings":
+            league_data = eval(request.form["contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.contender_rankings",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -1049,6 +1083,31 @@ def trade_tracker():
                     user_id=user_id,
                 )
             )
+        if list(request.form)[0] == "contender_rankings":
+            league_data = eval(request.form["contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
     if request.method == "GET":
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
@@ -1254,5 +1313,191 @@ def trade_tracker():
 
 @bp.route("/contender_rankings", methods=["GET", "POST"])
 def contender_rankings():
-    return render_template("leagues/contender_rankings.html")
+    db = get_db()
+    if request.method == "POST":
+        if list(request.form)[0] == "power_rankings":
+            league_data = eval(request.form["power_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.get_league",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "trade_tracker":
+
+            league_data = eval(request.form["trade_tracker"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # delete traded players and picks
+            clean_player_trades(db, league_id)
+            clean_draft_trades(db, league_id)
+            # get trades
+            trades = get_trades(league_id, get_sleeper_state())
+            # insert trades draft Positions
+            draft_positions(db, league_id, user_id)
+            insert_trades(db, trades, league_id)
+
+            return redirect(
+                url_for(
+                    "leagues.trade_tracker",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        league_type = get_league_type(league_id)
+        print("LEAGUE_TYPE", league_type)
+
+        contenders_cursor = db.execute(
+            f"""SELECT
+                    asset.user_id 
+                    , asset.league_id
+                    , asset.session_id
+                    , asset.year
+                    , asset.full_name
+                    , asset.position
+                    , asset.age
+                    , asset.team
+                    , asset.sleeper_id
+                    , coalesce(ep.total_projection,-1) value   
+                    from      
+                    (
+                    SELECT
+                        lp.user_id 
+                        , lp.league_id
+                        , lp.session_id
+                        , null as season
+                        , null as year
+                        , p.full_name full_name
+                        , p.position
+                        , p.age
+                        , p.team
+                        , p.player_id sleeper_id
+                        from league_players lp
+                        inner join players p on lp.player_id = p.player_id
+                        where 1=1
+                        and session_id = '{session_id}'
+                        and league_id = '{league_id}'
+                        and p.position != 'FB'                            
+                    ) asset  
+                LEFT JOIN espn_player_projections ep on replace(replace(replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ep.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
+                ORDER BY asset.user_id, asset.position, value desc
+        """
+        )
+        contenders = contenders_cursor.fetchall()
+
+        qbs = [player for player in contenders if player[5] == "QB"]
+        rbs = [player for player in contenders if player[5] == "RB"]
+        wrs = [player for player in contenders if player[5] == "WR"]
+        tes = [player for player in contenders if player[5] == "TE"]
+
+        c_aps = {"QB": qbs, "RB": rbs, "WR": wrs, "TE": tes}
+
+        c_owners_cursor = db.execute(
+            f"""SELECT 
+                    t3.user_id
+                    , m.display_name
+                    , total_value
+                    , total_rank
+                    , max(qb_value) as qb_value
+                    , DENSE_RANK() OVER (order by max(qb_value) desc) qb_rank
+                    , max(rb_value) as rb_value
+                    , DENSE_RANK() OVER (order by max(rb_value) desc) rb_rank
+                    , max(wr_value) as wr_value
+                    , DENSE_RANK() OVER (order by max(wr_value) desc) wr_rank
+                    , max(te_value) as te_value
+                    , DENSE_RANK() OVER (order by max(te_value) desc) te_rank
+
+                    from (select 
+                        user_id
+                        , sum(value) position_value
+                        , total_value
+                        , DENSE_RANK() OVER (PARTITION BY position  order by sum(value) desc) position_rank
+                        , DENSE_RANK() OVER (order by total_value desc) total_rank
+                        , position
+                        , case when position = "QB" THEN sum(value) else 0 end as qb_value
+                        , case when position = "RB" THEN sum(value) else 0 end as rb_value
+                        , case when position = "WR" THEN sum(value) else 0 end as wr_value
+                        , case when position = "TE" THEN sum(value) else 0 end as te_value
+                        from (SELECT
+                        asset.user_id 
+                        , asset.league_id
+                        , asset.session_id
+                        , asset.full_name
+                        , asset.position
+                        , asset.age
+                        , asset.team
+                        , coalesce(total_projection,0) value  
+                        , sum(coalesce(total_projection,0)) OVER (PARTITION BY asset.user_id) as total_value    
+                        from      
+                        (
+                        SELECT
+                            lp.user_id 
+                            ,lp.league_id
+                            ,lp.session_id
+                            , p.full_name full_name
+                            , p.position
+                            , p.age
+                            , p.team
+                            from league_players lp
+                            inner join players p on lp.player_id = p.player_id
+                            where 1=1
+                            and session_id = '{session_id}'
+                            and league_id = '{league_id}'
+                            and p.position != 'FB'  
+                    ) asset  
+                left JOIN espn_player_projections ep on replace(replace(replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = replace(replace(replace(replace(replace(replace(ep.player_name,'.',''), ' Jr', ''), ' III',''),'Jeffery','Jeff'), 'Joshua','Josh'),'William','Will')
+                ORDER BY asset.user_id, asset.position, value desc
+                            )
+                                                group by 
+                                                user_id
+                                                , position ) t3
+                                                INNER JOIN managers m on t3.user_id = m.user_id
+                                                group by 
+                                                t3.user_id
+                                                order by
+                                                total_value desc
+        """
+        )
+        c_owners = c_owners_cursor.fetchall()
+
+        return render_template(
+            "leagues/contender_rankings.html",
+            owners=c_owners,
+            league_name=get_league_name(league_id),
+            user_name=get_user_name(user_id)[1],
+            aps=c_aps,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+        )
+    else:
+        return redirect(url_for("leagues.index"))
 
