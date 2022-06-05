@@ -130,7 +130,7 @@ def insert_players(owned_players, session_id, league_id, user_id):
 
     db.executemany(
         "INSERT INTO owned_players (session_id, owner_league_id, owner_user_id, player_id, league_id, user_id, insert_date)"
-        " VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
         (own_players),
     )
     db.commit()
@@ -384,7 +384,8 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
         """INSERT OR REPLACE INTO league_players (session_id, owner_user_id, player_id, league_id, user_id, insert_date)
                 VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT (player_id, user_id) DO UPDATE
-                SET session_id =excluded.session_id, owner_user_id =excluded.owner_user_id, player_id =excluded.player_id, league_id =excluded.league_id, user_id =excluded.user_id, insert_date=excluded.insert_date""",
+                SET session_id =excluded.session_id, owner_user_id =excluded.owner_user_id, player_id =excluded.player_id, league_id =excluded.league_id, user_id =excluded.user_id, insert_date=excluded.insert_date
+                """,
         (league_players),
     )
     db.commit()
@@ -601,96 +602,6 @@ def data_sql_generator(
     return (data, col_names)
 
 
-async def get_api(session, call, call_type):
-    if call_type == "get_leagues":
-        url = "https://api.sleeper.app/v1/user/{}/leagues/nfl/2022".format(call)
-
-        async with session.get(url, ssl=False) as response:
-            if response.status == 200:
-                print(url, response.status)
-                payload = await response.json()
-                for result in payload:
-                    league_meta_tuple = result["league_id"]
-                    # print(league_meta_tuple)
-                    league_ids.append(
-                        league_meta_tuple
-                    ) if league_meta_tuple not in league_ids else None
-
-
-async def get_players_api(session, call):
-
-    url = "https://api.sleeper.app/v1/league/{}/rosters".format(call)
-
-    async with session.get(url, ssl=False) as response:
-        if response.status == 200:
-            print(url, response.status)
-            # league_ids.remove(call)
-            payload = await response.json()
-            league_metas.append(payload)
-            for league_rosters in league_metas:
-                for rosters in league_rosters:
-                    roster_tuple = (
-                        rosters["players"],
-                        rosters["owner_id"],
-                        rosters["league_id"],
-                    )
-                    players.append(
-                        roster_tuple
-                    ) if roster_tuple not in players else None
-
-
-async def concurent_players(calls, call_name: str = "get_players"):
-    tasks = [
-        asyncio.create_task(get_players_api(session, call, call_name)) for call in calls
-    ]
-    await asyncio.gather(*tasks)
-
-
-# async def con_gather(session_id, user_id, league_id, call_name: str = "get_leagues"):
-
-#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-#     if call_name == "get_leagues":
-#         user_ids = [i[0] for i in league_managers(league_id, user_id)]
-#     calls = (
-#         [i[0] for i in league_managers(league_id, user_id)]
-#         if call_name == "get_leagues"
-#         else call_id
-#     )
-#     leagues_connector = aiohttp.TCPConnector(limit=100)
-#     async with aiohttp.ClientSession(
-#         connector=leagues_connector, trust_env=True
-#     ) as session:
-#         tasks = [
-#             asyncio.create_task(get_api(session, call, call_name)) for call in calls
-#         ]
-#         await asyncio.gather(*tasks)
-
-#         if len(league_ids) > 0:
-#             roster_connector = aiohttp.TCPConnector(
-#                 limit=20, family=socket.AF_INET, verify_ssl=False
-#             )
-#             async with aiohttp.ClientSession(
-#                 connector=roster_connector, trust_env=True
-#             ) as session:
-#                 tasks = [
-#                     asyncio.create_task(get_players_api(session, league_id))
-#                     for league_id in league_ids
-#                 ]
-#                 await asyncio.gather(*tasks)
-
-#                 # await concurent_players(league_ids)
-
-#                 print("user_ids:", user_ids)
-#                 print("user_id:", user_id)
-#                 print("session_id:", session_id)
-#                 print("league_id:", league_id)
-#                 print("user_id:", user_id)
-#                 owned_players = [i for i in players if i[1] in user_ids]
-#                 delete_players(session_id, league_id, user_id)
-#                 insert_players(owned_players, session_id, league_id, user_id)
-#                 # return render_template('leagues/all_players_sql.html', owned_players=owned_players, session_id=session_id, user_id=user_id, league_id=league_id)
-
-
 league_ids = []
 league_metas = []
 players = []
@@ -795,6 +706,20 @@ def select_league():
             return redirect(
                 url_for(
                     "leagues.trade_tracker",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        elif list(request.form)[0] == "sel_contender_rankings":
+            league_data = eval(request.form["sel_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+
+            return redirect(
+                url_for(
+                    "leagues.contender_rankings",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -922,7 +847,7 @@ def get_league():
         players = cursor.fetchall()
 
         owners_value_cursor = db.execute(
-            f"""select 
+            f"""SELECT 
                     t3.user_id
                     , m.display_name
                     , total_value
@@ -1132,7 +1057,7 @@ def trade_tracker():
         print("LEAGUE_TYPE", league_type)
 
         trades_cursor = db.execute(
-            f"""select * 
+            f"""SELECT * 
                     from 
                     (select
                     league_id
@@ -1210,7 +1135,7 @@ def trade_tracker():
                                     order by t2.status_updated desc"""
         )
         analytics_cursor = db.execute(
-            f""" select display_name
+            f""" SELECT display_name
                     , count(distinct transaction_id) trades_cnt
                     , sum(CASE WHEN transaction_type = 'add' THEN value ELSE 0 END) as total_add
                     , sum(CASE WHEN transaction_type = 'drop' THEN value ELSE 0 END) as total_drop
@@ -1327,28 +1252,7 @@ def trade_tracker():
         )
 
 
-@bp.route("/all_players_async", methods=["GET", "POST"])
-def all_players_async():
-    user_id = request.args.get("user_id")
-    session_id = request.args.get("session_id")
-    league_id = request.args.get("league_id")
-    user_name = get_user_name(user_id)[-1]
-
-    all_data = data_sql_generator(session_id, user_name, user_id, league_id)
-    data = all_data[0]
-    col_names = all_data[1]
-    if len(data) > 0:
-        league_name = get_league_name(league_id)
-        return render_template(
-            "leagues/all_players_async.html",
-            data=data,
-            col_names=col_names,
-            user_name=user_name,
-            session_id=session_id,
-            owned_league=league_id,
-            user_id=user_id,
-            league_name=league_name,
-        )
-    else:
-        return redirect(url_for("leagues.index"))
+@bp.route("/contender_rankings", methods=["GET", "POST"])
+def contender_rankings():
+    return render_template("leagues/contender_rankings.html")
 
