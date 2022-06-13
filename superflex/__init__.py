@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask
 import requests
 from datetime import datetime
@@ -12,7 +11,6 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY="dev", DATABASE=os.path.join(app.instance_path, "dynastr.sqlite")
     )
-
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile("config.py", silent=True)
@@ -26,10 +24,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route("/hello")
-    def hello():
-        return "Hello, World!"
 
     @app.template_filter("get_user_name")
     def get_user_name(user_id: str) -> str:

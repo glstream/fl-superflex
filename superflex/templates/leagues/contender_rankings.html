@@ -7,12 +7,11 @@
     <div class="row justify-content-center">
         <div class="card" style="width: 18rem;">
             <div class="header">
-                <h4 style="padding:10px" class="title">Power Rankings</h4>
+                <h4 style="padding:10px" class="title">Contender Rankings</h4>
             </div>
             <ul class="list-group list-group-flush">
                 {% for owner in owners %}
-                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }} -
-                    {{"{:,}".format(owner.total_value)}}
+                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }} - {{"{:,}".format(owner.total_value)}}
                 </li>
                 {% endfor %}
             </ul>
@@ -52,12 +51,10 @@
                 <div class="list-group">
                     <form method="post" class="form-inline">
                         <div class="btn-group">
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings"
-                                value="{{session_id, user_id, league_id}}">Power
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings" value="{{session_id, user_id, league_id}}">Power
                                 Rankings</button>
                             <br>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
-                                value="{{session_id, user_id, league_id}}">Trade
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker" value="{{session_id, user_id, league_id}}">Trade
                                 Tracker</button>
                             <button class="btn btn-outline-secondary btn-lg" disabled>Contender Rankings</button>
                         </div>
@@ -68,19 +65,17 @@
 
     </div>
 </div>
-<p style="text-align: right">ESPN Player Projections Updated: 6/4/2022</p>
+<p style="text-align: right">ESPN Player Projections Updated: {{refresh_date}} </p>
 <div class="row">
     {% for owner in owners %}
     <div class="row justify-content-center">
-        <h5 class="text-left margin-left: 10px;">{{owner.display_name}} Total Value:
-            {{"{:,}".format(owner.total_value)}} Rank: {{owner.total_rank | suffix}}
+        <h5 class="text-left margin-left: 10px;">{{owner.display_name}} Total Value: {{"{:,}".format(owner.total_value)}} Rank: {{owner.total_rank | suffix}}
         </h5>
         <br> {% for k, v in aps.items()%}
 
         <div class="card-fr" style="width: 20rem; margin-right: 3px;">
             {% set position = k %}
-            <div class="card-header bg-transparent">{{position}} Rank: {{owner[position+"_rank"] | suffix}}
-                {{"{:,}".format(owner[position+"_value"])}}
+            <div class="card-header bg-transparent">{{position | upper}} Rank: {{owner[position+"_rank"] | suffix}} {{"{:,}".format(owner[position+"_value"])}}
             </div>
             <ul class="list-group">
                 {% for p in v if p.user_id == owner.user_id %}
