@@ -1,80 +1,71 @@
 -- Initialize the database.
 -- Drop any existing data and create empty tables.
 
--- DROP TABLE IF EXISTS players;
-DROP TABLE IF EXISTS owned_players;
-DROP TABLE IF EXISTS leagues;
-DROP TABLE IF EXISTS current_leagues;
--- DROP TABLE IF EXISTS ktc_player_ranks; 
--- DROP TABLE IF EXISTS espn_player_projections;  
--- DROP TABLE IF EXISTS fp_player_ranks;
-DROP TABLE IF EXISTS league_players;
-DROP TABLE IF EXISTS draft_positions;
-DROP TABLE IF EXISTS draft_picks;
-DROP TABLE IF EXISTS player_trades;
-DROP TABLE IF EXISTS draft_pick_trades; 
-DROP TABLE IF EXISTS managers;
+-- DROP TABLE IF EXISTS dynastr.players;
+DROP TABLE IF EXISTS dynastr.owned_players;
+DROP TABLE IF EXISTS dynastr.leagues;
+DROP TABLE IF EXISTS dynastr.current_leagues;
+-- DROP TABLE IF EXISTS dynastr.ktc_player_ranks;
+-- DROP TABLE IF EXISTS dynastr.espn_player_projections;  
+-- DROP TABLE IF EXISTS dynastr.fp_player_ranks;
+DROP TABLE IF EXISTS dynastr.league_players;
+DROP TABLE IF EXISTS dynastr.draft_positions;
+DROP TABLE IF EXISTS dynastr.draft_picks;
+DROP TABLE IF EXISTS dynastr.player_trades;
+DROP TABLE IF EXISTS dynastr.draft_pick_trades;
+DROP TABLE IF EXISTS dynastr.managers;
 
-CREATE TABLE IF NOT EXISTS players (
-  player_id TEXT PRIMARY KEY,
-  full_name TEXT NOT NULL,
-  position TEXT NOT NULL,
-  age TEXT,
-  team TEXT,
-  search_rank TEXT
+CREATE TABLE IF NOT EXISTS dynastr.players (
+  player_id VARCHAR(75) PRIMARY KEY,
+  full_name VARCHAR(75),
+  position VARCHAR(75),
+  age VARCHAR(75),
+  team VARCHAR(75),
+  search_rank VARCHAR(75)
 );
 
-CREATE TABLE leagues (
-  user_id TEXT NOT NULL,
-  user_name TEXT,
-  league_id TEXT,
-  league_name TEXT,
-  insert_date TEXT,
+CREATE TABLE dynastr.leagues (
+  user_id VARCHAR(75),
+  user_name VARCHAR(75),
+  league_id VARCHAR(75),
+  league_name VARCHAR(75),
+  insert_date VARCHAR(75),
   PRIMARY KEY (user_id, league_id)
 );
 
-CREATE TABLE owned_players (
-  session_id TEXT NOT NULL, 
-  owner_league_id TEXT NOT NULL,
-  owner_user_id TEXT NOT NULL,
-  player_id TEXT,
-  league_id TEXT NOT NULL,
-  user_id TEXT,
-  insert_date TEXT
-);
-
-CREATE TABLE league_players (
-  session_id TEXT NOT NULL, 
-  owner_user_id TEXT NOT NULL,
-  player_id TEXT  NOT NULL,
-  league_id TEXT NOT NULL,
-  user_id TEXT  NOT NULL,
-  insert_date TEXT,
+CREATE TABLE dynastr.league_players (
+  session_id VARCHAR(75),
+  owner_user_id VARCHAR(75),
+  player_id VARCHAR(75) ,
+  league_id VARCHAR(75),
+  user_id VARCHAR(75) ,
+  insert_date VARCHAR(75),
   PRIMARY KEY (user_id, player_id)
 );
 
-CREATE TABLE current_leagues (
-  session_id NOT NULL,
-  user_id TEXT NOT NULL,
-  user_name TEXT,
-  league_id TEXT,
-  league_name TEXT,
-  avatar TEXT,
-  total_rosters NUMBER,
-  insert_date TEXT,
+CREATE TABLE dynastr.current_leagues (
+  session_id VARCHAR(75),
+  user_id VARCHAR(75),
+  user_name VARCHAR(75),
+  league_id VARCHAR(75),
+  league_name VARCHAR(75),
+  avatar VARCHAR(75),
+  total_rosters integer,
+  sport VARCHAR(75),
+  insert_date VARCHAR(75),
   PRIMARY KEY (session_id, league_id)
 );
 
-CREATE TABLE IF NOT EXISTS ktc_player_ranks (
-  player_name NOT NULL,
-  ktc_player_id TEXT NOT NULL,
-  slug TEXT,
-  position TEXT,
-  position_id TEXT,
-  team TEXT,
-  rookie TEXT,
-  college TEXT,
-  age TEXT,
+CREATE TABLE IF NOT EXISTS dynastr.ktc_player_ranks (
+  player_name VARCHAR(75),
+  ktc_player_id VARCHAR(75),
+  slug VARCHAR(75),
+  position VARCHAR(75),
+  position_id VARCHAR(75),
+  team VARCHAR(75),
+  rookie VARCHAR(75),
+  college VARCHAR(75),
+  age VARCHAR(75),
   height_feet INTEGER,
   height_inches INTEGER,
   weight INTEGER,
@@ -121,110 +112,109 @@ CREATE TABLE IF NOT EXISTS ktc_player_ranks (
   sf_start_sit_positional_rank INTEGER,
   sf_start_sit_overall_tier INTEGER,
   sf_start_sit_positional_tier INTEGER,
-  insert_date TEXT,
+  insert_date VARCHAR(75),
   PRIMARY KEY (ktc_player_id)
 );
 
-CREATE TABLE IF NOT EXISTS espn_player_projections (
-  player_name NOT NULL,
-  espn_player_id TEXT NOT NULL,
-  ppr_rank INT,
-  ppr_auction_value INT,
-  total_projection INT,
-  recs INT,
-  rec_yards INT,
-  rec_tds INT,
-  carries INT,
-  rush_yards INT,
-  rush_tds INT,
-  pass_attempts INT,
-  pass_completions INT,
-  pass_yards INT,
-  pass_tds INT,
-  pass_ints INT,
-  insert_date TEXT,
+CREATE TABLE IF NOT EXISTS dynastr.espn_player_projections (
+  player_name VARCHAR(75),
+  espn_player_id VARCHAR(75),
+  ppr_rank INTEGER,
+  ppr_auction_value INTEGER,
+  total_projection INTEGER,
+  recs INTEGER,
+  rec_yards INTEGER,
+  rec_tds INTEGER,
+  carries INTEGER,
+  rush_yards INTEGER,
+  rush_tds INTEGER,
+  pass_attempts INTEGER,
+  pass_completions INTEGER,
+  pass_yards INTEGER,
+  pass_tds INTEGER,
+  pass_ints INTEGER,
+  insert_date VARCHAR(75),
   PRIMARY KEY (espn_player_id)
 );
 
-CREATE TABLE IF NOT EXISTS fp_player_ranks (
-  player_name TEXT NOT NULL,
-  fp_player_id TEXT NOT NULL,
-  player_team_id TEXT,
-  player_position_id TEXT,
-  player_positions TEXT,
-  player_short_name TEXT,
-  player_eligibility TEXT,
-  player_yahoo_positions TEXT,
-  player_page_url TEXT, 
-  player_square_image_url TEXT,
-  player_image_url TEXT,
-  player_yahoo_id TEXT, 
-  cbs_player_id TEXT,
-  player_bye_week TEXT, 
-  player_age TEXT,
-  player_ecr_delta TEXT,
-  rank_ecr TEXT,
-  rank_min TEXT,
-  rank_max TEXT,
-  rank_ave TEXT,
-  rank_std TEXT, 
-  pos_rank TEXT,
-  tier TEXT,
-  insert_date TEXT,
+CREATE TABLE IF NOT EXISTS dynastr.fp_player_ranks (
+  player_name VARCHAR(75),
+  fp_player_id VARCHAR(75),
+  player_team_id VARCHAR(75),
+  player_position_id VARCHAR(75),
+  player_positions VARCHAR(75),
+  player_short_name VARCHAR(75),
+  player_eligibility VARCHAR(75),
+  player_yahoo_positions VARCHAR(75),
+  player_page_url VARCHAR(75),
+  player_square_image_url VARCHAR(75),
+  player_image_url VARCHAR(75),
+  player_yahoo_id VARCHAR(75),
+  cbs_player_id VARCHAR(75),
+  player_bye_week VARCHAR(75),
+  player_age VARCHAR(75),
+  player_ecr_delta VARCHAR(75),
+  rank_ecr VARCHAR(75),
+  rank_min VARCHAR(75),
+  rank_max VARCHAR(75),
+  rank_ave VARCHAR(75),
+  rank_std VARCHAR(75),
+  pos_rank VARCHAR(75),
+  tier VARCHAR(75),
+  insert_date VARCHAR(75),
   PRIMARY KEY (fp_player_id)
   );
 
-CREATE TABLE IF NOT EXISTS draft_positions (
-    season TEXT,
-    rounds TEXT,
-    position TEXT,
-    position_name TEXT,
-    roster_id TEXT,
-    user_id TEXT,
-    league_id TEXT,
-    draft_id TEXT,
+CREATE TABLE IF NOT EXISTS dynastr.draft_positions (
+    season VARCHAR(75),
+    rounds VARCHAR(75),
+    position VARCHAR(75),
+    position_name VARCHAR(75),
+    roster_id VARCHAR(75),
+    user_id VARCHAR(75),
+    league_id VARCHAR(75),
+    draft_id VARCHAR(75),
     PRIMARY KEY (season, rounds, position, user_id, league_id)
 );
 
-CREATE TABLE IF NOT EXISTS draft_picks (
-    year TEXT,
-    round TEXT,
-    round_name TEXT,
-    roster_id TEXT,
-    owner_id TEXT,
-    league_id TEXT,
-    draft_id TEXT,
-    session_id TEXT,
+CREATE TABLE IF NOT EXISTS dynastr.draft_picks (
+    year VARCHAR(75),
+    round VARCHAR(75),
+    round_name VARCHAR(75),
+    roster_id VARCHAR(75),
+    owner_id VARCHAR(75),
+    league_id VARCHAR(75),
+    draft_id VARCHAR(75),
+    session_id VARCHAR(75),
     PRIMARY KEY (year, round, roster_id,owner_id, league_id, session_id)
 );
 
-CREATE TABLE IF NOT EXISTS player_trades (
-    transaction_id text,
-    status_updated int,
-    roster_id text,
-    transaction_type text,
-    player_id text,
-    league_id text
+CREATE TABLE IF NOT EXISTS dynastr.player_trades (
+    transaction_id VARCHAR(75),
+    status_updated INTEGER,
+    roster_id VARCHAR(75),
+    transaction_type VARCHAR(75),
+    player_id VARCHAR(75),
+    league_id VARCHAR(75)
 );
 
-CREATE TABLE IF NOT EXISTS draft_pick_trades (
-    transaction_id text,
-    status_updated number,
-    roster_id text,
-    transaction_type text,
-    season text,
-    round text,
-    round_suffix text, 
-    org_owner_id text,
-    league_id text
+CREATE TABLE IF NOT EXISTS dynastr.draft_pick_trades (
+    transaction_id VARCHAR(75),
+    status_updated integer,
+    roster_id VARCHAR(75),
+    transaction_type VARCHAR(75),
+    season VARCHAR(75),
+    round VARCHAR(75),
+    round_suffix VARCHAR(75),
+    org_owner_id VARCHAR(75),
+    league_id VARCHAR(75)
 );
 
-CREATE TABLE IF NOT EXISTS managers (
-    source text,
-    user_id number,
-    league_id text,
-    avatar text,
-    display_name text,
+CREATE TABLE IF NOT EXISTS dynastr.managers (
+    source VARCHAR(75),
+    user_id  VARCHAR(75),
+    league_id VARCHAR(75),
+    avatar VARCHAR(75),
+    display_name VARCHAR(75),
     PRIMARY KEY (user_id)
 );
-    
