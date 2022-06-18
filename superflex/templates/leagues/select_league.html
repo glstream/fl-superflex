@@ -5,21 +5,19 @@
     <div class="col-sm-3">
         <div class="card-fr">
             <div class="card-body">
-                <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{league[5]}}"
-                    type="image/png">
+                <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{league[5]}}" type="image/png">
                     <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                 </object>
                 <h5 class="card-title">{{league[4]}}</h5>
-                <p class="card-text"></p>
+                <span class="badge alert-secondary">{{league[6]}} Team</span>
+                <span class="badge alert-secondary">{{league[7] | upper }}</span>
+                <p></p>
                 <form method="post" class="form-inline">
                     <div class="row">
-                        <div class="btn-group" role="group"><button class="btn btn-outline-secondary" type="submit"
-                                name="sel_league_data" value="{{league[0],league[1],league[3],}}">Power
+                        <div class="btn-group" role="group"><button class="btn btn-outline-secondary" type="submit" name="sel_league_data" value="{{league[0],league[1],league[3],}}">Power
                                 Rankings</button>
-                            <button class="btn btn-outline-secondary" type="submit" name="sel_trade_tracker"
-                                value="{{league[0],league[1],league[3],}}">Trade Tracker</button>
-                            <button class="btn btn-outline-secondary" type="submit" name="sel_contender_rankings"
-                                value="{{league[0],league[1],league[3],}}">Contender Rankings</button>
+                            <button class="btn btn-outline-secondary" type="submit" name="sel_trade_tracker" value="{{league[0],league[1],league[3],}}">Trade Tracker</button>
+                            <button class="btn btn-outline-secondary" type="submit" name="sel_contender_rankings" value="{{league[0],league[1],league[3],}}">Contender Rankings</button>
                         </div>
                     </div>
                 </form>

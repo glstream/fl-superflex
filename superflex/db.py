@@ -9,9 +9,6 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-
-
-
 def get_db():
     """Connect to the application's configured database. The connection
     is unique for each request and will be reused if this is called
@@ -35,7 +32,7 @@ def pg_db():
     user = os.getenv('user')
     password = os.getenv('password')
     sslmode = os.getenv('sslmode')
-    conn_string = "host={0} user={1} dbname={2} password={3} sslmode={4}".format(host, user, dbname, password, sslmode)
+    conn_string = "host={0} user={1} dbname={2} password=superflex1! sslmode={4}".format(host, user, dbname, password, sslmode)
     g.db = psycopg2.connect(conn_string)
     # g.db = conn.cursor()
     g.db.autocommit = True

@@ -34,7 +34,7 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
     leagues_url = f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{year}"
     leagues_res = requests.get(leagues_url)
     leagues = [
-        (league["name"], league["league_id"], league["avatar"], league["total_rosters"])
+        (league["name"], league["league_id"], league["avatar"], league["total_rosters"], league["sport"])
         for league in leagues_res.json()
     ]
     return leagues
@@ -373,18 +373,7 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
                 league_player[5]
         ) for league_player in iter(league_players)], page_size=1000)
 
-    # cursor = db.cursor()
-    # execute_batch(cursor, """INSERT INTO dynastr.league_players (session_id, owner_user_id, player_id, league_id, user_id, insert_date)
-    # VALUES (%s, %s, %s, %s, %s, %s)
-    # ON CONFLICT (session_id, user_id, player_id)
-    # DO UPDATE SET league_id = EXCLUDED.league_id
-	#     , insert_date = EXCLUDED.insert_date
-    #     ;""", tuple(league_players), page_size=1000)          
-
     return
-    
-
-
 
 def total_owned_picks(
     db, league_id: str, session_id, base_picks: dict = {}, traded_picks_all: dict = {}
@@ -560,6 +549,7 @@ def index():
                 league[0],
                 league[2],
                 league[3],
+                league[4],
                 entry_time
             ) for league in iter(leagues)], page_size=1000)
 
@@ -1215,6 +1205,7 @@ def trade_tracker():
             session_id=session_id,
             user_id=user_id,
             date_=date_,
+            league_name=get_league_name(league_id),
         )
 
 
