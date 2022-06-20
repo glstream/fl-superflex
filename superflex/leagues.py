@@ -34,7 +34,13 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
     leagues_url = f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{year}"
     leagues_res = requests.get(leagues_url)
     leagues = [
-        (league["name"], league["league_id"], league["avatar"], league["total_rosters"], league["sport"])
+        (
+            league["name"],
+            league["league_id"],
+            league["avatar"],
+            league["total_rosters"],
+            league["sport"],
+        )
         for league in leagues_res.json()
     ]
     return leagues
@@ -143,29 +149,31 @@ def get_managers(league_id: str) -> list:
 
 def insert_managers(db, managers: list) -> None:
     with db.cursor() as cursor:
-        execute_values(cursor, """
+        execute_values(
+            cursor,
+            """
                 INSERT INTO dynastr.managers VALUES %s
                 ON CONFLICT (user_id)
                 DO UPDATE SET source = EXCLUDED.source
 	                        , league_id = EXCLUDED.league_id
                             , avatar = EXCLUDED.avatar
                             , display_name = EXCLUDED.display_name;;
-                """, [(
-                manager[0],
-                manager[1],
-                manager[2],
-                manager[3],
-                manager[4],
-        ) for manager in iter(managers)], page_size=1000)
+                """,
+            [
+                (manager[0], manager[1], manager[2], manager[3], manager[4])
+                for manager in iter(managers)
+            ],
+            page_size=1000,
+        )
     # cursor = db.cursor()
-    # execute_batch(cursor, """INSERT INTO dynastr.managers (source, user_id, league_id, avatar, display_name) 
-    # VALUES (%s, %s, %s, %s, %s) 
+    # execute_batch(cursor, """INSERT INTO dynastr.managers (source, user_id, league_id, avatar, display_name)
+    # VALUES (%s, %s, %s, %s, %s)
     # ON CONFLICT (user_id)
     # DO UPDATE SET source = EXCLUDED.source
-	#     , league_id = EXCLUDED.league_id
+    #     , league_id = EXCLUDED.league_id
     #     , avatar = EXCLUDED.avatar
     #     , display_name = EXCLUDED.display_name;
-    # """, tuple(managers), page_size=1000)          
+    # """, tuple(managers), page_size=1000)
     # db.commit()
     # cursor.close()
     return
@@ -194,7 +202,9 @@ def clean_league_rosters(db, session_id: str, user_id: str, league_id: str) -> N
 
 
 def clean_player_trades(db, league_id: str) -> None:
-    delete_query = f"""DELETE FROM dynastr.player_trades where league_id = '{league_id}'"""
+    delete_query = (
+        f"""DELETE FROM dynastr.player_trades where league_id = '{league_id}'"""
+    )
     cursor = db.cursor()
     cursor.execute(delete_query)
     db.commit()
@@ -203,7 +213,9 @@ def clean_player_trades(db, league_id: str) -> None:
 
 
 def clean_draft_trades(db, league_id: str) -> None:
-    delete_query = f"""DELETE FROM dynastr.draft_pick_trades where league_id = '{league_id}'"""
+    delete_query = (
+        f"""DELETE FROM dynastr.draft_pick_trades where league_id = '{league_id}'"""
+    )
     cursor = db.cursor()
     cursor.execute(delete_query)
     db.commit()
@@ -301,7 +313,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
                             draft_picks_[1],
                             suffix,
                             draft_picks_[2],
-                            league_id
+                            league_id,
                         ]
                     )
                     draft_drops_db.append(
@@ -324,18 +336,38 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
     draft_drops_db = dedupe(draft_drops_db)
 
     cursor = db.cursor()
-    execute_batch(cursor, """INSERT INTO dynastr.draft_pick_trades (transaction_id, status_updated, roster_id, transaction_type, season, round, round_suffix, org_owner_id, league_id)
+    execute_batch(
+        cursor,
+        """INSERT INTO dynastr.draft_pick_trades (transaction_id, status_updated, roster_id, transaction_type, season, round, round_suffix, org_owner_id, league_id)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
-    """, tuple(draft_adds_db), page_size=1000)   
-    execute_batch(cursor, """INSERT INTO dynastr.draft_pick_trades (transaction_id, status_updated, roster_id, transaction_type, season, round, round_suffix, org_owner_id, league_id)
+    """,
+        tuple(draft_adds_db),
+        page_size=1000,
+    )
+    execute_batch(
+        cursor,
+        """INSERT INTO dynastr.draft_pick_trades (transaction_id, status_updated, roster_id, transaction_type, season, round, round_suffix, org_owner_id, league_id)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)  
-    """, tuple(draft_drops_db), page_size=1000)   
-    execute_batch(cursor, """INSERT INTO dynastr.player_trades (transaction_id, status_updated, roster_id, transaction_type, player_id, league_id)
+    """,
+        tuple(draft_drops_db),
+        page_size=1000,
+    )
+    execute_batch(
+        cursor,
+        """INSERT INTO dynastr.player_trades (transaction_id, status_updated, roster_id, transaction_type, player_id, league_id)
     VALUES (%s, %s, %s, %s, %s, %s) 
-    """, tuple(player_adds_db), page_size=1000)   
-    execute_batch(cursor, """INSERT INTO dynastr.player_trades (transaction_id, status_updated, roster_id, transaction_type, player_id, league_id)
+    """,
+        tuple(player_adds_db),
+        page_size=1000,
+    )
+    execute_batch(
+        cursor,
+        """INSERT INTO dynastr.player_trades (transaction_id, status_updated, roster_id, transaction_type, player_id, league_id)
     VALUES (%s, %s, %s, %s, %s, %s) 
-    """, tuple(player_drops_db), page_size=1000)          
+    """,
+        tuple(player_drops_db),
+        page_size=1000,
+    )
     db.commit()
     cursor.close()
     return
@@ -359,21 +391,30 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
                 ]
             )
     with db.cursor() as cursor:
-        execute_values(cursor, """
+        execute_values(
+            cursor,
+            """
                 INSERT INTO dynastr.league_players VALUES %s
                 ON CONFLICT (session_id, user_id, player_id)
                 DO UPDATE SET league_id = EXCLUDED.league_id
 	                        , insert_date = EXCLUDED.insert_date;
-                """, [(
-                league_player[0],
-                league_player[1],
-                league_player[2],
-                league_player[3],
-                league_player[4],
-                league_player[5]
-        ) for league_player in iter(league_players)], page_size=1000)
+                """,
+            [
+                (
+                    league_player[0],
+                    league_player[1],
+                    league_player[2],
+                    league_player[3],
+                    league_player[4],
+                    league_player[5],
+                )
+                for league_player in iter(league_players)
+            ],
+            page_size=1000,
+        )
 
     return
+
 
 def total_owned_picks(
     db, league_id: str, session_id, base_picks: dict = {}, traded_picks_all: dict = {}
@@ -414,7 +455,7 @@ def total_owned_picks(
                 if [pick[0], pick[0]] in base_picks[year][round]:
                     base_picks[year][round].remove([pick[0], pick[0]])
                     base_picks[year][round].append(pick)
-    
+
     for year, round in base_picks.items():
         for round, picks in round.items():
             draft_picks = [
@@ -431,33 +472,40 @@ def total_owned_picks(
                 for pick in picks
             ]
             with db.cursor() as cursor:
-                execute_values(cursor, """
+                execute_values(
+                    cursor,
+                    """
                     INSERT INTO dynastr.draft_picks VALUES %s
                     ON CONFLICT (year, round, roster_id, owner_id, league_id, session_id)
                     DO UPDATE SET round_name = EXCLUDED.round_name
 	                              , draft_id = EXCLUDED.draft_id;
-                    """, [(
-                    draft_pick[0],
-                    draft_pick[1],
-                    draft_pick[2],
-                    draft_pick[3],
-                    draft_pick[4],
-                    draft_pick[5],
-                    draft_pick[6],
-                    draft_pick[7]
-                ) for draft_pick in iter(draft_picks)], page_size=1000)
+                    """,
+                    [
+                        (
+                            draft_pick[0],
+                            draft_pick[1],
+                            draft_pick[2],
+                            draft_pick[3],
+                            draft_pick[4],
+                            draft_pick[5],
+                            draft_pick[6],
+                            draft_pick[7],
+                        )
+                        for draft_pick in iter(draft_picks)
+                    ],
+                    page_size=1000,
+                )
 
             # cursor = db.cursor()
             # execute_batch(cursor, """INSERT INTO dynastr.draft_picks (year, round, round_name, roster_id,owner_id, league_id,draft_id, session_id)
             # VALUES (%s, %s, %s, %s, %s, %s,%s,%s)
             # ON CONFLICT (year, round, roster_id, owner_id, league_id, session_id)
             # DO UPDATE SET round_name = EXCLUDED.round_name
-	        #     , draft_id = EXCLUDED.draft_id;
-            # """, tuple(draft_picks), page_size=1000)          
+            #     , draft_id = EXCLUDED.draft_id;
+            # """, tuple(draft_picks), page_size=1000)
             # db.commit()
-            
+
     return
-           
 
 
 def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) -> None:
@@ -505,13 +553,18 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
             )
 
     cursor = db.cursor()
-    execute_batch(cursor, """INSERT into dynastr.draft_positions (season, rounds,  position, position_name, roster_id, user_id, league_id, draft_id)
+    execute_batch(
+        cursor,
+        """INSERT into dynastr.draft_positions (season, rounds,  position, position_name, roster_id, user_id, league_id, draft_id)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (season, rounds, position, user_id, league_id)
     DO UPDATE SET position_name = EXCLUDED.position_name
             ,roster_id = EXCLUDED.roster_id
             , draft_id = EXCLUDED.draft_id
-    ;""", tuple(draft_order), page_size=1000)          
+    ;""",
+        tuple(draft_order),
+        page_size=1000,
+    )
     db.commit()
     cursor.close()
     return
@@ -522,6 +575,7 @@ league_metas = []
 players = []
 current_year = datetime.now().strftime("%Y")
 # START ROUTES
+
 
 @bp.route("/", methods=("GET", "POST"))
 def index():
@@ -535,38 +589,57 @@ def index():
         user_id = session["user_id"] = get_user_id(user_name)
         leagues = user_leagues(str(user_id))
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
-        league_inserts = ((str(session_id),str(user_id),str(user_name),str(league[1]),str(league[0]),str(league[2]),str(league[3]),entry_time) for league in leagues)
-
+        league_inserts = (
+            (
+                str(session_id),
+                str(user_id),
+                str(user_name),
+                str(league[1]),
+                str(league[0]),
+                str(league[2]),
+                str(league[3]),
+                entry_time,
+            )
+            for league in leagues
+        )
 
         with db.cursor() as cursor:
-            execute_values(cursor, """
+            execute_values(
+                cursor,
+                """
                 INSERT INTO dynastr.current_leagues VALUES %s;
-                """, [(
-                session_id,
-                user_id,
-                user_name,
-                league[1],
-                league[0],
-                league[2],
-                league[3],
-                league[4],
-                entry_time
-            ) for league in iter(leagues)], page_size=1000)
+                """,
+                [
+                    (
+                        session_id,
+                        user_id,
+                        user_name,
+                        league[1],
+                        league[0],
+                        league[2],
+                        league[3],
+                        league[4],
+                        entry_time,
+                    )
+                    for league in iter(leagues)
+                ],
+                page_size=1000,
+            )
 
         # insert_execute_values_iterator(db, leagues)
 
-        # execute_batch(cursor, """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name,avatar,total_rosters, insert_date) 
+        # execute_batch(cursor, """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name,avatar,total_rosters, insert_date)
         # VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         # ON CONFLICT (session_id, league_id)
         # DO UPDATE SET user_id = EXCLUDED.user_id
-	    #             , user_name = EXCLUDED.user_name
+        #             , user_name = EXCLUDED.user_name
         #             , league_name = EXCLUDED.league_name
         #             , avatar = EXCLUDED.avatar
         #             , insert_date = EXCLUDED.insert_date;"""
-        # , league_inserts, page_size=1000)          
+        # , league_inserts, page_size=1000)
         # db.commit()
         # cursor.close()
-        
+
         return redirect(url_for("leagues.select_league"))
     return render_template("leagues/index.html")
 
@@ -601,7 +674,6 @@ def select_league():
             insert_league_rosters(db, session_id, user_id, league_id)
             total_owned_picks(db, league_id, session_id)
             draft_positions(db, league_id, user_id)
-
 
             return redirect(
                 url_for(
@@ -847,8 +919,8 @@ def get_league():
                         , asset.player_name
                         , asset.player_position
                         , asset.team
-                        , coalesce(ktc.sf_value,0) as value  
-                        , sum(coalesce(ktc.sf_value,0)) OVER (PARTITION BY asset.user_id) as total_value    
+                        , coalesce(ktc.{league_type},0) as value  
+                        , sum(coalesce(ktc.{league_type},0)) OVER (PARTITION BY asset.user_id) as total_value    
                         from      
                         (
                         SELECT
@@ -907,11 +979,11 @@ def get_league():
                                                total_value desc"""
         )
         owners = owner_cursor.fetchall()
-        qbs = [player for player in players if player['player_position'] == "QB"]
-        rbs = [player for player in players if player['player_position']   == "RB"]
-        wrs = [player for player in players if player['player_position']   == "WR"]
-        tes = [player for player in players if player['player_position']  == "TE"]
-        picks = [player for player in players if player['player_position']   == "PICKS"]
+        qbs = [player for player in players if player["player_position"] == "QB"]
+        rbs = [player for player in players if player["player_position"] == "RB"]
+        wrs = [player for player in players if player["player_position"] == "WR"]
+        tes = [player for player in players if player["player_position"] == "TE"]
+        picks = [player for player in players if player["player_position"] == "PICKS"]
 
         aps = {"qb": qbs, "rb": rbs, "wr": wrs, "te": tes, "picks": picks}
 
@@ -1181,17 +1253,21 @@ def trade_tracker():
 
         trades = trades_cursor.fetchall()
         summary_table = analytics_cursor.fetchall()
-        transaction_ids = list(set([(i['transaction_id'], i['status_updated']) for i in trades]))
+        transaction_ids = list(
+            set([(i["transaction_id"], i["status_updated"]) for i in trades])
+        )
         transaction_ids = sorted(
             transaction_ids,
             key=lambda x: datetime.utcfromtimestamp(int(str(x[-1])[:10])),
             reverse=True,
         )
-        managers_list = list(set([(i['display_name'], i['transaction_id']) for i in trades]))
+        managers_list = list(
+            set([(i["display_name"], i["transaction_id"]) for i in trades])
+        )
         trades_dict = {}
         for transaction_id in transaction_ids:
             trades_dict[transaction_id[0]] = {
-                i[0]: [p for p in trades if p['display_name'] == i[0]]
+                i[0]: [p for p in trades if p["display_name"] == i[0]]
                 for i in managers_list
                 if i[1] == transaction_id[0]
             }
@@ -1309,10 +1385,10 @@ def contender_rankings():
         )
         contenders = contenders_cursor.fetchall()
 
-        qbs = [player for player in contenders if player['player_position'] == "QB"]
-        rbs = [player for player in contenders if player['player_position'] == "RB"]
-        wrs = [player for player in contenders if player['player_position'] == "WR"]
-        tes = [player for player in contenders if player['player_position'] == "TE"]
+        qbs = [player for player in contenders if player["player_position"] == "QB"]
+        rbs = [player for player in contenders if player["player_position"] == "RB"]
+        wrs = [player for player in contenders if player["player_position"] == "WR"]
+        tes = [player for player in contenders if player["player_position"] == "TE"]
 
         c_aps = {"qb": qbs, "rb": rbs, "wr": wrs, "te": tes}
         c_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1381,7 +1457,9 @@ def contender_rankings():
         """
         )
         c_owners = c_owners_cursor.fetchall()
-        espn_date = datetime.strptime(contenders[0]['insert_date'], "%Y-%m-%dT%H:%M:%S.%f")
+        espn_date = datetime.strptime(
+            contenders[0]["insert_date"], "%Y-%m-%dT%H:%M:%S.%f"
+        )
         refresh_date = datetime.strftime(espn_date, "%m/%d/%Y")
 
         return render_template(
@@ -1393,7 +1471,7 @@ def contender_rankings():
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
-            refresh_date=refresh_date
+            refresh_date=refresh_date,
         )
     else:
         return redirect(url_for("leagues.index"))
