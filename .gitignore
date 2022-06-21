@@ -1,6 +1,4 @@
-/env
-/instance/dynastr.sqlite
-/__pycache__/
-instance/dynastr.sqlite
+env/
+__pycache__/
 .env
-/superflex/db.py
+superflex/db.py

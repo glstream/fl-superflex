@@ -10,8 +10,7 @@
             </div>
             <ul class="list-group list-group-flush">
                 {% for owner in owners %}
-                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }} -
-                    {{"{:,}".format(owner.total_value)}}
+                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }}
                 </li>
                 {% endfor %}
             </ul>
@@ -60,23 +59,20 @@
                                 value="{{session_id, user_id, league_id}}">Contender
                                 Rankings</button>
                         </div>
-                    </form>
                 </div>
-
+                </form>
             </div>
         </div>
     </div>
 
 </div>
 <div>
-    <form method="post" class="form-inline">
-        <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-secondary" disabled>KTC</button>
-            <button class="btn btn-secondary" type="submit" name="fp_rankings"
-                value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
-        </div>
-    </form>
-    <label style="float:right;">KTC Player Values Updated: {{date_}}</label>
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" disabled>KTC</button>
+        <button type="button" class="btn btn-secondary" type="submit" name="fp_rankings"
+            value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
+    </div>
+    <label style="float:right;">Fantasy Pros Player Values Updated: {{date_}}</label>
 </div>
 <br>
 <div class="row">
@@ -98,7 +94,7 @@
                 <li class="list-group-item d-flex align-items-center border-0">
                     <object class="avatar-player" data="{{p.sleeper_id | sleeper_img}}" type="image/png">
                         <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                    </object> {{p.full_name}} &nbsp<b>{{"{:,}".format(p.value)| replace(-1, "Unranked") }}</b>
+                    </object> {{p.full_name}} &nbsp<b>{{"{:,}".format(p.value)| replace(999, "Unranked") }}</b>
                 </li>
                 {% endfor %}
             </ul>

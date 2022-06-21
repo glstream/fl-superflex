@@ -33,16 +33,32 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
     owner_id = n_user_id(user_name)
     leagues_url = f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{year}"
     leagues_res = requests.get(leagues_url)
-    leagues = [
-        (
-            league["name"],
-            league["league_id"],
-            league["avatar"],
-            league["total_rosters"],
-            league["sport"],
+    leagues = []
+    for league in leagues_res.json():
+        qbs = len([i for i in league["roster_positions"] if i == "QB"])
+        rbs = len([i for i in league["roster_positions"] if i == "RB"])
+        wrs = len([i for i in league["roster_positions"] if i == "WR"])
+        tes = len([i for i in league["roster_positions"] if i == "TE"])
+        flexes = len([i for i in league["roster_positions"] if i == "FLEX"])
+        super_flexes = len([i for i in league["roster_positions"] if i == "SUPER_FLEX"])
+        starters = sum([qbs, rbs, wrs, tes, flexes, super_flexes])
+        leagues.append(
+            (
+                league["name"],
+                league["league_id"],
+                league["avatar"],
+                league["total_rosters"],
+                qbs,
+                rbs,
+                wrs,
+                tes,
+                flexes,
+                super_flexes,
+                starters,
+                len(league["roster_positions"]),
+                league["sport"],
+            )
         )
-        for league in leagues_res.json()
-    ]
     return leagues
 
 
@@ -589,19 +605,6 @@ def index():
         user_id = session["user_id"] = get_user_id(user_name)
         leagues = user_leagues(str(user_id))
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
-        league_inserts = (
-            (
-                str(session_id),
-                str(user_id),
-                str(user_name),
-                str(league[1]),
-                str(league[0]),
-                str(league[2]),
-                str(league[3]),
-                entry_time,
-            )
-            for league in leagues
-        )
 
         with db.cursor() as cursor:
             execute_values(
@@ -619,26 +622,20 @@ def index():
                         league[2],
                         league[3],
                         league[4],
+                        league[5],
+                        league[6],
+                        league[7],
+                        league[8],
+                        league[9],
+                        league[10],
+                        league[11],
+                        league[12],
                         entry_time,
                     )
                     for league in iter(leagues)
                 ],
                 page_size=1000,
             )
-
-        # insert_execute_values_iterator(db, leagues)
-
-        # execute_batch(cursor, """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name,avatar,total_rosters, insert_date)
-        # VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        # ON CONFLICT (session_id, league_id)
-        # DO UPDATE SET user_id = EXCLUDED.user_id
-        #             , user_name = EXCLUDED.user_name
-        #             , league_name = EXCLUDED.league_name
-        #             , avatar = EXCLUDED.avatar
-        #             , insert_date = EXCLUDED.insert_date;"""
-        # , league_inserts, page_size=1000)
-        # db.commit()
-        # cursor.close()
 
         return redirect(url_for("leagues.select_league"))
     return render_template("leagues/index.html")
@@ -745,11 +742,149 @@ def select_league():
         return redirect(url_for("leagues.index"))
 
 
+@bp.route("/get_league_fp", methods=("GET", "POST"))
+def get_league_fp():
+    db = pg_db()
+    date_ = datetime.now().strftime("%m/%d/%Y")
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        league_type = get_league_type(league_id)
+        print("LEAGUE_TYPE", league_type)
+
+        fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_cursor.execute(
+            f"""SELECT
+                    asset.user_id 
+                    , asset.league_id
+                    , asset.session_id
+                    , asset.year
+                    , asset.full_name
+                    , asset.player_position
+                    , asset.team
+                    , asset.sleeper_id
+                    , coalesce(fp.rank_ecr, 999) as value
+                    from      
+                    (
+                    SELECT
+                        lp.user_id 
+                        , lp.league_id
+                        , lp.session_id
+                        , null as season
+                        , null as year
+                        , p.full_name as full_name
+                        , p.player_name
+                        , p.player_position
+                        , p.team
+                        , p.player_id as sleeper_id
+                        from dynastr.league_players lp
+                        inner join dynastr.players p on lp.player_id = p.player_id
+                        where 1=1
+                        and session_id = '{session_id}'
+                        and league_id = '{league_id}'
+                        and p.player_position != 'FB'                            
+                    ) asset  
+                LEFT JOIN dynastr.fp_player_ranks fp on asset.player_name = fp.player_name
+                ORDER BY asset.user_id, asset.player_position, value asc
+        """
+        )
+        fp_players = fp_cursor.fetchall()
+
+        qbs = [player for player in fp_players if player["player_position"] == "QB"]
+        rbs = [player for player in fp_players if player["player_position"] == "RB"]
+        wrs = [player for player in fp_players if player["player_position"] == "WR"]
+        tes = [player for player in fp_players if player["player_position"] == "TE"]
+
+        fp_aps = {"qb": qbs, "rb": rbs, "wr": wrs, "te": tes}
+        fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_owners_cursor.execute(
+            f"""SELECT 
+                    t3.user_id
+                    , m.display_name
+                    , total_value
+                    , total_rank
+                    , max(qb_value) as qb_value
+                    , DENSE_RANK() OVER (order by max(qb_value) asc) qb_rank
+                    , max(rb_value) as rb_value
+                    , DENSE_RANK() OVER (order by max(rb_value) asc) rb_rank
+                    , max(wr_value) as wr_value
+                    , DENSE_RANK() OVER (order by max(wr_value) asc) wr_rank
+                    , max(te_value) as te_value
+                    , DENSE_RANK() OVER (order by max(te_value) asc) te_rank
+
+                    from (select 
+                        user_id
+                        , sum(value) as position_value
+                        , total_value
+                        , DENSE_RANK() OVER (PARTITION BY player_position  order by sum(value) asc) position_rank
+                        , DENSE_RANK() OVER (order by total_value asc) total_rank
+                        , player_position
+                        , case when player_position = 'QB' THEN sum(value) else 0 end as qb_value
+                        , case when player_position = 'RB' THEN sum(value) else 0 end as rb_value
+                        , case when player_position = 'WR' THEN sum(value) else 0 end as wr_value
+                        , case when player_position = 'TE' THEN sum(value) else 0 end as te_value
+                        from (SELECT
+                        asset.user_id 
+                        , asset.league_id
+                        , asset.session_id
+                        , asset.full_name
+                        , asset.player_position
+                        , asset.team
+                        , coalesce(fp.rank_ecr,0) as value  
+                        , sum(coalesce(fp.rank_ecr,0)) OVER (PARTITION BY asset.user_id) as total_value    
+                        from      
+                        (
+                        SELECT
+                            lp.user_id 
+                            ,lp.league_id
+                            ,lp.session_id
+                            , p.full_name full_name
+							, p.player_name
+                            , p.player_position
+                            , p.team
+                            from dynastr.league_players lp
+                            inner join dynastr.players p on lp.player_id = p.player_id
+                            where 1=1
+                            and session_id = '{session_id}'
+                            and league_id = '{league_id}'
+                            and p.player_position != 'FB'  
+                    ) asset  
+					LEFT JOIN dynastr.fp_player_ranks fp on asset.player_name = fp.player_name
+					ORDER BY asset.user_id, asset.player_position, value desc
+                            ) t2
+                                                group by 
+                                                user_id, t2.total_value
+                                                , player_position ) t3
+                                                INNER JOIN dynastr.managers m on cast(t3.user_id as varchar) = cast(m.user_id as varchar)
+                                                group by 
+                                                t3.user_id, m.display_name, total_value, total_rank
+                                                order by
+                                                total_value asc					
+        """
+        )
+        fp_owners = fp_owners_cursor.fetchall()
+
+        return render_template(
+            "leagues/get_league_fp.html",
+            owners=fp_owners,
+            league_name=get_league_name(league_id),
+            user_name=get_user_name(user_id)[1],
+            league_type=league_type,
+            aps=fp_aps,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+            date_=date_,
+        )
+
+
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
     date_ = datetime.now().strftime("%m/%d/%Y")
-
+    print(request.form)
     if request.method == "POST":
         if list(request.form)[0] == "trade_tracker":
 
@@ -798,6 +933,21 @@ def get_league():
             return redirect(
                 url_for(
                     "leagues.contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_rankings":
+            print("paspa")
+            print(request.form)
+            league_data = eval(request.form["fp_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
