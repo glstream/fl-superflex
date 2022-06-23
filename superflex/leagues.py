@@ -752,57 +752,696 @@ def get_league_fp():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         league_type = get_league_type(league_id)
+        lt = "sf_" if league_type == "sf_value" else "one_qb_"
         print("LEAGUE_TYPE", league_type)
 
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_cursor.execute(
-            f"""SELECT
-                    asset.user_id 
-                    , asset.league_id
-                    , asset.session_id
-                    , asset.year
-                    , asset.full_name
-                    , asset.player_position
-                    , asset.team
-                    , asset.sleeper_id
-                    , coalesce(fp.rank_ecr, 999) as value
-                    from      
-                    (
-                    SELECT
-                        lp.user_id 
-                        , lp.league_id
-                        , lp.session_id
-                        , null as season
-                        , null as year
-                        , p.full_name as full_name
-                        , p.player_name
-                        , p.player_position
-                        , p.team
-                        , p.player_id as sleeper_id
-                        from dynastr.league_players lp
-                        inner join dynastr.players p on lp.player_id = p.player_id
-                        where 1=1
-                        and session_id = '{session_id}'
-                        and league_id = '{league_id}'
-                        and p.player_position != 'FB'                            
-                    ) asset  
-                LEFT JOIN dynastr.fp_player_ranks fp on asset.player_name = fp.player_name
-                ORDER BY asset.user_id, asset.player_position, value asc
+            f"""select all_players.user_id 
+, all_players.display_name 
+, all_players.league_id
+, all_players.session_id
+, all_players.full_name
+, all_players.player_id as sleeper_id
+, all_players.player_position
+, all_players.fantasy_position
+, all_players.fantasy_designation
+, all_players.team
+, all_players.player_value
+, sum(all_players.player_value) OVER (PARTITION BY all_players.user_id) as total_value  
+from (SELECT
+lp.user_id 
+, m.display_name 
+, lp.league_id
+, lp.session_id
+, p.full_name as full_name
+, p.player_id
+, p.player_position
+, 'BENCH' as fantasy_position
+, 'BENCH' as fantasy_designation
+, p.team
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+from dynastr.league_players lp
+inner join dynastr.players p on lp.player_id = p.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on p.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and p.player_position != 'FB'    
+and fp.fp_player_id not in (				
+					select 
+					all_t.fp_player_id
+					from (
+					select
+					t2.user_id
+					, t2.display_name
+					, t2.league_id
+					, t2.session_id
+					, t2.full_name
+                    , t2.player_id
+					, t2.fp_player_id
+					, t2.team
+					, t2.player_position
+					, 'SUPER_FLEX' as fantasy_position
+					, t2.player_value
+					from 
+					(select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+                    , t1.player_id
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, t1.player_value
+					, t1.player_order
+					, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+					, t1.qb_cnt
+					, t1.rb_cnt
+					, t1.wr_cnt
+					, t1.te_cnt
+					, t1.flex_cnt
+					, t1.sf_cnt
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+                    , pl.player_id
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+					, qb_cnt
+					, rb_cnt
+					, wr_cnt
+					, te_cnt
+					, flex_cnt
+					, sf_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+                    and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position IN ('QB','RB', 'WR', 'TE')   
+					order by display_name, pl.player_position, player_value asc) t1
+					where 1=1
+					and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+					order by 
+					display_name, player_order asc) t2
+					where t2.flex_order <= sf_cnt
+					UNION ALL
+					select
+					t2.user_id
+					, t2.display_name
+					, t2.league_id
+					, t2.session_id
+					, t2.full_name
+                    , t2.player_id
+					, t2.fp_player_id
+					, t2.team
+					, t2.player_position
+					, 'FLEX' as fantasy_position
+					, t2.player_value
+					from 
+					(select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+                    , t1.player_id
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, t1.player_value
+					, t1.player_order
+					, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+					, t1.qb_cnt
+					, t1.rb_cnt
+					, t1.wr_cnt
+					, t1.te_cnt
+					, t1.flex_cnt
+					, t1.sf_cnt
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+                    , pl.player_id
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+					, qb_cnt
+					, rb_cnt
+					, wr_cnt
+					, te_cnt
+					, flex_cnt
+					, sf_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position IN ('RB', 'WR', 'TE')   
+					order by display_name, pl.player_position, player_value asc) t1
+					where 1=1
+					and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+					order by 
+					display_name, player_order asc) t2
+					where t2.flex_order <= t2.flex_cnt+sf_cnt and t2.flex_order > sf_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+                    , t1.player_id
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'RB' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+                    , pl.player_id
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, rb_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+                    and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'RB'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= rb_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+                    , t1.player_id
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'WR' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+                    , pl.player_id
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, wr_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'            
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'WR'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= wr_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+                    , t1.player_id
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'TE' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+                    , pl.player_id
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, te_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'            
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'TE'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= te_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+                    , t1.player_id
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'QB' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+                    , pl.player_id
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, qb_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'QB'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= qb_cnt
+					order by display_name, fantasy_position,player_value asc
+					) all_t
+)
+UNION ALL 			
+				
+select 
+all_t.user_id
+,all_t.display_name
+,all_t.league_id
+,all_t.session_id
+,all_t.full_name
+,all_t.player_id
+,all_t.player_position
+,all_t.fantasy_position
+, 'STARTER' as fantasy_designation
+,all_t.team
+,all_t.player_value as player_value
+--, sum(all_t.player_value) OVER (PARTITION BY all_t.user_id) as total_value  
+from (
+select
+t2.user_id
+, t2.display_name
+, t2.league_id
+, t2.session_id
+, t2.full_name
+, t2.player_id
+, t2.fp_player_id
+, t2.team
+, t2.player_position
+, 'SUPER_FLEX' as fantasy_position
+, t2.player_value
+from 
+(select 
+t1.user_id
+, t1.display_name
+, t1.league_id
+, t1.session_id
+, t1.full_name
+, t1.player_id
+, t1.fp_player_id
+, t1.team
+, t1.player_position
+, t1.player_value
+, t1.player_order
+, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+, t1.qb_cnt
+, t1.rb_cnt
+, t1.wr_cnt
+, t1.te_cnt
+, t1.flex_cnt
+, t1.sf_cnt
+from 
+(SELECT
+lp.user_id
+, m.display_name
+, lp.league_id
+, lp.session_id
+, pl.full_name as full_name
+, pl.player_id
+, fp.fp_player_id
+, pl.team
+, pl.player_position
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+, RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+, qb_cnt
+, rb_cnt
+, wr_cnt
+, te_cnt
+, flex_cnt
+, sf_cnt
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position != 'FB'   
+and pl.player_position IN ('QB','RB', 'WR', 'TE')   
+order by display_name, pl.player_position, player_value asc) t1
+where 1=1
+and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+order by 
+display_name, player_order asc) t2
+where t2.flex_order <= sf_cnt
+UNION ALL
+select
+t2.user_id
+, t2.display_name
+, t2.league_id
+, t2.session_id
+, t2.full_name
+, t2.player_id
+, t2.fp_player_id
+, t2.team
+, t2.player_position
+, 'FLEX' as fantasy_position
+, t2.player_value
+from 
+(select 
+t1.user_id
+, t1.display_name
+, t1.league_id
+, t1.session_id
+, t1.full_name
+, t1.player_id
+, t1.fp_player_id
+, t1.team
+, t1.player_position
+, t1.player_value
+, t1.player_order
+, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+, t1.qb_cnt
+, t1.rb_cnt
+, t1.wr_cnt
+, t1.te_cnt
+, t1.flex_cnt
+, t1.sf_cnt
+from 
+(SELECT
+lp.user_id
+, m.display_name
+, lp.league_id
+, lp.session_id
+, pl.full_name as full_name
+, pl.player_id
+, fp.fp_player_id
+, pl.team
+, pl.player_position
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+, RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+, qb_cnt
+, rb_cnt
+, wr_cnt
+, te_cnt
+, flex_cnt
+, sf_cnt
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position != 'FB'   
+and pl.player_position IN ('RB', 'WR', 'TE')   
+order by display_name, pl.player_position, player_value asc) t1
+where 1=1
+and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+order by 
+display_name, player_order asc) t2
+where t2.flex_order <= t2.flex_cnt+sf_cnt and t2.flex_order > sf_cnt
+UNION ALL 
+select 
+t1.user_id
+, t1.display_name
+, t1.league_id
+, t1.session_id
+, t1.full_name
+, t1.player_id
+, t1.fp_player_id
+, t1.team
+, t1.player_position
+, 'RB' as fantasy_position
+, t1.player_value
+from 
+(SELECT
+lp.user_id
+, m.display_name
+, lp.league_id
+, lp.session_id
+, pl.full_name as full_name
+, pl.player_id
+, fp.fp_player_id
+, pl.team
+, pl.player_position
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+, rb_cnt
+, flex_cnt
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position != 'FB'   
+and pl.player_position = 'RB'   
+order by display_name, pl.player_position, player_value asc) t1
+where player_order <= rb_cnt
+UNION ALL 
+select 
+t1.user_id
+, t1.display_name
+, t1.league_id
+, t1.session_id
+, t1.full_name
+, t1.player_id
+, t1.fp_player_id
+, t1.team
+, t1.player_position
+, 'WR' as fantasy_position
+, t1.player_value
+from 
+(SELECT
+lp.user_id
+, m.display_name
+, lp.league_id
+, lp.session_id
+, pl.full_name as full_name
+, pl.player_id
+, fp.fp_player_id
+, pl.team
+, pl.player_position
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+, wr_cnt
+, flex_cnt
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position != 'FB'   
+and pl.player_position = 'WR'   
+order by display_name, pl.player_position, player_value asc) t1
+where player_order <= wr_cnt
+UNION ALL 
+select 
+t1.user_id
+, t1.display_name
+, t1.league_id
+, t1.session_id
+, t1.full_name
+, t1.player_id
+, t1.fp_player_id
+, t1.team
+, t1.player_position
+, 'TE' as fantasy_position
+, t1.player_value
+from 
+(SELECT
+lp.user_id
+, m.display_name
+, lp.league_id
+, lp.session_id
+, pl.full_name as full_name
+, pl.player_id
+, fp.fp_player_id
+, pl.team
+, pl.player_position
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+, te_cnt
+, flex_cnt
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position != 'FB'   
+and pl.player_position = 'TE'   
+order by display_name, pl.player_position, player_value asc) t1
+where player_order <= te_cnt
+UNION ALL 
+select 
+t1.user_id
+, t1.display_name
+, t1.league_id
+, t1.session_id
+, t1.full_name
+, t1.player_id
+, t1.fp_player_id
+, t1.team
+, t1.player_position
+, 'QB' as fantasy_position
+, t1.player_value
+from 
+(SELECT
+lp.user_id
+, m.display_name
+, lp.league_id
+, lp.session_id
+, pl.full_name as full_name
+, pl.player_id
+, fp.fp_player_id
+, pl.team
+, pl.player_position
+, coalesce(fp.sf_rank_ecr, 529) as player_value
+, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+, qb_cnt
+, flex_cnt
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+inner join dynastr.managers m on lp.user_id = m.user_id
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+where 1=1
+and lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position != 'FB'   
+and pl.player_position = 'QB'   
+order by display_name, pl.player_position, player_value asc) t1
+where player_order <= qb_cnt
+order by display_name, fantasy_position,player_value asc
+) all_t) all_players  
+order by player_value asc
         """
         )
         fp_players = fp_cursor.fetchall()
 
-        qbs = [player for player in fp_players if player["player_position"] == "QB"]
-        rbs = [player for player in fp_players if player["player_position"] == "RB"]
-        wrs = [player for player in fp_players if player["player_position"] == "WR"]
-        tes = [player for player in fp_players if player["player_position"] == "TE"]
+        qbs = [player for player in fp_players if player["fantasy_position"] == "QB"]
+        rbs = [player for player in fp_players if player["fantasy_position"] == "RB"]
+        wrs = [player for player in fp_players if player["fantasy_position"] == "WR"]
+        tes = [player for player in fp_players if player["fantasy_position"] == "TE"]
+        flex = [player for player in fp_players if player["fantasy_position"] == "FLEX"]
+        super_flex = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "SUPER_FLEX"
+        ]
+        bench = [
+            player for player in fp_players if player["fantasy_position"] == "BENCH"
+        ]
 
-        fp_aps = {"qb": qbs, "rb": rbs, "wr": wrs, "te": tes}
+        fp_aps = {
+            "qb": qbs,
+            "rb": rbs,
+            "wr": wrs,
+            "te": tes,
+            "flex": flex,
+            "super_flex": super_flex,
+            "bench": bench,
+        }
+
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_owners_cursor.execute(
             f"""SELECT 
                     t3.user_id
-                    , m.display_name
+                    , t3.display_name
                     , total_value
                     , total_rank
                     , max(qb_value) as qb_value
@@ -813,56 +1452,662 @@ def get_league_fp():
                     , DENSE_RANK() OVER (order by max(wr_value) asc) wr_rank
                     , max(te_value) as te_value
                     , DENSE_RANK() OVER (order by max(te_value) asc) te_rank
+                    , max(flex_value) as flex_value
+                    , DENSE_RANK() OVER (order by max(flex_value) asc) flex_rank
+                    , max(super_flex_value) as super_flex_value
+                    , DENSE_RANK() OVER (order by max(super_flex_value) asc) super_flex_rank
+					, max(bench_value) as bench_value
+                    , DENSE_RANK() OVER (order by max(bench_value) asc) bench_rank
 
                     from (select 
-                        user_id
-                        , sum(value) as position_value
-                        , total_value
-                        , DENSE_RANK() OVER (PARTITION BY player_position  order by sum(value) asc) position_rank
-                        , DENSE_RANK() OVER (order by total_value asc) total_rank
-                        , player_position
-                        , case when player_position = 'QB' THEN sum(value) else 0 end as qb_value
-                        , case when player_position = 'RB' THEN sum(value) else 0 end as rb_value
-                        , case when player_position = 'WR' THEN sum(value) else 0 end as wr_value
-                        , case when player_position = 'TE' THEN sum(value) else 0 end as te_value
-                        from (SELECT
-                        asset.user_id 
-                        , asset.league_id
-                        , asset.session_id
-                        , asset.full_name
-                        , asset.player_position
-                        , asset.team
-                        , coalesce(fp.rank_ecr,0) as value  
-                        , sum(coalesce(fp.rank_ecr,0)) OVER (PARTITION BY asset.user_id) as total_value    
-                        from      
-                        (
-                        SELECT
-                            lp.user_id 
-                            ,lp.league_id
-                            ,lp.session_id
-                            , p.full_name full_name
-							, p.player_name
-                            , p.player_position
-                            , p.team
-                            from dynastr.league_players lp
-                            inner join dynastr.players p on lp.player_id = p.player_id
-                            where 1=1
-                            and session_id = '{session_id}'
-                            and league_id = '{league_id}'
-                            and p.player_position != 'FB'  
-                    ) asset  
-					LEFT JOIN dynastr.fp_player_ranks fp on asset.player_name = fp.player_name
-					ORDER BY asset.user_id, asset.player_position, value desc
-                            ) t2
-                                                group by 
-                                                user_id, t2.total_value
-                                                , player_position ) t3
-                                                INNER JOIN dynastr.managers m on cast(t3.user_id as varchar) = cast(m.user_id as varchar)
-                                                group by 
-                                                t3.user_id, m.display_name, total_value, total_rank
-                                                order by
-                                                total_value asc					
-        """
+                    user_id
+                    ,display_name
+                    , sum(player_value) as position_value
+                    , total_value
+                    , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) asc) position_rank
+                    , DENSE_RANK() OVER (order by total_value asc) total_rank
+                    , fantasy_position
+                    , case when fantasy_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                    , case when fantasy_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                    , case when fantasy_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                    , case when fantasy_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                    , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
+                    , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
+					, case when fantasy_position = 'BENCH' THEN sum(player_value) else 0 end as bench_value
+                    from 
+                    (select all_players.user_id 
+                    , all_players.display_name 
+                    , all_players.league_id
+                    , all_players.session_id
+                    , all_players.full_name
+                    , all_players.player_position
+                    , all_players.fantasy_position
+                    , all_players.fantasy_designation
+                    , all_players.team
+                    , all_players.player_value
+                    , sum(all_players.player_value) OVER (PARTITION BY all_players.user_id) as total_value  
+                    from (SELECT
+                    lp.user_id 
+                    , m.display_name 
+                    , lp.league_id
+                    , lp.session_id
+                    , p.full_name as full_name
+                    , p.player_position
+                    , 'BENCH' as fantasy_position
+                    , 'BENCH' as fantasy_designation
+                    , p.team
+                    , coalesce(fp.sf_rank_ecr, 529) as player_value
+                    from dynastr.league_players lp
+                    inner join dynastr.players p on lp.player_id = p.player_id
+                    LEFT JOIN dynastr.fp_player_ranks fp on p.player_name = fp.player_name
+                    inner join dynastr.managers m on lp.user_id = m.user_id
+                    where 1=1
+                    and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'        
+                    and p.player_position != 'FB'    
+                    and fp.fp_player_id not in (		
+					select 
+					all_t.fp_player_id
+					from (
+					select
+					t2.user_id
+					, t2.display_name
+					, t2.league_id
+					, t2.session_id
+					, t2.full_name
+					, t2.fp_player_id
+					, t2.team
+					, t2.player_position
+					, 'SUPER_FLEX' as fantasy_position
+					, t2.player_value
+					from 
+					(select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, t1.player_value
+					, t1.player_order
+					, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+					, t1.qb_cnt
+					, t1.rb_cnt
+					, t1.wr_cnt
+					, t1.te_cnt
+					, t1.flex_cnt
+					, t1.sf_cnt
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+					, qb_cnt
+					, rb_cnt
+					, wr_cnt
+					, te_cnt
+					, flex_cnt
+					, sf_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position IN ('QB','RB', 'WR', 'TE')   
+					order by display_name, pl.player_position, player_value asc) t1
+					where 1=1
+					and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+					order by 
+					display_name, player_order asc) t2
+					where  t2.flex_order <= sf_cnt
+					UNION ALL
+					select
+					t2.user_id
+					, t2.display_name
+					, t2.league_id
+					, t2.session_id
+					, t2.full_name
+					, t2.fp_player_id
+					, t2.team
+					, t2.player_position
+					, 'FLEX' as fantasy_position
+					, t2.player_value
+					from 
+					(select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, t1.player_value
+					, t1.player_order
+					, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+					, t1.qb_cnt
+					, t1.rb_cnt
+					, t1.wr_cnt
+					, t1.te_cnt
+					, t1.flex_cnt
+					, t1.sf_cnt
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+					, qb_cnt
+					, rb_cnt
+					, wr_cnt
+					, te_cnt
+					, flex_cnt
+					, sf_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position IN ('RB', 'WR', 'TE')   
+					order by display_name, pl.player_position, player_value asc) t1
+					where 1=1
+					and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+					order by 
+					display_name, player_order asc) t2
+					where t2.flex_order <= t2.flex_cnt+sf_cnt and t2.flex_order > sf_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'RB' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, rb_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'RB'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= rb_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'WR' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, wr_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'WR'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= wr_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'TE' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, te_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'TE'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= te_cnt
+					UNION ALL 
+					select 
+					t1.user_id
+					, t1.display_name
+					, t1.league_id
+					, t1.session_id
+					, t1.full_name
+					, t1.fp_player_id
+					, t1.team
+					, t1.player_position
+					, 'QB' as fantasy_position
+					, t1.player_value
+					from 
+					(SELECT
+					lp.user_id
+					, m.display_name
+					, lp.league_id
+					, lp.session_id
+					, pl.full_name as full_name
+					, fp.fp_player_id
+					, pl.team
+					, pl.player_position
+					, coalesce(fp.sf_rank_ecr, 529) as player_value
+					, RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+					, qb_cnt
+					, flex_cnt
+					from dynastr.league_players lp
+					inner join dynastr.players pl on lp.player_id = pl.player_id
+					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					inner join dynastr.managers m on lp.user_id = m.user_id
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					where 1=1
+					and lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
+					and pl.player_position != 'FB'   
+					and pl.player_position = 'QB'   
+					order by display_name, pl.player_position, player_value asc) t1
+					where player_order <= qb_cnt
+					order by display_name, fantasy_position,player_value asc
+					) all_t
+                        )
+                        UNION ALL 			
+                                        
+                        select 
+                        all_t.user_id
+                        ,all_t.display_name
+                        ,all_t.league_id
+                        ,all_t.session_id
+                        ,all_t.full_name
+                        ,all_t.player_position
+                        ,all_t.fantasy_position
+                        , 'STARTER' as fantasy_designation
+                        ,all_t.team
+                        ,all_t.player_value as player_value
+                        --, sum(all_t.player_value) OVER (PARTITION BY all_t.user_id) as total_value  
+                        from (
+                        select
+                        t2.user_id
+                        , t2.display_name
+                        , t2.league_id
+                        , t2.session_id
+                        , t2.full_name
+                        , t2.fp_player_id
+                        , t2.team
+                        , t2.player_position
+                        , 'SUPER_FLEX' as fantasy_position
+                        , t2.player_value
+                        from 
+                        (select 
+                        t1.user_id
+                        , t1.display_name
+                        , t1.league_id
+                        , t1.session_id
+                        , t1.full_name
+                        , t1.fp_player_id
+                        , t1.team
+                        , t1.player_position
+                        , t1.player_value
+                        , t1.player_order
+                        , RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+                        , t1.qb_cnt
+                        , t1.rb_cnt
+                        , t1.wr_cnt
+                        , t1.te_cnt
+                        , t1.flex_cnt
+                        , t1.sf_cnt
+                        from 
+                        (SELECT
+                        lp.user_id
+                        , m.display_name
+                        , lp.league_id
+                        , lp.session_id
+                        , pl.full_name as full_name
+                        , fp.fp_player_id
+                        , pl.team
+                        , pl.player_position
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+                        , RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+                        , qb_cnt
+                        , rb_cnt
+                        , wr_cnt
+                        , te_cnt
+                        , flex_cnt
+                        , sf_cnt
+                        from dynastr.league_players lp
+                        inner join dynastr.players pl on lp.player_id = pl.player_id
+                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        inner join dynastr.managers m on lp.user_id = m.user_id
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        where 1=1
+                        and lp.session_id = '{session_id}'
+                        and lp.league_id = '{league_id}'
+                        and pl.player_position != 'FB'   
+                        and pl.player_position IN ('QB','RB', 'WR', 'TE')   
+                        order by display_name, pl.player_position, player_value asc) t1
+                        where 1=1
+                        and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+                        order by 
+                        display_name, player_order asc) t2
+                        where t2.flex_order <= sf_cnt
+                        UNION ALL
+                        select
+                        t2.user_id
+                        , t2.display_name
+                        , t2.league_id
+                        , t2.session_id
+                        , t2.full_name
+                        , t2.fp_player_id
+                        , t2.team
+                        , t2.player_position
+                        , 'FLEX' as fantasy_position
+                        , t2.player_value
+                        from 
+                        (select 
+                        t1.user_id
+                        , t1.display_name
+                        , t1.league_id
+                        , t1.session_id
+                        , t1.full_name
+                        , t1.fp_player_id
+                        , t1.team
+                        , t1.player_position
+                        , t1.player_value
+                        , t1.player_order
+                        , RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+                        , t1.qb_cnt
+                        , t1.rb_cnt
+                        , t1.wr_cnt
+                        , t1.te_cnt
+                        , t1.flex_cnt
+                        , t1.sf_cnt
+                        from 
+                        (SELECT
+                        lp.user_id
+                        , m.display_name
+                        , lp.league_id
+                        , lp.session_id
+                        , pl.full_name as full_name
+                        , fp.fp_player_id
+                        , pl.team
+                        , pl.player_position
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY m.display_name ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+                        , RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as position_order
+                        , qb_cnt
+                        , rb_cnt
+                        , wr_cnt
+                        , te_cnt
+                        , flex_cnt
+                        , sf_cnt
+                        from dynastr.league_players lp
+                        inner join dynastr.players pl on lp.player_id = pl.player_id
+                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        inner join dynastr.managers m on lp.user_id = m.user_id
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        where 1=1
+                        and lp.session_id = '{session_id}'
+                        and lp.league_id = '{league_id}'
+                        and pl.player_position != 'FB'   
+                        and pl.player_position IN ('RB', 'WR', 'TE')   
+                        order by display_name, pl.player_position, player_value asc) t1
+                        where 1=1
+                        and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+                        order by 
+                        display_name, player_order asc) t2
+                        where t2.flex_order <= t2.flex_cnt+sf_cnt and t2.flex_order > sf_cnt
+                        UNION ALL 
+                        select 
+                        t1.user_id
+                        , t1.display_name
+                        , t1.league_id
+                        , t1.session_id
+                        , t1.full_name
+                        , t1.fp_player_id
+                        , t1.team
+                        , t1.player_position
+                        , 'RB' as fantasy_position
+                        , t1.player_value
+                        from 
+                        (SELECT
+                        lp.user_id
+                        , m.display_name
+                        , lp.league_id
+                        , lp.session_id
+                        , pl.full_name as full_name
+                        , fp.fp_player_id
+                        , pl.team
+                        , pl.player_position
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+                        , rb_cnt
+                        , flex_cnt
+                        from dynastr.league_players lp
+                        inner join dynastr.players pl on lp.player_id = pl.player_id
+                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        inner join dynastr.managers m on lp.user_id = m.user_id
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        where 1=1
+                        and lp.session_id = '{session_id}'
+                        and lp.league_id = '{league_id}'
+                        and pl.player_position != 'FB'   
+                        and pl.player_position = 'RB'   
+                        order by display_name, pl.player_position, player_value asc) t1
+                        where player_order <= rb_cnt
+                        UNION ALL 
+                        select 
+                        t1.user_id
+                        , t1.display_name
+                        , t1.league_id
+                        , t1.session_id
+                        , t1.full_name
+                        , t1.fp_player_id
+                        , t1.team
+                        , t1.player_position
+                        , 'WR' as fantasy_position
+                        , t1.player_value
+                        from 
+                        (SELECT
+                        lp.user_id
+                        , m.display_name
+                        , lp.league_id
+                        , lp.session_id
+                        , pl.full_name as full_name
+                        , fp.fp_player_id
+                        , pl.team
+                        , pl.player_position
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+                        , wr_cnt
+                        , flex_cnt
+                        from dynastr.league_players lp
+                        inner join dynastr.players pl on lp.player_id = pl.player_id
+                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        inner join dynastr.managers m on lp.user_id = m.user_id
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        where 1=1
+                        and lp.session_id = '{session_id}'
+                        and lp.league_id = '{league_id}'
+                        and pl.player_position != 'FB'   
+                        and pl.player_position = 'WR'   
+                        order by display_name, pl.player_position, player_value asc) t1
+                        where player_order <= wr_cnt
+                        UNION ALL 
+                        select 
+                        t1.user_id
+                        , t1.display_name
+                        , t1.league_id
+                        , t1.session_id
+                        , t1.full_name
+                        , t1.fp_player_id
+                        , t1.team
+                        , t1.player_position
+                        , 'TE' as fantasy_position
+                        , t1.player_value
+                        from 
+                        (SELECT
+                        lp.user_id
+                        , m.display_name
+                        , lp.league_id
+                        , lp.session_id
+                        , pl.full_name as full_name
+                        , fp.fp_player_id
+                        , pl.team
+                        , pl.player_position
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+                        , te_cnt
+                        , flex_cnt
+                        from dynastr.league_players lp
+                        inner join dynastr.players pl on lp.player_id = pl.player_id
+                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        inner join dynastr.managers m on lp.user_id = m.user_id
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        where 1=1
+                        and lp.session_id = '{session_id}'
+                        and lp.league_id = '{league_id}'
+                        and pl.player_position != 'FB'   
+                        and pl.player_position = 'TE'   
+                        order by display_name, pl.player_position, player_value asc) t1
+                        where player_order <= te_cnt
+                        UNION ALL 
+                        select 
+                        t1.user_id
+                        , t1.display_name
+                        , t1.league_id
+                        , t1.session_id
+                        , t1.full_name
+                        , t1.fp_player_id
+                        , t1.team
+                        , t1.player_position
+                        , 'QB' as fantasy_position
+                        , t1.player_value
+                        from 
+                        (SELECT
+                        lp.user_id
+                        , m.display_name
+                        , lp.league_id
+                        , lp.session_id
+                        , pl.full_name as full_name
+                        , fp.fp_player_id
+                        , pl.team
+                        , pl.player_position
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY m.display_name, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc)as player_order
+                        , qb_cnt
+                        , flex_cnt
+                        from dynastr.league_players lp
+                        inner join dynastr.players pl on lp.player_id = pl.player_id
+                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        inner join dynastr.managers m on lp.user_id = m.user_id
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        where 1=1
+                        and lp.session_id = '{session_id}'
+                        and lp.league_id = '{league_id}'
+                        and pl.player_position != 'FB'   
+                        and pl.player_position = 'QB'   
+                        order by display_name, pl.player_position, player_value asc) t1
+                        where player_order <= qb_cnt
+                        order by display_name, fantasy_position,player_value asc
+                        ) all_t) all_players
+                        ) t2 
+                                            group by 
+                    t2.user_id
+                    , t2.display_name
+                    , t2.total_value
+                    , t2.fantasy_position) t3
+                    group by 
+                    t3.user_id
+                    , t3.display_name
+                    , total_value
+                    , total_rank
+                    order by
+                    total_value asc"""
         )
         fp_owners = fp_owners_cursor.fetchall()
 
@@ -1519,6 +2764,7 @@ def contender_rankings():
                         , null as season
                         , null as year
                         , p.full_name as full_name
+                        , p.player_name
                         , p.player_position
                         , p.team
                         , p.player_id as sleeper_id
@@ -1529,7 +2775,7 @@ def contender_rankings():
                         and league_id = '{league_id}'
                         and p.player_position != 'FB'                            
                     ) asset  
-                LEFT JOIN dynastr.espn_player_projections ep on replace(replace(replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = ep.player_name
+                LEFT JOIN dynastr.espn_player_projections ep on asset.player_name = ep.player_name
                 ORDER BY asset.user_id, asset.player_position, value desc
         """
         )
@@ -1584,6 +2830,7 @@ def contender_rankings():
                             ,lp.league_id
                             ,lp.session_id
                             , p.full_name full_name
+                            , p.player_name
                             , p.player_position
                             , p.team
                             from dynastr.league_players lp
@@ -1593,7 +2840,7 @@ def contender_rankings():
                             and league_id = '{league_id}'
                             and p.player_position != 'FB'  
                     ) asset  
-                left JOIN dynastr.espn_player_projections ep on replace(replace(replace(replace(replace(replace(asset.full_name,'.', ''), ' Jr', ''), ' III',''), 'Jeffery','Jeff'),'Joshua','Josh'),'William','Will') = ep.player_name
+                left JOIN dynastr.espn_player_projections ep on asset.player_name = ep.player_name
                 ORDER BY asset.user_id, asset.player_position, value desc
                             ) t2
                                                 group by 

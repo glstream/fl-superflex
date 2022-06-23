@@ -26,7 +26,9 @@
                         <th>RB</th>
                         <th>WR</th>
                         <th>TE</th>
-                        <th>PICKS</th>
+                        <th>FLEX</th>
+                        <th>SUPER FLEX</th>
+                        <th>BENCH</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,7 +96,7 @@
                 <li class="list-group-item d-flex align-items-center border-0">
                     <object class="avatar-player" data="{{p.sleeper_id | sleeper_img}}" type="image/png">
                         <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                    </object> {{p.full_name}} &nbsp<b>{{"{:,}".format(p.value)| replace(999, "Unranked") }}</b>
+                    </object> {{p.full_name}} &nbsp<b>{{"{:,}".format(p.player_value)| replace(999, "Unranked") }}</b>
                 </li>
                 {% endfor %}
             </ul>
