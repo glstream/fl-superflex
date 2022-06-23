@@ -746,6 +746,74 @@ def select_league():
 def get_league_fp():
     db = pg_db()
     date_ = datetime.now().strftime("%m/%d/%Y")
+    if request.method == "POST":
+        if list(request.form)[0] == "trade_tracker":
+
+            league_data = eval(request.form["trade_tracker"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # delete traded players and picks
+            clean_player_trades(db, league_id)
+            clean_draft_trades(db, league_id)
+            # get trades
+            trades = get_trades(league_id, get_sleeper_state())
+            # insert trades draft Positions
+            draft_positions(db, league_id, user_id)
+            insert_trades(db, trades, league_id)
+
+            return redirect(
+                url_for(
+                    "leagues.trade_tracker",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "contender_rankings":
+            league_data = eval(request.form["contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "ktc_rankings":
+            print("paspa")
+            print(request.form)
+            league_data = eval(request.form["ktc_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")

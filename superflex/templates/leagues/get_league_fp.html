@@ -69,11 +69,14 @@
 
 </div>
 <div>
-    <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-secondary" disabled>KTC</button>
-        <button type="button" class="btn btn-secondary" type="submit" name="fp_rankings"
-            value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
-    </div>
+    <form method="post" class="form-inline">
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button class="btn btn-secondary" type="submit" name="ktc_rankings"
+                value="{{session_id, user_id, league_id}}">KTC</button>
+            <button class="btn btn-secondary" type="submit" name="fp_rankings"
+                value="{{session_id, user_id, league_id}}" disabled>Fantasy Pros</button>
+        </div>
+    </form>
     <label style="float:right;">Fantasy Pros Player Values Updated: {{date_}}</label>
 </div>
 <br>
