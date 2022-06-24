@@ -3,4 +3,5 @@ __pycache__/
 .env
 superflex/db.py
 superflex/__pycache__/*.pyc
+superflex/__pycache__/*.*.pyc
 /superflex/__pycache__/*.pyc
