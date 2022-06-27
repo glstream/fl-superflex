@@ -16,13 +16,15 @@ DROP TABLE IF EXISTS dynastr.draft_pick_trades;
 DROP TABLE IF EXISTS dynastr.managers;
 
 CREATE TABLE IF NOT EXISTS dynastr.players (
-  player_id VARCHAR(75) PRIMARY KEY,
-  full_name VARCHAR(75),
-  position VARCHAR(75),
-  age VARCHAR(75),
-  team VARCHAR(75),
-  search_rank VARCHAR(75)
+  player_id VARCHAR(150) PRIMARY KEY,
+  first_name VARCHAR(150),
+  last_name VARCHAR(150), 
+  full_name VARCHAR(150),
+  player_position VARCHAR(150),
+  age VARCHAR(150),
+  team VARCHAR(150)
 );
+
 
 CREATE TABLE dynastr.leagues (
   user_id VARCHAR(75),
@@ -125,8 +127,10 @@ CREATE TABLE IF NOT EXISTS dynastr.ktc_player_ranks (
 );
 
 CREATE TABLE IF NOT EXISTS dynastr.espn_player_projections (
-  player_name VARCHAR(75),
-  espn_player_id VARCHAR(75),
+  player_first_name VARCHAR(150),
+  player_last_name VARCHAR(150),
+  player_full_name VARCHAR(150),
+  espn_player_id VARCHAR(150),
   ppr_rank INTEGER,
   ppr_auction_value INTEGER,
   total_projection INTEGER,
@@ -146,7 +150,9 @@ CREATE TABLE IF NOT EXISTS dynastr.espn_player_projections (
 );
 
 CREATE TABLE IF NOT EXISTS dynastr.fp_player_ranks (
-  player_name VARCHAR(100),
+  player_first_name VARCHAR(150),
+  player_last_name VARCHAR(150),
+  player_full_name VARCHAR(150),
   fp_player_id VARCHAR(100),
   player_team_id VARCHAR(100),
   player_position_id VARCHAR(100),
@@ -161,14 +167,22 @@ CREATE TABLE IF NOT EXISTS dynastr.fp_player_ranks (
   cbs_player_id VARCHAR(100),
   player_bye_week VARCHAR(100),
   player_age integer,
-  player_ecr_delta VARCHAR(100),
-  rank_ecr integer,
-  rank_min integer,
-  rank_max integer,
-  rank_ave VARCHAR(100),
-  rank_std VARCHAR(100),
-  pos_rank VARCHAR(100),
-  tier integer,
+  sf_player_ecr_delta VARCHAR(100),
+  sf_rank_ecr integer,
+  sf_rank_min integer,
+  sf_rank_max integer,
+  sf_rank_ave VARCHAR(100),
+  sf_rank_std VARCHAR(100),
+  sf_pos_rank VARCHAR(100),
+  sf_tier integer,
+  one_qb_player_ecr_delta VARCHAR(100),
+  one_qb_rank_ecr integer,
+  one_qb_rank_min integer,
+  one_qb_rank_max integer,
+  one_qb_rank_ave VARCHAR(100),
+  one_qb_rank_std VARCHAR(100),
+  one_qb_pos_rank VARCHAR(100),
+  one_qb_tier integer,
   insert_date VARCHAR(100),
   PRIMARY KEY (fp_player_id)
   );

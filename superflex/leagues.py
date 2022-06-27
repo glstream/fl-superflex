@@ -851,7 +851,7 @@ lp.user_id
 , coalesce(fp.sf_rank_ecr, 529) as player_value
 from dynastr.league_players lp
 inner join dynastr.players p on lp.player_id = p.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on p.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(p.first_name, p.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 where 1=1
 and lp.session_id = '{session_id}'
@@ -915,7 +915,7 @@ and fp.fp_player_id not in (
 					, sf_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -984,7 +984,7 @@ and fp.fp_player_id not in (
 					, sf_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1028,7 +1028,7 @@ and fp.fp_player_id not in (
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1068,7 +1068,7 @@ and fp.fp_player_id not in (
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1108,7 +1108,7 @@ and fp.fp_player_id not in (
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1148,7 +1148,7 @@ and fp.fp_player_id not in (
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1231,7 +1231,7 @@ lp.user_id
 , sf_cnt
 from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 where 1=1
@@ -1300,7 +1300,7 @@ lp.user_id
 , sf_cnt
 from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 where 1=1
@@ -1344,7 +1344,7 @@ lp.user_id
 , flex_cnt
 from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 where 1=1
@@ -1384,7 +1384,7 @@ lp.user_id
 , flex_cnt
 from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 where 1=1
@@ -1424,7 +1424,7 @@ lp.user_id
 , flex_cnt
 from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 where 1=1
@@ -1464,7 +1464,7 @@ lp.user_id
 , flex_cnt
 from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
-LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
 inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 where 1=1
@@ -1567,7 +1567,7 @@ order by player_value asc
                     , coalesce(fp.sf_rank_ecr, 529) as player_value
                     from dynastr.league_players lp
                     inner join dynastr.players p on lp.player_id = p.player_id
-                    LEFT JOIN dynastr.fp_player_ranks fp on p.player_name = fp.player_name
+                    LEFT JOIN dynastr.fp_player_ranks fp on concat(p.first_name, p.last_name) = concat(fp.player_first_name, fp.player_last_name)
                     inner join dynastr.managers m on lp.user_id = m.user_id
                     where 1=1
                     and lp.session_id = '{session_id}'
@@ -1628,7 +1628,7 @@ order by player_value asc
 					, sf_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1694,7 +1694,7 @@ order by player_value asc
 					, sf_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1736,7 +1736,7 @@ order by player_value asc
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1774,7 +1774,7 @@ order by player_value asc
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1812,7 +1812,7 @@ order by player_value asc
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1850,7 +1850,7 @@ order by player_value asc
 					, flex_cnt
 					from dynastr.league_players lp
 					inner join dynastr.players pl on lp.player_id = pl.player_id
-					LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
 					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
 					where 1=1
@@ -1929,7 +1929,7 @@ order by player_value asc
                         , sf_cnt
                         from dynastr.league_players lp
                         inner join dynastr.players pl on lp.player_id = pl.player_id
-                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
                         inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
                         where 1=1
@@ -1995,7 +1995,7 @@ order by player_value asc
                         , sf_cnt
                         from dynastr.league_players lp
                         inner join dynastr.players pl on lp.player_id = pl.player_id
-                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
                         inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
                         where 1=1
@@ -2037,7 +2037,7 @@ order by player_value asc
                         , flex_cnt
                         from dynastr.league_players lp
                         inner join dynastr.players pl on lp.player_id = pl.player_id
-                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
                         inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
                         where 1=1
@@ -2075,7 +2075,7 @@ order by player_value asc
                         , flex_cnt
                         from dynastr.league_players lp
                         inner join dynastr.players pl on lp.player_id = pl.player_id
-                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
                         inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
                         where 1=1
@@ -2113,7 +2113,7 @@ order by player_value asc
                         , flex_cnt
                         from dynastr.league_players lp
                         inner join dynastr.players pl on lp.player_id = pl.player_id
-                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
                         inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
                         where 1=1
@@ -2151,7 +2151,7 @@ order by player_value asc
                         , flex_cnt
                         from dynastr.league_players lp
                         inner join dynastr.players pl on lp.player_id = pl.player_id
-                        LEFT JOIN dynastr.fp_player_ranks fp on pl.player_name = fp.player_name
+                        LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
                         inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
                         where 1=1
@@ -2280,13 +2280,13 @@ def get_league():
                     , asset.session_id
                     , asset.year
                     , CASE WHEN asset.year = asset.season THEN asset.full_name
-                            ELSE replace(asset.full_name, 'Mid ','') END AS full_name
+                        ELSE replace(asset.full_name, 'Mid ','') END AS full_name
                     , asset.full_name
                     , asset.player_name
                     , asset.player_position
                     , asset.team
                     , asset.sleeper_id
-                    , coalesce(ktc.{league_type},-1) as value   
+                    , value   
                     from      
                     (
                     SELECT
@@ -2296,47 +2296,62 @@ def get_league():
                         , null as season
                         , null as year
                         , p.full_name full_name
-                        , p.player_name player_name
+                        , p.full_name player_name
                         , p.player_position
                         , p.team
                         , p.player_id sleeper_id
-                        -- , coalesce(ktc.sf_value,0) as value
+                        , coalesce(ktc.{league_type},-1) as value  
+
                         from dynastr.league_players lp
                         inner join dynastr.players p on lp.player_id = p.player_id
+                        LEFT JOIN dynastr.ktc_player_ranks ktc on concat(p.first_name, p.last_name) = concat(ktc.player_first_name, ktc.player_last_name)
                         where 1=1
                         and session_id = '{session_id}'
                         and league_id = '{league_id}'
                         and p.player_position != 'FB'
-                    UNION ALL         
-                    SELECT  
-                        al.user_id
-                        , al.league_id
-                        , null as session_id
-                        , al.season
-                        , al.year 
-                        , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name 
-                                                        ELSE al.year|| ' Mid ' || al.round_name END AS full_name
-                        , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name 
-                                                        ELSE al.year|| ' Mid ' || al.round_name END AS player_name 
-                        , 'PICKS' as position
-                        , null as team
-                        , null as sleeper_id
-                        FROM (                           
-                            SELECT dp.roster_id, dp.year, dp.round_name, dp.league_id, dpos.user_id, dpos.season
-                            FROM dynastr.draft_picks dp
-                            inner join dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id  
+                    UNION ALL 
+                    SELECT 
+                    t3.user_id
+                    , t3.league_id
+                    , t3.session_id
+                    , t3.season
+                    , t3.year
+                    , t3.full_name
+                    , t3.player_name
+                    , t3.position
+                    , t3.team
+                    , t3.sleeper_id
+                    , coalesce(ktc.{league_type},-1) as value  
+                    FROM
+                       (SELECT  
+                            al.user_id
+                            , al.league_id
+                            , null as session_id
+                            , al.season
+                            , al.year 
+                            , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name 
+                                                            ELSE al.year|| ' Mid ' || al.round_name END AS full_name
+                            , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name 
+                                                            ELSE al.year|| ' Mid ' || al.round_name END AS player_name 
+                            , 'PICKS' as position
+                            , null as team
+                            , null as sleeper_id
+                            FROM (                           
+                                SELECT dp.roster_id, dp.year, dp.round_name, dp.league_id, dpos.user_id, dpos.season
+                                FROM dynastr.draft_picks dp
+                                inner join dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id  
 
-                            where 1=1
-                            and dp.league_id = '{league_id}'
-                            and dpos.league_id = '{league_id}'
-                            and dp.session_id = '{session_id}'
-                            ) al 
-                        inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id
-                        where 1=1 
-                        and dname.league_id = '{league_id}'
-      
+                                where 1=1
+                                and dp.league_id = '{league_id}'
+                                and dpos.league_id = '{league_id}'
+                                and dp.session_id = '{session_id}'
+                                ) al 
+                            inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id
+                            where 1=1 
+                            and dname.league_id = '{league_id}'
+                            ) t3
+                    LEFT JOIN dynastr.ktc_player_ranks ktc on t3.player_name = ktc.player_full_name
                     ) asset  
-                LEFT JOIN dynastr.ktc_player_ranks ktc on asset.player_name = ktc.player_name
                 ORDER BY asset.user_id, asset.player_position, asset.year, value desc
                 """
         )
@@ -2382,54 +2397,73 @@ def get_league():
                         , asset.player_name
                         , asset.player_position
                         , asset.team
-                        , coalesce(ktc.{league_type},0) as value  
-                        , sum(coalesce(ktc.{league_type},0)) OVER (PARTITION BY asset.user_id) as total_value    
+                        , value  
+                        , sum(value) OVER (PARTITION BY asset.user_id) as total_value    
                         from      
                         (
                         SELECT
-                            lp.user_id
-                            ,lp.league_id
-                            ,lp.session_id
-                            , null as season
-                            , null as year
-                            , p.full_name full_name
-                            , p.player_name player_name
-                            , p.player_position
-                            , p.team
-                            from dynastr.league_players lp
-                            inner join dynastr.players p on lp.player_id = p.player_id
-                            where 1=1
-                            and session_id = '{session_id}'
-                            and league_id = '{league_id}'
-                            and p.player_position != 'FB'
-                        UNION ALL        
-                        SELECT  
+                        lp.user_id 
+                        , lp.league_id
+                        , lp.session_id
+                        , null as season
+                        , null as year
+                        , p.full_name full_name
+                        , p.full_name player_name
+                        , p.player_position
+                        , p.team
+                        , p.player_id sleeper_id
+                        , coalesce(ktc.{league_type},-1) as value  
+
+                        from dynastr.league_players lp
+                        inner join dynastr.players p on lp.player_id = p.player_id
+                        LEFT JOIN dynastr.ktc_player_ranks ktc on concat(p.first_name, p.last_name) = concat(ktc.player_first_name, ktc.player_last_name)
+                        where 1=1
+                        and session_id = '{session_id}'
+                        and league_id = '{league_id}'
+                        and p.player_position != 'FB'
+                    UNION ALL 
+                    SELECT 
+                    t3.user_id
+                    , t3.league_id
+                    , t3.session_id
+                    , t3.season
+                    , t3.year
+                    , t3.full_name
+                    , t3.player_name
+                    , t3.position
+                    , t3.team
+                    , t3.sleeper_id
+                    , coalesce(ktc.{league_type},-1) as value  
+                    FROM
+                       (SELECT  
                             al.user_id
                             , al.league_id
                             , null as session_id
                             , al.season
-                            , al.year
-                            , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name
+                            , al.year 
+                            , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name 
                                                             ELSE al.year|| ' Mid ' || al.round_name END AS full_name
-                            , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name
-                            ELSE al.year|| ' Mid ' || al.round_name END AS player_name
-                            , 'PICKS' as player_position
+                            , case when al.year = dname.season THEN al.year|| ' ' || dname.position_name|| ' ' || al.round_name 
+                                                            ELSE al.year|| ' Mid ' || al.round_name END AS player_name 
+                            , 'PICKS' as position
                             , null as team
-                            FROM (                          
+                            , null as sleeper_id
+                            FROM (                           
                                 SELECT dp.roster_id, dp.year, dp.round_name, dp.league_id, dpos.user_id, dpos.season
                                 FROM dynastr.draft_picks dp
                                 inner join dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id  
 
                                 where 1=1
                                 and dp.league_id = '{league_id}'
-                                and dp.session_id = '{session_id}'
                                 and dpos.league_id = '{league_id}'
-                                ) al
+                                and dp.session_id = '{session_id}'
+                                ) al 
                             inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id
-                            where 1=1
-                            and dname.league_id = '{league_id}'  
+                            where 1=1 
+                            and dname.league_id = '{league_id}'
+                            ) t3
+                    LEFT JOIN dynastr.ktc_player_ranks ktc on t3.player_name = ktc.player_full_name
                     ) asset  
-                left JOIN dynastr.ktc_player_ranks ktc on asset.player_name = ktc.player_name
                 ORDER BY asset.user_id, asset.player_position, asset.year, value desc
                             ) t2
                                                 group by
@@ -2555,13 +2589,13 @@ def trade_tracker():
                                     , dp.user_id
                                     , pt.transaction_type
                                     , p.full_name as asset
-                                    , p.player_name 
+                                    , p.full_name player_name
                                     , coalesce(ktc.{league_type}, 0) as value
                                     , m.display_name
                                     , p.player_id
                                     from dynastr.player_trades pt
                                     inner join dynastr.players p on pt.player_id = p.player_id
-                                    left join dynastr.ktc_player_ranks ktc on p.player_name = ktc.player_name
+                                    left join dynastr.ktc_player_ranks ktc on concat(p.first_name, p.last_name) = concat(ktc.player_first_name, ktc.player_last_name)
                                     inner join dynastr.draft_positions dp on pt.roster_id = dp.roster_id and dp.league_id = pt.league_id
                                     inner join dynastr.managers m on cast(dp.user_id as varchar) = cast(m.user_id as varchar)
                                     where 1=1
@@ -2607,7 +2641,7 @@ def trade_tracker():
                                                 --and dpt.transaction_id IN ('832101872931274752')
                                                 
                                                 )  a1
-                                    inner join dynastr.ktc_player_ranks ktc on a1.player_name = ktc.player_name
+                                    inner join dynastr.ktc_player_ranks ktc on a1.player_name = ktc.player_full_name
                                     inner join dynastr.managers m on cast(a1.user_id as varchar) = cast(m.user_id as varchar)
                                     
                                     ) t1                              
@@ -2647,13 +2681,13 @@ def trade_tracker():
                                     , dp.user_id
                                     , pt.transaction_type
                                     , p.full_name as asset
-                                    , p.player_name
+                                    , p.full_name
                                     , coalesce(ktc.{league_type}, 0) as value
                                     , m.display_name
                                     , p.player_id
                                     from dynastr.player_trades pt
                                     inner join dynastr.players p on pt.player_id = p.player_id
-                                    left join dynastr.ktc_player_ranks ktc on p.player_name = ktc.player_name
+                                    left join dynastr.ktc_player_ranks ktc on concat(p.first_name, p.last_name) = concat(ktc.player_first_name, ktc.player_last_name)
                                     inner join dynastr.draft_positions dp on pt.roster_id = dp.roster_id and dp.league_id = pt.league_id
                                     inner join dynastr.managers m on cast(dp.user_id as varchar) = cast(m.user_id as varchar)
                                     where 1=1
@@ -2699,7 +2733,7 @@ def trade_tracker():
                                                 --and transaction_type = 'add'
                                                 
                                                 )  a1
-                                    inner join dynastr.ktc_player_ranks ktc on a1.player_name = ktc.player_name
+                                    inner join dynastr.ktc_player_ranks ktc on a1.player_name = ktc.player_full_name
                                     inner join dynastr.managers m on cast(a1.user_id as varchar) = cast(m.user_id as varchar)
                                     where 1=1 
                                     
@@ -2832,7 +2866,7 @@ def contender_rankings():
                         , null as season
                         , null as year
                         , p.full_name as full_name
-                        , p.player_name
+                        , concat(p.first_name, p.last_name) player_name
                         , p.player_position
                         , p.team
                         , p.player_id as sleeper_id
@@ -2843,7 +2877,7 @@ def contender_rankings():
                         and league_id = '{league_id}'
                         and p.player_position != 'FB'                            
                     ) asset  
-                LEFT JOIN dynastr.espn_player_projections ep on asset.player_name = ep.player_name
+                LEFT JOIN dynastr.espn_player_projections ep on asset.player_name = concat(ep.player_first_name, ep.player_last_name)
                 ORDER BY asset.user_id, asset.player_position, value desc
         """
         )
@@ -2898,7 +2932,7 @@ def contender_rankings():
                             ,lp.league_id
                             ,lp.session_id
                             , p.full_name full_name
-                            , p.player_name
+                            , concat(p.first_name, p.last_name) player_name
                             , p.player_position
                             , p.team
                             from dynastr.league_players lp
@@ -2908,7 +2942,7 @@ def contender_rankings():
                             and league_id = '{league_id}'
                             and p.player_position != 'FB'  
                     ) asset  
-                left JOIN dynastr.espn_player_projections ep on asset.player_name = ep.player_name
+                LEFT JOIN dynastr.espn_player_projections ep on asset.player_name = concat(ep.player_first_name, ep.player_last_name)
                 ORDER BY asset.user_id, asset.player_position, value desc
                             ) t2
                                                 group by 
