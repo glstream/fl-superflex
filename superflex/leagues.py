@@ -825,7 +825,7 @@ def get_league_fp():
 
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_cursor.execute(
-            f"""select all_players.user_id 
+            f"""SELECT all_players.user_id 
 , all_players.display_name 
 , all_players.league_id
 , all_players.session_id
@@ -845,7 +845,7 @@ lp.user_id
 , p.full_name as full_name
 , p.player_id
 , p.player_position
-, 'BENCH' as fantasy_position
+, p.player_position as fantasy_position
 , 'BENCH' as fantasy_designation
 , p.team
 , coalesce(fp.sf_rank_ecr, 529) as player_value
@@ -1481,29 +1481,71 @@ order by player_value asc
         )
         fp_players = fp_cursor.fetchall()
 
-        qbs = [player for player in fp_players if player["fantasy_position"] == "QB"]
-        rbs = [player for player in fp_players if player["fantasy_position"] == "RB"]
-        wrs = [player for player in fp_players if player["fantasy_position"] == "WR"]
-        tes = [player for player in fp_players if player["fantasy_position"] == "TE"]
+        starting_qbs = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "QB"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_rbs = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "RB"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_wrs = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "WR"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_tes = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "TE"
+            if player["fantasy_designation"] == "STARTER"
+        ]
         flex = [player for player in fp_players if player["fantasy_position"] == "FLEX"]
         super_flex = [
             player
             for player in fp_players
             if player["fantasy_position"] == "SUPER_FLEX"
         ]
-        bench = [
-            player for player in fp_players if player["fantasy_position"] == "BENCH"
+        bench_qbs = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "QB"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_rbs = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "RB"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_wrs = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "WR"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_tes = [
+            player
+            for player in fp_players
+            if player["fantasy_position"] == "TE"
+            if player["fantasy_designation"] == "BENCH"
         ]
 
-        fp_aps = {
-            "qb": qbs,
-            "rb": rbs,
-            "wr": wrs,
-            "te": tes,
+        fp_starters = {
+            "qb": starting_qbs,
+            "rb": starting_rbs,
+            "wr": starting_wrs,
+            "te": starting_tes,
             "flex": flex,
             "super_flex": super_flex,
-            "bench": bench,
         }
+        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
+        fp_team_spots = {"Starters": fp_starters, "Bench": fp_bench}
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_owners_cursor.execute(
@@ -2185,7 +2227,7 @@ order by player_value asc
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
             league_type=league_type,
-            aps=fp_aps,
+            aps=fp_team_spots,
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
@@ -2923,7 +2965,7 @@ def contender_rankings():
                         , asset.full_name
                         , asset.player_position
                         , asset.team
-                        , coalesce(total_projection,0) as value  
+                        , coalesce(total_projection,-1) as value  
                         , sum(coalesce(total_projection,0)) OVER (PARTITION BY asset.user_id) as total_value    
                         from      
                         (

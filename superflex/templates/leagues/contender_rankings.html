@@ -88,7 +88,7 @@
                 <li class="list-group-item d-flex align-items-center border-0">
                     <object class="avatar-player" data="{{p.sleeper_id | sleeper_img}}" type="image/png">
                         <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                    </object> {{p.full_name}} &nbsp<b>{{"{:,}".format(p.value)| replace(-1, "Unranked") }}</b>
+                    </object> {{p.full_name}} &nbsp<b>{{"{:,}".format(p.value) | replace(-1, "Unranked") }}</b>
                 </li>
                 {% endfor %}
             </ul>
