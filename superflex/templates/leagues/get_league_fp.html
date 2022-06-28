@@ -52,11 +52,9 @@
                             <button class="btn btn-outline-secondary btn-lg" disabled>Power
                                 Rankings</button>
                             <br>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
-                                value="{{session_id, user_id, league_id}}">Trade
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker" value="{{session_id, user_id, league_id}}">Trade
                                 Tracker</button>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings"
-                                value="{{session_id, user_id, league_id}}">Contender
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings" value="{{session_id, user_id, league_id}}">Contender
                                 Rankings</button>
                         </div>
                 </div>
@@ -69,10 +67,8 @@
 <div>
     <form method="post" class="form-inline">
         <div class="btn-group" role="group" aria-label="Basic example">
-            <button class="btn btn-secondary" type="submit" name="ktc_rankings"
-                value="{{session_id, user_id, league_id}}">KTC</button>
-            <button class="btn btn-secondary" type="submit" name="fp_rankings"
-                value="{{session_id, user_id, league_id}}" disabled>Fantasy Pros</button>
+            <button class="btn btn-secondary" type="submit" name="ktc_rankings" value="{{session_id, user_id, league_id}}">KTC</button>
+            <button class="btn btn-secondary" type="submit" name="fp_rankings" value="{{session_id, user_id, league_id}}" disabled>Fantasy Pros</button>
         </div>
     </form>
     <label style="float:right;">Fantasy Pros Player Values Updated: {{date_}}</label>
@@ -91,22 +87,17 @@
             {% set designation = k %}
             <div class="card-header bg-transparent">{{designation | upper}} Rank: PLACEHODLER
             </div>
-            <br>
-            {% for p,j in v.items() %}
+            <br> {% for p,j in v.items() %}
             <div class="card d-flex border-0">
-                {% for c in j if c.user_id == owner.user_id %}
+                {% for c in j if c.user_id == owner.user_id %} g
 
                 <div class="d-flex justify-content-between">
-                    {%if loop.index == 1%}
-                    {%if c.fantasy_position == "QB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                    {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-primary">{{c.fantasy_position}}</span></h5>
                     {% elif c.fantasy_position == "RB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-success">{{c.fantasy_position}}</span></h5>
                     {% elif c.fantasy_position == "WR" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-warning">{{c.fantasy_position}}</span></h5>
                     {% elif c.fantasy_position == "TE" %}
                     <h5 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
                     </h5>
@@ -126,8 +117,8 @@
                             <img class="avatar-player"
                                 src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                         </object>
-                        <p class="text-left align-middle">{{c.full_name}}</p> &nbsp
-                        &nbsp<b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
+                        <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
+                        <b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
                                 replace(999, "Unranked") }}</b></span>
                     </li>
                     {% endfor %}
