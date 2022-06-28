@@ -89,7 +89,7 @@
             </div>
             <br> {% for p,j in v.items() %}
             <div class="card d-flex border-0">
-                {% for c in j if c.user_id == owner.user_id %} g
+                {% for c in j if c.user_id == owner.user_id %}
 
                 <div class="d-flex justify-content-between">
                     {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
