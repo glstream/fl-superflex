@@ -217,10 +217,11 @@ th.rotate {
 }
 
 th.rotate>div {
-    transform: /* Magic Numbers */
-    translate(2px, 55px)
-    /* 45 is really 360 - 45 */
-    rotate(270deg);
+    transform:
+        /* Magic Numbers */
+        translate(2px, 55px)
+        /* 45 is really 360 - 45 */
+        rotate(270deg);
     width: 25px;
 }
 
@@ -280,7 +281,6 @@ tr td {
     border-style: solid;
     border-width: 2px 2px 2px 2px;
     border-color: rgb(10, 158, 180);
-    text-align: center;
 }
 
 .btn-group.special {
@@ -299,6 +299,10 @@ tr td {
 
 .text-right {
     text-align: right;
+}
+
+.text-left {
+    text-align: left;
 }
 
 
@@ -358,7 +362,6 @@ a {
     font-size: 14px;
 }
 
-.badge {
-    display: flex;
-    margin-left: auto;
+h5>.badge {
+    vertical-align: bottom;
 }
