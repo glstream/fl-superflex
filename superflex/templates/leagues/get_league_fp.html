@@ -52,9 +52,11 @@
                             <button class="btn btn-outline-secondary btn-lg" disabled>Power
                                 Rankings</button>
                             <br>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker" value="{{session_id, user_id, league_id}}">Trade
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
+                                value="{{session_id, user_id, league_id}}">Trade
                                 Tracker</button>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings" value="{{session_id, user_id, league_id}}">Contender
+                            <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings"
+                                value="{{session_id, user_id, league_id}}">Contender
                                 Rankings</button>
                         </div>
                 </div>
@@ -67,8 +69,10 @@
 <div>
     <form method="post" class="form-inline">
         <div class="btn-group" role="group" aria-label="Basic example">
-            <button class="btn btn-secondary" type="submit" name="ktc_rankings" value="{{session_id, user_id, league_id}}">KTC</button>
-            <button class="btn btn-secondary" type="submit" name="fp_rankings" value="{{session_id, user_id, league_id}}" disabled>Fantasy Pros</button>
+            <button class="btn btn-secondary" type="submit" name="ktc_rankings"
+                value="{{session_id, user_id, league_id}}">KTC</button>
+            <button class="btn btn-secondary" type="submit" name="fp_rankings"
+                value="{{session_id, user_id, league_id}}" disabled>Fantasy Pros</button>
         </div>
     </form>
     <label style="float:right;">Fantasy Pros Player Values Updated: {{date_}}</label>
@@ -78,10 +82,10 @@
 <br>
 <div class="row">
     {% for owner in owners %}
-    <div class="col-sm-3 justify-content-center">
-        <h5 class="text-left">{{owner.display_name}}</h5>
-        <h5 class="text-left">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
-        <h5 class="text-left"> Rank: {{owner.total_rank | suffix}}</h5>
+    <div class="row justify-content-center">
+        <h5 class="text-center">{{owner.display_name}}</h5>
+        <h5 class="text-center">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
+        <h5 class="text-center"> Rank: {{owner.total_rank | suffix}}</h5>
         {% for k, v in aps.items()%}
         <div class="card-fr" style="width: 18rem; margin-right: 10px;">
             {% set designation = k %}
@@ -93,11 +97,14 @@
 
                 <div class="d-flex justify-content-between">
                     {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                    <h5 class="text-left margin-left: 20px;"><span
+                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
                     {% elif c.fantasy_position == "RB" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                    <h5 class="text-left margin-left: 20px;"><span
+                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
                     {% elif c.fantasy_position == "WR" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                    <h5 class="text-left margin-left: 20px;"><span
+                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
                     {% elif c.fantasy_position == "TE" %}
                     <h5 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
                     </h5>
@@ -128,6 +135,7 @@
 
         </div>
         {% endfor %}
+
     </div>
     {% endfor %}
 </div>
