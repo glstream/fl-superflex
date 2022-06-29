@@ -26,8 +26,7 @@
                         <th>RB</th>
                         <th>WR</th>
                         <th>TE</th>
-                        <th>FLEX</th>
-                        <th>SUPER FLEX</th>
+                        <th>STARTERS</th>
                         <th>BENCH</th>
                     </tr>
                 </thead>
@@ -36,7 +35,12 @@
                     <tr>
                         <td scope="row" style="text-align:center">{{owner.display_name}}</td>
                         <td style="text-align:center">{{owner.total_rank | suffix}}</td>
-
+                        <td style="text-align:center">{{owner.qb_rank | suffix}}</td>
+                        <td style="text-align:center">{{owner.rb_rank | suffix}}</td>
+                        <td style="text-align:center">{{owner.wr_rank | suffix}}</td>
+                        <td style="text-align:center">{{owner.te_rank | suffix}}</td>
+                        <td style="text-align:center">{{owner.starters_rank | suffix}}</td>
+                        <td style="text-align:center">{{owner.bench_rank | suffix}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -89,9 +93,11 @@
         {% for k, v in aps.items()%}
         <div class="card-fr" style="width: 18rem; margin-right: 10px;">
             {% set designation = k %}
-            <div class="card-header bg-transparent">{{designation | upper}} Rank: PLACEHODLER
+            <div class="card-header bg-transparent">{{designation | upper}} Rank: {{owner[designation+"_rank"] |
+                suffix}}
             </div>
-            <br> {% for p,j in v.items() %}
+            <br>
+            {% for p,j in v.items() %}
             <div class="card d-flex border-0">
                 {% for c in j if c.user_id == owner.user_id %}
 
