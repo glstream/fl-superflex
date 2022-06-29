@@ -887,6 +887,7 @@ and fp.fp_player_id not in (
 					, t1.player_value
 					, t1.player_order
 					, RANK() OVER (PARTITION BY t1.display_name ORDER BY t1.player_order asc) as flex_order
+                    , t1.position_order
 					, t1.qb_cnt
 					, t1.rb_cnt
 					, t1.wr_cnt
@@ -917,7 +918,7 @@ and fp.fp_player_id not in (
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
                     and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -925,7 +926,10 @@ and fp.fp_player_id not in (
 					and pl.player_position IN ('QB','RB', 'WR', 'TE')   
 					order by display_name, pl.player_position, player_value asc) t1
 					where 1=1
-					and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+					and (position_order > qb_cnt 
+						 or position_order > rb_cnt
+						 or position_order > wr_cnt
+						 or position_order > te_cnt)
 					order by 
 					display_name, player_order asc) t2
 					where t2.flex_order <= sf_cnt
@@ -986,7 +990,7 @@ and fp.fp_player_id not in (
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1030,7 +1034,7 @@ and fp.fp_player_id not in (
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
                     and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1070,7 +1074,7 @@ and fp.fp_player_id not in (
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'            
@@ -1110,7 +1114,7 @@ and fp.fp_player_id not in (
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'            
@@ -1150,7 +1154,7 @@ and fp.fp_player_id not in (
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1233,7 +1237,7 @@ from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
 LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
-inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 where 1=1
 and lp.session_id = '{session_id}'
 and lp.league_id = '{league_id}'
@@ -1241,7 +1245,11 @@ and pl.player_position != 'FB'
 and pl.player_position IN ('QB','RB', 'WR', 'TE')   
 order by display_name, pl.player_position, player_value asc) t1
 where 1=1
-and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+and (position_order > qb_cnt 
+						 or position_order > rb_cnt
+						 or position_order > wr_cnt
+						 or position_order > te_cnt
+						)
 order by 
 display_name, player_order asc) t2
 where t2.flex_order <= sf_cnt
@@ -1302,7 +1310,7 @@ from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
 LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
-inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 where 1=1
 and lp.session_id = '{session_id}'
 and lp.league_id = '{league_id}'
@@ -1310,7 +1318,7 @@ and pl.player_position != 'FB'
 and pl.player_position IN ('RB', 'WR', 'TE')   
 order by display_name, pl.player_position, player_value asc) t1
 where 1=1
-and position_order > te_cnt and position_order > wr_cnt and position_order > rb_cnt
+and (position_order > te_cnt or position_order > wr_cnt or position_order > rb_cnt)
 order by 
 display_name, player_order asc) t2
 where t2.flex_order <= t2.flex_cnt+sf_cnt and t2.flex_order > sf_cnt
@@ -1346,7 +1354,7 @@ from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
 LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
-inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 where 1=1
 and lp.session_id = '{session_id}'
 and lp.league_id = '{league_id}'
@@ -1386,7 +1394,7 @@ from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
 LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
-inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 where 1=1
 and lp.session_id = '{session_id}'
 and lp.league_id = '{league_id}'
@@ -1426,7 +1434,7 @@ from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
 LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
-inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 where 1=1
 and lp.session_id = '{session_id}'
 and lp.league_id = '{league_id}'
@@ -1466,7 +1474,7 @@ from dynastr.league_players lp
 inner join dynastr.players pl on lp.player_id = pl.player_id
 LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 inner join dynastr.managers m on lp.user_id = m.user_id
-inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 where 1=1
 and lp.session_id = '{session_id}'
 and lp.league_id = '{league_id}'
@@ -1675,7 +1683,7 @@ order by player_value asc
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1741,7 +1749,7 @@ order by player_value asc
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1783,7 +1791,7 @@ order by player_value asc
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1821,7 +1829,7 @@ order by player_value asc
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1859,7 +1867,7 @@ order by player_value asc
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1897,7 +1905,7 @@ order by player_value asc
 					inner join dynastr.players pl on lp.player_id = pl.player_id
 					LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
 					inner join dynastr.managers m on lp.user_id = m.user_id
-					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+					inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
 					where 1=1
 					and lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -1976,7 +1984,7 @@ order by player_value asc
                         inner join dynastr.players pl on lp.player_id = pl.player_id
                         LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
-                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                         where 1=1
                         and lp.session_id = '{session_id}'
                         and lp.league_id = '{league_id}'
@@ -2042,7 +2050,7 @@ order by player_value asc
                         inner join dynastr.players pl on lp.player_id = pl.player_id
                         LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
-                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                         where 1=1
                         and lp.session_id = '{session_id}'
                         and lp.league_id = '{league_id}'
@@ -2084,7 +2092,7 @@ order by player_value asc
                         inner join dynastr.players pl on lp.player_id = pl.player_id
                         LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
-                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                         where 1=1
                         and lp.session_id = '{session_id}'
                         and lp.league_id = '{league_id}'
@@ -2122,7 +2130,7 @@ order by player_value asc
                         inner join dynastr.players pl on lp.player_id = pl.player_id
                         LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
-                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                         where 1=1
                         and lp.session_id = '{session_id}'
                         and lp.league_id = '{league_id}'
@@ -2160,7 +2168,7 @@ order by player_value asc
                         inner join dynastr.players pl on lp.player_id = pl.player_id
                         LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
-                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                         where 1=1
                         and lp.session_id = '{session_id}'
                         and lp.league_id = '{league_id}'
@@ -2198,7 +2206,7 @@ order by player_value asc
                         inner join dynastr.players pl on lp.player_id = pl.player_id
                         LEFT JOIN dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name) = concat(fp.player_first_name, fp.player_last_name)
                         inner join dynastr.managers m on lp.user_id = m.user_id
-                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '5fe01991-c892-46aa-91e5-a79532f395cc'
+                        inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                         where 1=1
                         and lp.session_id = '{session_id}'
                         and lp.league_id = '{league_id}'
