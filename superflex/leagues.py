@@ -1172,7 +1172,7 @@ all_t.user_id
 ,all_t.player_id
 ,all_t.player_position
 ,all_t.fantasy_position
-, 'STARTER' as fantasy_designation
+, 'STARTERS' as fantasy_designation
 ,all_t.team
 ,all_t.player_value as player_value
 --, sum(all_t.player_value) OVER (PARTITION BY all_t.user_id) as total_value  
@@ -1485,25 +1485,25 @@ order by player_value asc
             player
             for player in fp_players
             if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
+            if player["fantasy_designation"] == "STARTERS"
         ]
         starting_rbs = [
             player
             for player in fp_players
             if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
+            if player["fantasy_designation"] == "STARTERS"
         ]
         starting_wrs = [
             player
             for player in fp_players
             if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
+            if player["fantasy_designation"] == "STARTERS"
         ]
         starting_tes = [
             player
             for player in fp_players
             if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
+            if player["fantasy_designation"] == "STARTERS"
         ]
         flex = [player for player in fp_players if player["fantasy_position"] == "FLEX"]
         super_flex = [
@@ -1545,7 +1545,7 @@ order by player_value asc
             "super_flex": super_flex,
         }
         fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        fp_team_spots = {"Starters": fp_starters, "Bench": fp_bench}
+        fp_team_spots = {"starters": fp_starters, "bench": fp_bench}
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_owners_cursor.execute(
@@ -1566,7 +1566,9 @@ order by player_value asc
                     , DENSE_RANK() OVER (order by max(flex_value) asc) flex_rank
                     , max(super_flex_value) as super_flex_value
                     , DENSE_RANK() OVER (order by max(super_flex_value) asc) super_flex_rank
-					, max(bench_value) as bench_value
+					, max(starters_value) as starters_value
+                    , DENSE_RANK() OVER (order by max(starters_value) asc) starters_rank
+					, max(Bench_value) as Bench_value
                     , DENSE_RANK() OVER (order by max(bench_value) asc) bench_rank
 
                     from (select 
@@ -1583,7 +1585,8 @@ order by player_value asc
                     , case when fantasy_position = 'TE' THEN sum(player_value) else 0 end as te_value
                     , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
                     , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
-					, case when fantasy_position = 'BENCH' THEN sum(player_value) else 0 end as bench_value
+				    , case when fantasy_designation = 'STARTERS' THEN sum(player_value) else 0 end as starters_value
+				    , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
                     from 
                     (select all_players.user_id 
                     , all_players.display_name 
@@ -1915,7 +1918,7 @@ order by player_value asc
                         ,all_t.full_name
                         ,all_t.player_position
                         ,all_t.fantasy_position
-                        , 'STARTER' as fantasy_designation
+                        , 'STARTERS' as fantasy_designation
                         ,all_t.team
                         ,all_t.player_value as player_value
                         --, sum(all_t.player_value) OVER (PARTITION BY all_t.user_id) as total_value  
@@ -2210,7 +2213,8 @@ order by player_value asc
                     t2.user_id
                     , t2.display_name
                     , t2.total_value
-                    , t2.fantasy_position) t3
+                    , t2.fantasy_position
+					, t2.fantasy_designation) t3
                     group by 
                     t3.user_id
                     , t3.display_name
