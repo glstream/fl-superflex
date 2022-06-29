@@ -84,66 +84,71 @@
 <br>
 <br>
 <br>
-<div class="row">
-    {% for owner in owners %}
+<div class="container">
     <div class="row justify-content-center">
-        <h5 class="text-center">{{owner.display_name}}</h5>
-        <h5 class="text-center">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
-        <h5 class="text-center"> Rank: {{owner.total_rank | suffix}}</h5>
-        {% for k, v in aps.items()%}
-        <div class="card-fr" style="width: 18rem; margin-right: 10px;">
-            {% set designation = k %}
-            <div class="card-header bg-transparent">{{designation | upper}} Rank: {{owner[designation+"_rank"] |
-                suffix}}
-            </div>
-            <br>
-            {% for p,j in v.items() %}
-            <div class="card d-flex border-0">
-                {% for c in j if c.user_id == owner.user_id %}
+        {% for owner in owners %}
+        <div class="col-md-auto">
+            <h5 class="text-center">{{owner.display_name}}</h5>
+            <h5 class="text-center">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
+            <h5 class="text-center"> Rank: {{owner.total_rank | suffix}}</h5>
 
-                <div class="d-flex justify-content-between">
-                    {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
-                    {% elif c.fantasy_position == "RB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
-                    {% elif c.fantasy_position == "WR" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
-                    {% elif c.fantasy_position == "TE" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
-                    </h5>
-                    {% elif c.fantasy_position == "FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
-                    </h5>
-                    {% elif c.fantasy_position == "SUPER_FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
-                    </h5>
-                    {%endif%}
-                    <h5 class="text-right"><span class="badge bg-secondary">Rank</span></h5>
-                    {%endif%}
+            <div class="card-fr" style="width: 18rem">
+                {% for k, v in aps.items()%}
+                {% set designation = k %}
+                <div class="card-header bg-transparent">{{designation | upper}} Rank: {{owner[designation+"_rank"] |
+                    suffix}}
                 </div>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center border-0">
-                        <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
-                            <img class="avatar-player"
-                                src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                        </object>
-                        <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
-                        <b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
-                                replace(999, "Unranked") }}</b></span>
-                    </li>
-                    {% endfor %}
+                <br>
+                {% for p,j in v.items() %}
+                <div class="card d-flex border-0">
+                    {% for c in j if c.user_id == owner.user_id %}
+
+                    <div class="d-flex justify-content-between">
+                        {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position == "RB" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position == "WR" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position == "TE" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-danger">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position == "FLEX" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-info">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position == "SUPER_FLEX" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-dark">{{c.fantasy_position}}</span>
+                        </h5>
+                        {%endif%}
+                        <h5 class="text-right"><span class="badge bg-secondary">Rank</span></h5>
+                        {%endif%}
+                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                            <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
+                            <b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
+                                    replace(999, "Unranked") }}</b></span>
+                        </li>
+                        {% endfor %}
+                </div>
+                {% endfor %}
+                </ul>
+                {% endfor %}
             </div>
-            {% endfor %}
-            </ul>
+
 
         </div>
         {% endfor %}
-
     </div>
-    {% endfor %}
 </div>
-
 {% endblock %}
