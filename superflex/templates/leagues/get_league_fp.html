@@ -1,5 +1,4 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
-
 <h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
 <br>
 <div class="container">
@@ -92,6 +91,10 @@
             <h5 class="text-center">{{owner.display_name}}</h5>
             <h5 class="text-center">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
             <h5 class="text-center"> Rank: {{owner.total_rank | suffix}}</h5>
+            <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" role="button"
+                aria-expanded="false" aria-controls="collapseExample">
+                Bench
+            </a>
 
             <div class="card-fr" style="width: 18rem">
                 {% for k, v in aps.items()%}
@@ -103,7 +106,7 @@
                 {% for p,j in v.items() %}
                 <div class="card d-flex border-0">
                     {% for c in j if c.user_id == owner.user_id %}
-
+                    {% if k == 'starters' %}
                     <div class="d-flex justify-content-between">
                         {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
                         <h5 class="text-left margin-left: 20px;"><span
@@ -130,6 +133,7 @@
                         <h5 class="text-right"><span class="badge bg-secondary">Rank</span></h5>
                         {%endif%}
                     </div>
+
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-center border-0">
                             <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
@@ -140,10 +144,56 @@
                             <b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
                                     replace(545, "Unranked") }}</b></span>
                         </li>
+                        {% endif %}
+                        {% if k == 'bench' %}
+                        <div class="collapse" id="collapse-{{owner.user_id}}">
+
+                            <div class="d-flex justify-content-between">
+                                {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
+                                <h5 class="text-left margin-left: 20px;"><span
+                                        class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                                {% elif c.fantasy_position == "RB" %}
+                                <h5 class="text-left margin-left: 20px;"><span
+                                        class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                                {% elif c.fantasy_position == "WR" %}
+                                <h5 class="text-left margin-left: 20px;"><span
+                                        class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                                {% elif c.fantasy_position == "TE" %}
+                                <h5 class="text-left margin-left: 20px;"><span
+                                        class="badge bg-danger">{{c.fantasy_position}}</span>
+                                </h5>
+                                {% elif c.fantasy_position == "FLEX" %}
+                                <h5 class="text-left margin-left: 20px;"><span
+                                        class="badge bg-info">{{c.fantasy_position}}</span>
+                                </h5>
+                                {% elif c.fantasy_position == "SUPER_FLEX" %}
+                                <h5 class="text-left margin-left: 20px;"><span
+                                        class="badge bg-dark">{{c.fantasy_position}}</span>
+                                </h5>
+                                {%endif%}
+                                <h5 class="text-right"><span class="badge bg-secondary">Rank</span></h5>
+                                {%endif%}
+                            </div>
+
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0">
+                                    <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}"
+                                        type="image/png">
+                                        <img class="avatar-player"
+                                            src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                                    </object>
+                                    <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
+                                    <b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
+                                            replace(545, "Unranked") }}</b></span>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% endfor %}
+
                 </div>
                 {% endfor %}
-                </ul>
+
                 {% endfor %}
             </div>
 
