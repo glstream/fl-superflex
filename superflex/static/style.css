@@ -5,35 +5,8 @@ html {
 
 body {
     margin: 0 auto;
-    background: white;
+    /* background: white; */
 }
-
-tbody {
-    border: 2px solid transparent;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-
-/* tr:nth-child(even) {
-  background-color: #c2c7c9;
-  text-align: right;
-} */
-
-thead {
-    border: 1px solid #cd1111;
-}
-
-
-/* td,
-th {
-  border: 1px solid #070606;
-  text-align: left;
-  padding: 8px;
-} */
 
 .content {
     padding: 0 1rem 1rem;
@@ -50,16 +23,11 @@ th {
     margin: 1rem 0 0.25rem 0;
 }
 
-.flash {
+/* .flash {
     margin: 1em 0;
     padding: 1em;
     background: #caa6f6;
     border: 1px solid #377ba8;
-}
-
-
-/* .post .body {
-  white-space: pre-line;
 } */
 
 .content:last-child {
@@ -101,101 +69,87 @@ input[type=submit] {
     text-align: center;
 }
 
-.over-limit-0 {
+table {
+    border-collapse: separate;
+
+}
+
+td {
+    border-radius: 5px;
+    border: 1px solid rgb(11, 7, 7);
+}
+
+td.over-limit-1 {
+    background-color: rgb(8, 29, 252, .75);
     text-align: center;
-    border: 1px solid white;
-    /* Green border */
-    background-color: rgb(41, 59, 247);
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-10 {
-    background-color: rgb(224, 243, 248);
+td.over-limit-2 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-20 {
-    background-color: rgb(244, 109, 67);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-30 {
-    background-color: rgb(244, 109, 67);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-40 {
-    background-color: rgb(244, 109, 67);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-50 {
-    background-color: rgb(215, 48, 39);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-60 {
-    background-color: rgb(215, 48, 39);
+td.over-limit-3 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-70 {
-    background-color: rgb(215, 48, 39);
+td.over-limit-4 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-80 {
-    background-color: rgb(165, 0, 38);
+td.over-limit-5 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: white
+    color: white;
 }
 
-.over-limit-90 {
-    background-color: rgb(165, 0, 38);
+td.over-limit-6 {
+    background-color: rgb(60, 64, 63, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 14px;
-    color: white
+    color: white;
 }
 
+td.over-limit-7 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
 
-/* .table-all {
-  border: 1px solid black;
-  font-size: 14px;
-} */
+td.over-limit-8 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
 
+td.over-limit-9 {
+    background-color: rgb(113, 73, 73, .75);
+    text-align: center;
+    color: white;
+}
 
-/* .table-color {
-  border: 1px solid rgb(243, 247, 243);
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-} */
+td.over-limit-10 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-11 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-12 {
+    background-color: rgb(255, 0, 0, .75);
+    text-align: center;
+    color: white;
+}
 
 .player-names {
     border: 1px solid gray;
@@ -207,16 +161,16 @@ input[type=submit] {
     font-size: 12px;
 }
 
-th.rotate {
+/* th.rotate {
     /* Something you can count on */
-    height: 140px;
-    white-space: nowrap;
-    background-color: white;
-    border-color: white;
-    border-bottom-color: gray;
-}
+/* height: 140px;
+white-space: nowrap;
+background-color: white;
+border-color: white;
+border-bottom-color: gray;
+} */
 
-th.rotate>div {
+*/ th.rotate>div {
     transform:
         /* Magic Numbers */
         translate(2px, 55px)
@@ -226,17 +180,8 @@ th.rotate>div {
 }
 
 
-/* th.rotate > div > span {
-  border-bottom: 1px solid #ccc;
-  padding: 5px 10px;
-} */
 
-.transparent {
-    color: white;
-    background-color: white;
-    border-color: white;
-    border-bottom: gray;
-}
+
 
 .RdYlBu .q0-3 {
     fill: rgb(252, 141, 89)
@@ -250,22 +195,13 @@ th.rotate>div {
     fill: rgb(145, 191, 219)
 }
 
-
-/* .table td {
-  text-align: left;
-  border-collapse: collapse;
+th,
+td {
+    border: 1px solid black;
+    border-radius: 10px;
 }
 
-.table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 500px;
-  border-spacing: 0;
-} */
 
-tr td {
-    padding-top: 1em;
-}
 
 .row-bottom-margin {
     margin-bottom: -20px;
@@ -290,7 +226,6 @@ tr td {
 .special .btn {
     flex: 1
 }
-
 
 /* .card-header {
   border: none;
@@ -319,10 +254,10 @@ tr td {
   border-bottom: 1px;
 } */
 
-.row {
+/* .row {
     margin-bottom: 2px;
     margin-top: 2px;
-}
+} */
 
 a.right {
     display: inline-block;

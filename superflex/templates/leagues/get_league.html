@@ -10,7 +10,7 @@
             </div>
             <ul class="list-group list-group-flush">
                 {% for owner in owners %}
-                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }} -
+                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}} -
                     {{"{:,}".format(owner.total_value)}}
                 </li>
                 {% endfor %}
