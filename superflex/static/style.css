@@ -69,85 +69,86 @@ input[type=submit] {
     text-align: center;
 }
 
-.over-limit-0 {
+table {
+    border-collapse: separate;
+
+}
+
+td {
+    border-radius: 5px;
+    border: 1px solid rgb(11, 7, 7);
+}
+
+td.over-limit-1 {
+    background-color: rgb(8, 29, 252, .75);
     text-align: center;
-    border: 1px solid white;
-    /* Green border */
-    background-color: rgb(41, 59, 247);
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-10 {
-    background-color: rgb(224, 243, 248);
+td.over-limit-2 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-20 {
-    background-color: rgb(244, 109, 67);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-30 {
-    background-color: rgb(244, 109, 67);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-40 {
-    background-color: rgb(244, 109, 67);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: black;
-}
-
-.over-limit-50 {
-    background-color: rgb(215, 48, 39);
-    text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-60 {
-    background-color: rgb(215, 48, 39);
+td.over-limit-3 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-70 {
-    background-color: rgb(215, 48, 39);
+td.over-limit-4 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
     color: white;
 }
 
-.over-limit-80 {
-    background-color: rgb(165, 0, 38);
+td.over-limit-5 {
+    background-color: rgb(14, 33, 229, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 12px;
-    color: white
+    color: white;
 }
 
-.over-limit-90 {
-    background-color: rgb(165, 0, 38);
+td.over-limit-6 {
+    background-color: rgb(60, 64, 63, .75);
     text-align: center;
-    border: 1px solid white;
-    font-size: 14px;
-    color: white
+    color: white;
+}
+
+td.over-limit-7 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-8 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-9 {
+    background-color: rgb(113, 73, 73, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-10 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-11 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-12 {
+    background-color: rgb(255, 0, 0, .75);
+    text-align: center;
+    color: white;
 }
 
 .player-names {
