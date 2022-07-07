@@ -23,12 +23,12 @@ body {
     margin: 1rem 0 0.25rem 0;
 }
 
-/* .flash {
+.flash {
     margin: 1em 0;
     padding: 1em;
     background: #caa6f6;
     border: 1px solid #377ba8;
-} */
+}
 
 .content:last-child {
     margin-bottom: 0;
@@ -69,87 +69,7 @@ input[type=submit] {
     text-align: center;
 }
 
-table {
-    border-collapse: separate;
 
-}
-
-td {
-    border-radius: 5px;
-    border: 1px solid rgb(11, 7, 7);
-}
-
-td.over-limit-1 {
-    background-color: rgb(8, 29, 252, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-2 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-3 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-4 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-5 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-6 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-7 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-8 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-9 {
-    background-color: rgb(113, 73, 73, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-10 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-11 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-12 {
-    background-color: rgb(255, 0, 0, .75);
-    text-align: center;
-    color: white;
-}
 
 .player-names {
     border: 1px solid gray;
@@ -160,47 +80,6 @@ td.over-limit-12 {
     text-overflow: ellipsis;
     font-size: 12px;
 }
-
-/* th.rotate {
-    /* Something you can count on */
-/* height: 140px;
-white-space: nowrap;
-background-color: white;
-border-color: white;
-border-bottom-color: gray;
-} */
-
-*/ th.rotate>div {
-    transform:
-        /* Magic Numbers */
-        translate(2px, 55px)
-        /* 45 is really 360 - 45 */
-        rotate(270deg);
-    width: 25px;
-}
-
-
-
-
-
-.RdYlBu .q0-3 {
-    fill: rgb(252, 141, 89)
-}
-
-.RdYlBu .q1-3 {
-    fill: rgb(255, 255, 191)
-}
-
-.RdYlBu .q2-3 {
-    fill: rgb(145, 191, 219)
-}
-
-th,
-td {
-    border: 1px solid black;
-    border-radius: 10px;
-}
-
 
 
 .row-bottom-margin {
@@ -299,4 +178,86 @@ a {
 
 h5>.badge {
     vertical-align: bottom;
+}
+
+table {
+    border-collapse: separate;
+
+}
+
+td {
+    border-radius: 5px;
+    border: 1px solid rgb(11, 7, 7);
+}
+
+td.over-limit-1 {
+    background-color: rgb(8, 29, 252, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-2 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-3 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-4 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-5 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-6 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-7 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-8 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-9 {
+    background-color: rgb(113, 73, 73, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-10 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-11 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-12 {
+    background-color: rgb(255, 0, 0, .75);
+    text-align: center;
+    color: white;
 }
