@@ -1290,8 +1290,18 @@ order by m.display_name, player_value asc"""
                     total_value asc"""
         )
         fp_owners = fp_owners_cursor.fetchall()
-        print(fp_team_spots)
 
+        labels = [row["display_name"] for row in fp_owners]
+        values = [row["total_value"] for row in fp_owners]
+        total_value = [row["total_value"] for row in fp_owners][0] * 0.95
+        # pct_values = [
+        #     int((((row["total_value"] - total_value) / total_value) + 1) * 100)
+        #     for row in fp_owners
+        # ]
+        pct_values = [
+            100 - abs((total_value / row["total_value"]) - 1) * 100 for row in fp_owners
+        ]
+        print(pct_values)
         return render_template(
             "leagues/get_league_fp.html",
             owners=fp_owners,
@@ -1303,6 +1313,9 @@ order by m.display_name, player_value asc"""
             session_id=session_id,
             user_id=user_id,
             date_=date_,
+            labels=labels,
+            values=values,
+            pct_values=pct_values,
         )
 
 
