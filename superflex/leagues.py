@@ -2446,8 +2446,6 @@ order by m.display_name, player_value desc
             (((row["total_value"] - total_value) / total_value) + 1) * 100
             for row in c_owners
         ]
-        print(pct_values)
-        print([row["total_value"] for row in c_owners])
 
         # espn_date = datetime.strptime(
         #     contenders[0]["insert_date"], "%Y-%m-%dT%H:%M:%S.%f"
