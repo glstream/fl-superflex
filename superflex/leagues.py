@@ -2278,9 +2278,9 @@ order by m.display_name, player_value desc
                                 from dynastr.league_players lp
                                 inner join dynastr.players pl on lp.player_id = pl.player_id
                                 LEFT JOIN dynastr.espn_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
-                                inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'ce6756b6-b4da-4c09-951c-85136d26c24b'
-                                where lp.session_id = 'ce6756b6-b4da-4c09-951c-85136d26c24b'
-                                and lp.league_id = '785357489553154048'
+                                inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
+                                where lp.session_id = '{session_id}'
+                                and lp.league_id = '{league_id}'
                                 and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))  
                                                         
                                 , starters as (SELECT  
