@@ -1972,54 +1972,247 @@ def contender_rankings():
         league_type = get_league_type(league_id)
         contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         contenders_cursor.execute(
-            f"""SELECT
-                    asset.user_id 
-                    , asset.league_id
-                    , asset.session_id
-                    , asset.year
-                    , asset.full_name
-                    , asset.player_position
-                    , asset.team
-                    , asset.sleeper_id
-                    , coalesce(ep.total_projection,-1) as value
-                    , ep.insert_date   
-                    from      
-                    (
-                    SELECT
-                        lp.user_id 
-                        , lp.league_id
-                        , lp.session_id
-                        , null as season
-                        , null as year
-                        , p.full_name as full_name
-                        , concat(p.first_name, p.last_name) player_name
-                        , p.player_position
-                        , p.team
-                        , p.player_id as sleeper_id
-                        from dynastr.league_players lp
-                        inner join dynastr.players p on lp.player_id = p.player_id
-                        where 1=1
-                        and session_id = '{session_id}'
-                        and league_id = '{league_id}'
-                        and p.player_position != 'FB'                            
-                    ) asset  
-                LEFT JOIN dynastr.espn_player_projections ep on asset.player_name = concat(ep.player_first_name, ep.player_last_name)
-                ORDER BY asset.user_id, asset.player_position, value desc
+            f"""WITH base_players as (SELECT
+lp.user_id
+, lp.league_id
+, lp.session_id
+, pl.full_name 
+, pl.player_id
+, ep.espn_player_id
+, pl.player_position
+, coalesce(ep.total_projection, -1) as player_value
+, RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ep.total_projection, -1) desc) as player_order
+, qb_cnt
+, rb_cnt
+, wr_cnt
+, te_cnt
+, flex_cnt
+, sf_cnt
+
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.espn_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'ce6756b6-b4da-4c09-951c-85136d26c24b'
+where lp.session_id = 'ce6756b6-b4da-4c09-951c-85136d26c24b'
+and lp.league_id = '785357489553154048'
+and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))  
+						   
+, starters as (SELECT  
+qb.user_id
+, qb.player_id
+, qb.espn_player_id
+, qb.player_position
+, qb.player_position as fantasy_position
+, qb.player_order
+from base_players qb
+where 1=1
+and qb.player_position = 'QB'
+and qb.player_order <= qb.qb_cnt
+UNION ALL
+select 
+rb.user_id
+, rb.player_id
+, rb.espn_player_id
+, rb.player_position
+, rb.player_position as fantasy_position
+, rb.player_order
+from base_players rb
+where 1=1
+and rb.player_position = 'RB'
+and rb.player_order <= rb.rb_cnt
+UNION ALL
+select 
+wr.user_id
+, wr.player_id
+, wr.espn_player_id
+, wr.player_position
+, wr.player_position as fantasy_position
+, wr.player_order
+from base_players wr
+where wr.player_position = 'WR'
+and wr.player_order <= wr.wr_cnt
+
+UNION ALL
+select 
+te.user_id
+, te.player_id
+, te.espn_player_id
+, te.player_position
+, te.player_position as fantasy_position
+, te.player_order
+from 	
+base_players te
+where te.player_position = 'TE'
+and te.player_order <= te.te_cnt
+)
+
+, flex as (
+SELECT
+ns.user_id
+, ns.player_id
+, ns.espn_player_id
+, ns.player_position
+, 'FLEX' as fantasy_position
+, ns.player_order
+from (
+SELECT
+fp.user_id
+, fp.espn_player_id
+, fp.player_id
+, fp.player_position
+, RANK() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, fp.flex_cnt
+from base_players fp
+left join starters s on s.espn_player_id = fp.espn_player_id
+where 1=1
+--and lower(fp.user_id) in ('432367510474461184','342397313982976000')
+and s.espn_player_id IS NULL
+and fp.player_position IN ('RB','WR','TE')  
+order by player_order) ns
+where player_order <= ns.flex_cnt)
+
+,super_flex as (
+SELECT
+ns_sf.user_id
+, ns_sf.player_id
+, ns_sf.espn_player_id
+, ns_sf.player_position
+, 'SUPER_FLEX' as fantasy_position
+, ns_sf.player_order
+from (
+SELECT
+fp.user_id
+, fp.espn_player_id
+, fp.player_id
+, fp.player_position
+, RANK() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, fp.sf_cnt
+from base_players fp
+left join (select * from starters UNION ALL select * from flex) s on s.espn_player_id = fp.espn_player_id
+where s.espn_player_id IS NULL
+and fp.player_position IN ('QB','RB','WR','TE')  
+order by player_order) ns_sf
+where player_order <= ns_sf.sf_cnt)
+
+, all_starters as (select 
+user_id
+,ap.player_id
+,ap.espn_player_id
+,ap.player_position 
+,ap.fantasy_position
+,'STARTER' as fantasy_designation
+,ap.player_order
+from (select * from starters UNION ALL select * from flex UNION ALL select * from super_flex) ap
+order by user_id, player_position desc)
+						  
+select tp.user_id
+,m.display_name
+,p.full_name
+,p.team
+,tp.player_id as sleeper_id
+,tp.player_position
+,tp.fantasy_position
+,tp.fantasy_designation
+,coalesce(ep.total_projection, -1) as player_value
+from (select 
+		user_id
+		,ap.player_id
+		,ap.espn_player_id
+		,ap.player_position 
+		,ap.fantasy_position
+		,'STARTER' as fantasy_designation
+		,ap.player_order 
+		from all_starters ap
+		UNION
+		select 
+		bp.user_id
+		,bp.player_id
+		,bp.espn_player_id
+		,bp.player_position 
+		,bp.player_position as fantasy_position
+		,'BENCH' as fantasy_designation
+		,bp.player_order
+		from base_players bp where bp.player_id not in (select player_id from all_starters)) tp
+inner join dynastr.players p on tp.player_id = p.player_id
+inner JOIN dynastr.espn_player_projections ep on tp.espn_player_id = ep.espn_player_id
+
+inner join dynastr.managers m on tp.user_id = m.user_id 
+order by m.display_name, player_value desc
         """
         )
         contenders = contenders_cursor.fetchall()
 
-        qbs = [player for player in contenders if player["player_position"] == "QB"]
-        rbs = [player for player in contenders if player["player_position"] == "RB"]
-        wrs = [player for player in contenders if player["player_position"] == "WR"]
-        tes = [player for player in contenders if player["player_position"] == "TE"]
+        starting_qbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "QB"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_rbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "RB"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_wrs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "WR"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_tes = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "TE"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        flex = [player for player in contenders if player["fantasy_position"] == "FLEX"]
+        super_flex = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "SUPER_FLEX"
+        ]
+        bench_qbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "QB"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_rbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "RB"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_wrs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "WR"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_tes = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "TE"
+            if player["fantasy_designation"] == "BENCH"
+        ]
 
-        c_aps = {"qb": qbs, "rb": rbs, "wr": wrs, "te": tes}
+        fp_starters = {
+            "qb": starting_qbs,
+            "rb": starting_rbs,
+            "wr": starting_wrs,
+            "te": starting_tes,
+            "flex": flex,
+            "super_flex": super_flex,
+        }
+        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
+        c_aps = {"starters": fp_starters, "bench": fp_bench}
+
         c_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         c_owners_cursor.execute(
             f"""SELECT 
-                    t3.user_id
-                    , m.display_name
+                     t3.user_id
+                    , t3.display_name
                     , total_value
                     , total_rank
                     , max(qb_value) as qb_value
@@ -2030,62 +2223,237 @@ def contender_rankings():
                     , DENSE_RANK() OVER (order by max(wr_value) desc) wr_rank
                     , max(te_value) as te_value
                     , DENSE_RANK() OVER (order by max(te_value) desc) te_rank
+                    , max(flex_value) as flex_value
+                    , DENSE_RANK() OVER (order by max(flex_value) desc) flex_rank
+                    , max(super_flex_value) as super_flex_value
+                    , DENSE_RANK() OVER (order by max(super_flex_value) desc) super_flex_rank
+					, max(starters_value) as starters_value
+                    , DENSE_RANK() OVER (order by max(starters_value) desc) starters_rank
+					, max(Bench_value) as Bench_value
+                    , DENSE_RANK() OVER (order by max(bench_value) desc) bench_rank
 
                     from (select 
                         user_id
-                        , sum(value) as position_value
-                        , total_value
-                        , DENSE_RANK() OVER (PARTITION BY player_position  order by sum(value) desc) position_rank
-                        , DENSE_RANK() OVER (order by total_value desc) total_rank
-                        , player_position
-                        , case when player_position = 'QB' THEN sum(value) else 0 end as qb_value
-                        , case when player_position = 'RB' THEN sum(value) else 0 end as rb_value
-                        , case when player_position = 'WR' THEN sum(value) else 0 end as wr_value
-                        , case when player_position = 'TE' THEN sum(value) else 0 end as te_value
-                        from (SELECT
-                        asset.user_id 
-                        , asset.league_id
-                        , asset.session_id
-                        , asset.full_name
-                        , asset.player_position
-                        , asset.team
-                        , coalesce(total_projection,-1) as value  
-                        , sum(coalesce(total_projection,0)) OVER (PARTITION BY asset.user_id) as total_value    
-                        from      
-                        (
-                        SELECT
-                            lp.user_id 
-                            ,lp.league_id
-                            ,lp.session_id
-                            , p.full_name full_name
-                            , concat(p.first_name, p.last_name) player_name
-                            , p.player_position
-                            , p.team
-                            from dynastr.league_players lp
-                            inner join dynastr.players p on lp.player_id = p.player_id
-                            where 1=1
-                            and session_id = '{session_id}'
-                            and league_id = '{league_id}'
-                            and p.player_position != 'FB'  
-                    ) asset  
-                LEFT JOIN dynastr.espn_player_projections ep on asset.player_name = concat(ep.player_first_name, ep.player_last_name)
-                ORDER BY asset.user_id, asset.player_position, value desc
-                            ) t2
+                    ,display_name
+                    , sum(player_value) as position_value
+                    , total_value
+                    , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) desc) position_rank
+                    , DENSE_RANK() OVER (order by total_value desc) total_rank
+                    , fantasy_position
+                    , case when fantasy_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                    , case when fantasy_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                    , case when fantasy_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                    , case when fantasy_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                    , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
+                    , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
+				    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
+				    , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
+                     from 
+                    (select all_players.user_id 
+                    , all_players.display_name 
+                    , all_players.full_name
+                    , all_players.player_position
+                    , all_players.fantasy_position
+                    , all_players.fantasy_designation
+                    , all_players.team
+                    , all_players.player_value
+                    , sum(all_players.player_value) OVER (PARTITION BY all_players.user_id) as total_value  
+                    from (WITH base_players as (SELECT
+                                lp.user_id
+                                , lp.league_id
+                                , lp.session_id
+                                , pl.full_name 
+                                , pl.player_id
+                                , ep.espn_player_id
+                                , pl.player_position
+                                , coalesce(ep.total_projection, -1) as player_value
+                                , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ep.total_projection, -1) desc) as player_order
+                                , qb_cnt
+                                , rb_cnt
+                                , wr_cnt
+                                , te_cnt
+                                , flex_cnt
+                                , sf_cnt
+
+                                from dynastr.league_players lp
+                                inner join dynastr.players pl on lp.player_id = pl.player_id
+                                LEFT JOIN dynastr.espn_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
+                                inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'ce6756b6-b4da-4c09-951c-85136d26c24b'
+                                where lp.session_id = 'ce6756b6-b4da-4c09-951c-85136d26c24b'
+                                and lp.league_id = '785357489553154048'
+                                and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))  
+                                                        
+                                , starters as (SELECT  
+                                qb.user_id
+                                , qb.player_id
+                                , qb.espn_player_id
+                                , qb.player_position
+                                , qb.player_position as fantasy_position
+                                , qb.player_order
+                                from base_players qb
+                                where 1=1
+                                and qb.player_position = 'QB'
+                                and qb.player_order <= qb.qb_cnt
+                                UNION ALL
+                                select 
+                                rb.user_id
+                                , rb.player_id
+                                , rb.espn_player_id
+                                , rb.player_position
+                                , rb.player_position as fantasy_position
+                                , rb.player_order
+                                from base_players rb
+                                where 1=1
+                                and rb.player_position = 'RB'
+                                and rb.player_order <= rb.rb_cnt
+                                UNION ALL
+                                select 
+                                wr.user_id
+                                , wr.player_id
+                                , wr.espn_player_id
+                                , wr.player_position
+                                , wr.player_position as fantasy_position
+                                , wr.player_order
+                                from base_players wr
+                                where wr.player_position = 'WR'
+                                and wr.player_order <= wr.wr_cnt
+
+                                UNION ALL
+                                select 
+                                te.user_id
+                                , te.player_id
+                                , te.espn_player_id
+                                , te.player_position
+                                , te.player_position as fantasy_position
+                                , te.player_order
+                                from 	
+                                base_players te
+                                where te.player_position = 'TE'
+                                and te.player_order <= te.te_cnt
+                                )
+
+                                , flex as (
+                                SELECT
+                                ns.user_id
+                                , ns.player_id
+                                , ns.espn_player_id
+                                , ns.player_position
+                                , 'FLEX' as fantasy_position
+                                , ns.player_order
+                                from (
+                                SELECT
+                                fp.user_id
+                                , fp.espn_player_id
+                                , fp.player_id
+                                , fp.player_position
+                                , RANK() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+                                , fp.flex_cnt
+                                from base_players fp
+                                left join starters s on s.espn_player_id = fp.espn_player_id
+                                where 1=1
+                                --and lower(fp.user_id) in ('432367510474461184','342397313982976000')
+                                and s.espn_player_id IS NULL
+                                and fp.player_position IN ('RB','WR','TE')  
+                                order by player_order) ns
+                                where player_order <= ns.flex_cnt)
+
+                                ,super_flex as (
+                                SELECT
+                                ns_sf.user_id
+                                , ns_sf.player_id
+                                , ns_sf.espn_player_id
+                                , ns_sf.player_position
+                                , 'SUPER_FLEX' as fantasy_position
+                                , ns_sf.player_order
+                                from (
+                                SELECT
+                                fp.user_id
+                                , fp.espn_player_id
+                                , fp.player_id
+                                , fp.player_position
+                                , RANK() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+                                , fp.sf_cnt
+                                from base_players fp
+                                left join (select * from starters UNION ALL select * from flex) s on s.espn_player_id = fp.espn_player_id
+                                where s.espn_player_id IS NULL
+                                and fp.player_position IN ('QB','RB','WR','TE')  
+                                order by player_order) ns_sf
+                                where player_order <= ns_sf.sf_cnt)
+
+                                , all_starters as (select 
+                                user_id
+                                ,ap.player_id
+                                ,ap.espn_player_id
+                                ,ap.player_position 
+                                ,ap.fantasy_position
+                                ,'STARTER' as fantasy_designation
+                                ,ap.player_order
+                                from (select * from starters UNION ALL select * from flex UNION ALL select * from super_flex) ap
+                                order by user_id, player_position desc)
+                                                        
+                                select tp.user_id
+                                ,m.display_name
+                                ,p.full_name
+                                ,p.team
+                                ,tp.player_id as sleeper_id
+                                ,tp.player_position
+                                ,tp.fantasy_position
+                                ,tp.fantasy_designation
+                                ,coalesce(ep.total_projection, -1) as player_value
+                                from (select 
+                                        user_id
+                                        ,ap.player_id
+                                        ,ap.espn_player_id
+                                        ,ap.player_position 
+                                        ,ap.fantasy_position
+                                        ,'STARTER' as fantasy_designation
+                                        ,ap.player_order 
+                                        from all_starters ap
+                                        UNION
+                                        select 
+                                        bp.user_id
+                                        ,bp.player_id
+                                        ,bp.espn_player_id
+                                        ,bp.player_position 
+                                        ,bp.player_position as fantasy_position
+                                        ,'BENCH' as fantasy_designation
+                                        ,bp.player_order
+                                        from base_players bp where bp.player_id not in (select player_id from all_starters)) tp
+                                inner join dynastr.players p on tp.player_id = p.player_id
+                                inner JOIN dynastr.espn_player_projections ep on tp.espn_player_id = ep.espn_player_id
+                                inner join dynastr.managers m on tp.user_id = m.user_id 
+                                order by m.display_name, player_value desc)all_players
+									 					) t2
                                                 group by 
-                                                user_id, t2.total_value
-                                                , player_position ) t3
-                                                INNER JOIN dynastr.managers m on cast(t3.user_id as varchar) = cast(m.user_id as varchar)
-                                                group by 
-                                                t3.user_id, m.display_name, total_value, total_rank
+                                                  t2.user_id
+                                                , t2.display_name
+                                                , t2.total_value
+                                                , t2.fantasy_position
+                                                , t2.fantasy_designation ) t3
+                                                 group by 
+                                                t3.user_id
+                                                , t3.display_name
+                                                , total_value
+                                                , total_rank
                                                 order by
-                                                total_value desc
-        """
+                                                total_value desc"""
         )
         c_owners = c_owners_cursor.fetchall()
-        espn_date = datetime.strptime(
-            contenders[0]["insert_date"], "%Y-%m-%dT%H:%M:%S.%f"
-        )
-        refresh_date = datetime.strftime(espn_date, "%m/%d/%Y")
+        labels = [row["display_name"] for row in c_owners]
+        values = [row["total_value"] for row in c_owners]
+        total_value = [row["total_value"] for row in c_owners][0] * 1.05
+        pct_values = [
+            (((row["total_value"] - total_value) / total_value) + 1) * 100
+            for row in c_owners
+        ]
+        print(pct_values)
+        print([row["total_value"] for row in c_owners])
+
+        # espn_date = datetime.strptime(
+        #     contenders[0]["insert_date"], "%Y-%m-%dT%H:%M:%S.%f"
+        # )
+        # refresh_date = datetime.strftime(espn_date, "%m/%d/%Y")
+        date_ = datetime.now().strftime("%m/%d/%Y")
 
         return render_template(
             "leagues/contender_rankings.html",
@@ -2096,7 +2464,10 @@ def contender_rankings():
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
-            refresh_date=refresh_date,
+            refresh_date=date_,
+            labels=labels,
+            values=values,
+            pct_values=pct_values,
         )
     else:
         return redirect(url_for("leagues.index"))
