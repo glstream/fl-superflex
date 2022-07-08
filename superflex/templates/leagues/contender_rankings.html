@@ -39,7 +39,7 @@
     }
 
     td.over-limit-5 {
-        background-color: rgb(14, 33, 229, .75);
+        background-color: rgb(49, 56, 105, .75);
         text-align: center;
         color: white;
     }
@@ -63,13 +63,13 @@
     }
 
     td.over-limit-9 {
-        background-color: rgb(113, 73, 73, .75);
+        background-color: rgb(142, 37, 37, .75);
         text-align: center;
         color: white;
     }
 
     td.over-limit-10 {
-        background-color: rgb(228, 9, 9, .75);
+        background-color: rgb(193, 20, 20, .75);
         text-align: center;
         color: white;
     }
@@ -97,9 +97,10 @@
                 {% for owner in owners %}
                 <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}}
                 </li>
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%"
-                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{owner.total_value}}</div>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar" role="progressbar"
+                        style="width: {{pct_values[loop.index-1]}}%;font-size: medium;" aria-valuenow="0"
+                        aria-valuemin="0" aria-valuemax="100">{{owner.total_value}}</div>
                 </div>
                 {% endfor %}
             </ul>
