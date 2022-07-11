@@ -4,80 +4,79 @@
 <style>
     table {
         border-collapse: separate;
-
     }
-
+    
     td {
         border-radius: 5px;
         border: 1px solid rgb(11, 7, 7);
     }
-
+    
     td.over-limit-1 {
         background-color: rgb(8, 29, 252, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-2 {
         background-color: rgb(14, 33, 229, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-3 {
         background-color: rgb(14, 33, 229, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-4 {
         background-color: rgb(14, 33, 229, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-5 {
         background-color: rgb(49, 56, 105, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-6 {
         background-color: rgb(60, 64, 63, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-7 {
         background-color: rgb(60, 64, 63, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-8 {
         background-color: rgb(60, 64, 63, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-9 {
         background-color: rgb(142, 37, 37, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-10 {
         background-color: rgb(193, 20, 20, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-11 {
         background-color: rgb(208, 15, 15, .75);
         text-align: center;
         color: white;
     }
-
+    
     td.over-limit-12 {
         background-color: rgb(255, 0, 0, .75);
         text-align: center;
@@ -96,8 +95,7 @@
                 <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }}
                 </li>
                 <div class="progress" style="height: 15px;">
-                    <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%"
-                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" "></div>
+                    <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100""></div>
                 </div>
                 {% endfor %}
             </ul>
@@ -196,7 +194,7 @@
                         Bench
                     </a>
 
-                    <div class="card-fr" style="">
+                    <div class="card-fr">
                         {% for k, v in aps.items()%}
                         {% set designation = k %}
                         <div class="card-header bg-transparent">{{designation | upper}} Rank:
@@ -209,24 +207,24 @@
                             {% for c in j if c.user_id == owner.user_id %}
                             {% if k == 'starters' %}
                             <div class="d-flex justify-content-between">
-                                {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
+                                {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
                                 <h5 class="text-left margin-left: 20px;"><span
                                         class="badge bg-primary">{{c.fantasy_position}}</span></h5>
-                                {% elif c.fantasy_position == "RB" %}
+                                {% elif c.fantasy_position =="RB" %}
                                 <h5 class="text-left margin-left: 20px;"><span
                                         class="badge bg-success">{{c.fantasy_position}}</span></h5>
-                                {% elif c.fantasy_position == "WR" %}
+                                {% elif c.fantasy_position =="WR" %}
                                 <h5 class="text-left margin-left: 20px;"><span
                                         class="badge bg-warning">{{c.fantasy_position}}</span></h5>
-                                {% elif c.fantasy_position == "TE" %}
+                                {% elif c.fantasy_position =="TE" %}
                                 <h5 class="text-left margin-left: 20px;"><span
                                         class="badge bg-danger">{{c.fantasy_position}}</span>
                                 </h5>
-                                {% elif c.fantasy_position == "FLEX" %}
+                                {% elif c.fantasy_position =="FLEX" %}
                                 <h5 class="text-left margin-left: 20px;"><span
                                         class="badge bg-info">{{c.fantasy_position}}</span>
                                 </h5>
-                                {% elif c.fantasy_position == "SUPER_FLEX" %}
+                                {% elif c.fantasy_position =="SUPER_FLEX" %}
                                 <h5 class="text-left margin-left: 20px;"><span
                                         class="badge bg-dark">{{c.fantasy_position}}</span>
                                 </h5>
@@ -244,31 +242,31 @@
                                     </object>
                                     <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
                                     <b class="text-left"><span class="text-lg-right"> {{"{:,}".format(c.player_value)|
-                                            replace(545, "Unranked") }}</b></span>
+                                            replace(545,"Unranked") }}</b></span>
                                 </li>
                                 {% endif %}
                                 {% if k == 'bench' %}
                                 <div class="collapse" id="collapse-{{owner.user_id}}">
 
                                     <div class="d-flex justify-content-between">
-                                        {%if loop.index == 1%} {%if c.fantasy_position == "QB" %}
+                                        {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
                                         <h5 class="text-left margin-left: 20px;"><span
                                                 class="badge bg-primary">{{c.fantasy_position}}</span></h5>
-                                        {% elif c.fantasy_position == "RB" %}
+                                        {% elif c.fantasy_position =="RB" %}
                                         <h5 class="text-left margin-left: 20px;"><span
                                                 class="badge bg-success">{{c.fantasy_position}}</span></h5>
-                                        {% elif c.fantasy_position == "WR" %}
+                                        {% elif c.fantasy_position =="WR" %}
                                         <h5 class="text-left margin-left: 20px;"><span
                                                 class="badge bg-warning">{{c.fantasy_position}}</span></h5>
-                                        {% elif c.fantasy_position == "TE" %}
+                                        {% elif c.fantasy_position =="TE" %}
                                         <h5 class="text-left margin-left: 20px;"><span
                                                 class="badge bg-danger">{{c.fantasy_position}}</span>
                                         </h5>
-                                        {% elif c.fantasy_position == "FLEX" %}
+                                        {% elif c.fantasy_position =="FLEX" %}
                                         <h5 class="text-left margin-left: 20px;"><span
                                                 class="badge bg-info">{{c.fantasy_position}}</span>
                                         </h5>
-                                        {% elif c.fantasy_position == "SUPER_FLEX" %}
+                                        {% elif c.fantasy_position =="SUPER_FLEX" %}
                                         <h5 class="text-left margin-left: 20px;"><span
                                                 class="badge bg-dark">{{c.fantasy_position}}</span>
                                         </h5>
@@ -283,12 +281,12 @@
                                             <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}"
                                                 type="image/png">
                                                 <img class="avatar-player"
-                                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp"/>
                                             </object>
                                             <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
                                             <b class="text-left"><span class="text-lg-right">
                                                     {{"{:,}".format(c.player_value)|
-                                                    replace(545, "Unranked") }}</b></span>
+                                                    replace(545,"Unranked") }}</b></span>
                                         </li>
                                     </ul>
                                 </div>

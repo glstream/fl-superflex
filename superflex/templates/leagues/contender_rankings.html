@@ -100,7 +100,7 @@
                 <div class="progress" style="height: 20px;">
                     <div class="progress-bar" role="progressbar"
                         style="width: {{pct_values[loop.index-1]}}%;font-size: medium;" aria-valuenow="0"
-                        aria-valuemin="0" aria-valuemax="100">{{owner.total_value}}</div>
+                        aria-valuemin="0" aria-valuemax="100">{{"{:,}".format(owner.total_value)}}</div>
                 </div>
                 {% endfor %}
             </ul>
