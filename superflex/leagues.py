@@ -1421,8 +1421,8 @@ def get_league():
                     inner join dynastr.players pl on lp.player_id = pl.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
                     inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
-                    where lp.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
-                    and lp.league_id = '785357489553154048'
+                    where lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
                     and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))
 
                     , base_picks as (select t1.user_id
@@ -2655,4 +2655,3 @@ order by m.display_name, player_value desc
         )
     else:
         return redirect(url_for("leagues.index"))
-
