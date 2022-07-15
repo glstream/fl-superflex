@@ -1568,7 +1568,7 @@ def get_league():
                     ,m.display_name
                     ,ktc.player_full_name as full_name
                     ,p.team
-                    ,tp.player_id as player_id
+                    ,tp.player_id as sleeper_id
                     ,tp.player_position
                     ,tp.fantasy_position
                     ,tp.fantasy_designation
