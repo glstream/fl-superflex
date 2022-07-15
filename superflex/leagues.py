@@ -1420,9 +1420,9 @@ def get_league():
                     from dynastr.league_players lp
                     inner join dynastr.players pl on lp.player_id = pl.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
-                    inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
-                    where lp.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
-                    and lp.league_id = '785357489553154048'
+                    inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
+                    where lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
                     and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))
 
                     , base_picks as (select t1.user_id
@@ -1449,8 +1449,8 @@ def get_league():
                                         FROM dynastr.draft_picks dp
                                         inner join dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id and dp.league_id = dpos.league_id
 
-                                        where dpos.league_id = '785357489553154048'
-                                        and dp.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
+                                        where dpos.league_id = '{league_id}'
+                                        and dp.session_id = '{session_id}'
                                         ) al 
                                     inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
@@ -1665,9 +1665,7 @@ def get_league():
         ]
 
         picks = [
-            player
-            for player in players
-            if player["fantasy_designation"] == "PICKS"
+            player for player in players if player["fantasy_designation"] == "PICKS"
         ]
 
         starters = {
@@ -1680,8 +1678,8 @@ def get_league():
         }
 
         bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        picks_ = {"picks":picks}
-        team_spots = {"starters": starters, "bench": bench, "picks":picks_}
+        picks_ = {"picks": picks}
+        team_spots = {"starters": starters, "bench": bench, "picks": picks_}
 
         owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         owner_cursor.execute(
@@ -1760,8 +1758,8 @@ def get_league():
                     inner join dynastr.players pl on lp.player_id = pl.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
                     inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
-                    where lp.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
-                    and lp.league_id = '785357489553154048'
+                    where lp.session_id = '{session_id}'
+                    and lp.league_id = '{league_id}'
                     and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))
 
                     , base_picks as (select t1.user_id
@@ -1788,8 +1786,8 @@ def get_league():
                                         FROM dynastr.draft_picks dp
                                         inner join dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id and dp.league_id = dpos.league_id
 
-                                        where dpos.league_id = '785357489553154048'
-                                        and dp.session_id = 'acfd04a3-1c0d-48e7-b0e0-a3c2a1e36260'
+                                        where dpos.league_id = '{league_id}'
+                                        and dp.session_id = '{session_id}'
                                         ) al 
                                     inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
@@ -1961,7 +1959,7 @@ def get_league():
                                     , total_rank
                                 ORDER BY                                                        
                                 total_value desc"""
-)
+        )
         owners = owner_cursor.fetchall()
         labels = [row["display_name"] for row in owners]
         values = [row["total_value"] for row in owners]
@@ -2833,4 +2831,3 @@ order by m.display_name, player_value desc
         )
     else:
         return redirect(url_for("leagues.index"))
-
