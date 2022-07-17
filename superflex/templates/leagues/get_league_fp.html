@@ -5,78 +5,78 @@
     table {
         border-collapse: separate;
     }
-    
+
     td {
         border-radius: 5px;
         border: 1px solid rgb(11, 7, 7);
     }
-    
+
     td.over-limit-1 {
         background-color: rgb(8, 29, 252, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-2 {
         background-color: rgb(14, 33, 229, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-3 {
         background-color: rgb(14, 33, 229, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-4 {
         background-color: rgb(14, 33, 229, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-5 {
         background-color: rgb(49, 56, 105, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-6 {
         background-color: rgb(60, 64, 63, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-7 {
         background-color: rgb(60, 64, 63, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-8 {
         background-color: rgb(60, 64, 63, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-9 {
         background-color: rgb(142, 37, 37, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-10 {
         background-color: rgb(193, 20, 20, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-11 {
         background-color: rgb(208, 15, 15, .75);
         text-align: center;
         color: white;
     }
-    
+
     td.over-limit-12 {
         background-color: rgb(255, 0, 0, .75);
         text-align: center;
@@ -85,7 +85,6 @@
 </style>
 <div class="container">
     <div class="row justify-content-center">
-
         <div class="card" style="width: 18rem;">
             <div class="header">
                 <h4 style="padding:10px" class="title">Power Rankings</h4>
@@ -95,7 +94,8 @@
                 <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name }}
                 </li>
                 <div class="progress" style="height: 15px;">
-                    <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100""></div>
+                    <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%"
+                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100""></div>
                 </div>
                 {% endfor %}
             </ul>
@@ -177,7 +177,7 @@
 
         </div>
         <div>
-            <label style="float:right;">Fantasy Pros Player Values Updated: {{date_}}</label>
+            <label style="float:right;">Fantasy Pros Player Ranks Updated {{update_diff_minutes}} minutes ago.</label>
         </div>
         <br>
         <br>
@@ -281,7 +281,7 @@
                                             <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}"
                                                 type="image/png">
                                                 <img class="avatar-player"
-                                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp"/>
+                                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                                             </object>
                                             <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
                                             <b class="text-left"><span class="text-lg-right">
@@ -304,4 +304,6 @@
                 {% endfor %}
             </div>
         </div>
-        {% endblock %}
+    </div>
+</div>
+{% endblock %}
