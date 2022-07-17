@@ -1337,8 +1337,6 @@ order by m.display_name, player_value asc"""
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
-
-    print(request.form)
     if request.method == "POST":
         if list(request.form)[0] == "trade_tracker":
 
@@ -1393,8 +1391,6 @@ def get_league():
                 )
             )
         if list(request.form)[0] == "fp_rankings":
-            print("paspa")
-            print(request.form)
             league_data = eval(request.form["fp_rankings"])
             session_id = league_data[0]
             user_id = league_data[1]
@@ -1422,8 +1418,8 @@ def get_league():
                     , pl.player_id
                     , ktc.ktc_player_id
                     , pl.player_position
-                    , coalesce(ktc.sf_value, -1) as player_value
-                    , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ktc.sf_value, -1) desc) as player_order
+                    , coalesce(ktc.{league_type}, -1) as player_value
+                    , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ktc.{league_type}, -1) desc) as player_order
                     , qb_cnt
                     , rb_cnt
                     , wr_cnt
@@ -1586,7 +1582,7 @@ def get_league():
                     ,tp.player_position
                     ,tp.fantasy_position
                     ,tp.fantasy_designation
-                    ,coalesce(ktc.sf_value, -1) as player_value
+                    ,coalesce(ktc.{league_type}, -1) as player_value
                     from (select 
                             user_id
                             ,ap.player_id
@@ -1762,8 +1758,8 @@ def get_league():
                     , pl.player_id
                     , ktc.ktc_player_id
                     , pl.player_position
-                    , coalesce(ktc.sf_value, -1) as player_value
-                    , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ktc.sf_value, -1) desc) as player_order
+                    , coalesce(ktc.{league_type}, -1) as player_value
+                    , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ktc.{league_type}, -1) desc) as player_order
                     , qb_cnt
                     , rb_cnt
                     , wr_cnt
@@ -1926,7 +1922,7 @@ def get_league():
                     ,tp.player_position
                     ,tp.fantasy_position
                     ,tp.fantasy_designation
-                    ,coalesce(ktc.sf_value, -1) as player_value
+                    ,coalesce(ktc.{league_type}, -1) as player_value
                     from (select 
                             user_id
                             ,ap.player_id
