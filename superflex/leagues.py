@@ -1301,7 +1301,22 @@ order by m.display_name, player_value asc"""
         pct_values = [
             100 - abs((total_value / row["total_value"]) - 1) * 100 for row in fp_owners
         ]
-        print(pct_values)
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.espn_player_projections"
+        )
+        _date = date_cursor.fetchall()
+        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round(
+            (current_time - ktc_max_time).total_seconds() / 60.0
+        )
+
+        fp_owners_cursor.close()
+        fp_cursor.close()
+        date_cursor.close()
+
         return render_template(
             "leagues/get_league_fp.html",
             owners=fp_owners,
@@ -1312,7 +1327,7 @@ order by m.display_name, player_value asc"""
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
-            date_=date_,
+            update_diff_minutes=update_diff_minutes,
             labels=labels,
             values=values,
             pct_values=pct_values,
@@ -1322,7 +1337,7 @@ order by m.display_name, player_value asc"""
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
-    date_ = datetime.now().strftime("%m/%d/%Y")
+
     print(request.form)
     if request.method == "POST":
         if list(request.form)[0] == "trade_tracker":
@@ -1404,7 +1419,6 @@ def get_league():
                     lp.user_id
                     , lp.league_id
                     , lp.session_id
-                    , pl.full_name 
                     , pl.player_id
                     , ktc.ktc_player_id
                     , pl.player_position
@@ -1566,7 +1580,7 @@ def get_league():
                                             
                     select tp.user_id
                     ,m.display_name
-                    ,ktc.player_full_name as full_name
+                    ,coalesce(ktc.player_full_name, tp.picks_player_name, p.full_name)as full_name
                     ,p.team
                     ,tp.player_id as sleeper_id
                     ,tp.player_position
@@ -1577,6 +1591,7 @@ def get_league():
                             user_id
                             ,ap.player_id
                             ,ap.ktc_player_id
+                            ,NULL as picks_player_name
                             ,ap.player_position 
                             ,ap.fantasy_position
                             ,'STARTER' as fantasy_designation
@@ -1587,6 +1602,7 @@ def get_league():
                             bp.user_id
                             ,bp.player_id
                             ,bp.ktc_player_id
+                            ,NULL as picks_player_name
                             ,bp.player_position 
                             ,bp.player_position as fantasy_position
                             ,'BENCH' as fantasy_designation
@@ -1597,6 +1613,7 @@ def get_league():
                             user_id
                             ,null as player_id
                             ,picks.ktc_player_id
+                            ,picks.player_name as picks_player_name
                             ,'PICKS' as player_position 
                             ,'PICKS' as fantasy_position
                             ,'PICKS' as fantasy_designation
@@ -1604,7 +1621,7 @@ def get_league():
                             from base_picks picks
                             ) tp
                     left join dynastr.players p on tp.player_id = p.player_id
-                    inner JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
+                    LEFT JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
                     inner join dynastr.managers m on tp.user_id = m.user_id 
                     order by m.display_name, player_value desc
                 """
@@ -1969,8 +1986,19 @@ def get_league():
             for row in owners
         ]
 
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute("select max(insert_date) from dynastr.ktc_player_ranks")
+        _date = date_cursor.fetchall()
+        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round(
+            (current_time - ktc_max_time).total_seconds() / 60.0
+        )
+
         owner_cursor.close()
         player_cursor.close()
+        date_cursor.close()
 
         return render_template(
             "leagues/get_league.html",
@@ -1982,7 +2010,7 @@ def get_league():
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
-            date_=date_,
+            update_diff_minutes=update_diff_minutes,
             labels=labels,
             values=values,
             pct_values=pct_values,
@@ -2257,6 +2285,16 @@ def trade_tracker():
                 if i[1] == transaction_id[0]
             }
 
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute("select max(insert_date) from dynastr.ktc_player_ranks")
+        _date = date_cursor.fetchall()
+        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round(
+            (current_time - ktc_max_time).total_seconds() / 60.0
+        )
+
         return render_template(
             "leagues/trade_tracker.html",
             transaction_ids=transaction_ids,
@@ -2265,7 +2303,7 @@ def trade_tracker():
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
-            date_=date_,
+            update_diff_minutes=update_diff_minutes,
             league_name=get_league_name(league_id),
         )
 
@@ -2809,11 +2847,20 @@ order by m.display_name, player_value desc
             for row in c_owners
         ]
 
-        # espn_date = datetime.strptime(
-        #     contenders[0]["insert_date"], "%Y-%m-%dT%H:%M:%S.%f"
-        # )
-        # refresh_date = datetime.strftime(espn_date, "%m/%d/%Y")
-        date_ = datetime.now().strftime("%m/%d/%Y")
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.espn_player_projections"
+        )
+        _date = date_cursor.fetchall()
+        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round(
+            (current_time - ktc_max_time).total_seconds() / 60.0
+        )
+        contenders_cursor.close()
+        c_owners_cursor.close()
+        date_cursor.close()
 
         return render_template(
             "leagues/contender_rankings.html",
@@ -2824,7 +2871,7 @@ order by m.display_name, player_value desc
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
-            refresh_date=date_,
+            update_diff_minutes=update_diff_minutes,
             labels=labels,
             values=values,
             pct_values=pct_values,
