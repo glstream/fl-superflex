@@ -34,7 +34,7 @@
         <a class="btn btn-outline-primary" href="{{url_for('leagues.index')}}">User Name</a>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
         {% for message in get_flashed_messages() %}
         <div class="flash">{{ message }}</div>
         {% endfor %} {% block content %}{% endblock %}

@@ -24,7 +24,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-
     @app.template_filter("get_user_name")
     def get_user_name(user_id: str) -> str:
         user_url = f"https://api.sleeper.app/v1/user/{user_id}"
@@ -48,6 +47,13 @@ def create_app(test_config=None):
     def sleeper_img(sleeper_id):
         if sleeper_id:
             return f"https://sleepercdn.com/content/nfl/players/thumb/{sleeper_id}.jpg"
+        else:
+            return "https://sleepercdn.com/images/v2/icons/player_default.webp"
+
+    @app.template_filter("owner_img")
+    def owner_img(avatar_id):
+        if avatar_id:
+            return f"https://sleepercdn.com/uploads/{avatar_id}.jpg"
         else:
             return "https://sleepercdn.com/images/v2/icons/player_default.webp"
 

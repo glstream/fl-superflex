@@ -8,6 +8,97 @@ body {
     /* background: white; */
 }
 
+table {
+    border-collapse: separate;
+
+}
+
+.table-all {
+    border: 1px solid black;
+    font-size: 14px;
+}
+
+th {
+    height: 100%;
+}
+
+td {
+    border-radius: 5px;
+    border: 1px solid rgb(11, 7, 7);
+}
+
+td.over-limit-1 {
+    background-color: rgb(8, 29, 252, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-2 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-3 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-4 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-5 {
+    background-color: rgb(14, 33, 229, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-6 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-7 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-8 {
+    background-color: rgb(60, 64, 63, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-9 {
+    background-color: rgb(113, 73, 73, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-10 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+td.over-limit-11 {
+    background-color: rgb(228, 9, 9, .75);
+    text-align: center;
+    color: white;
+}
+
+.over-limit-pl {
+    background-color: rgba(27, 120, 93, 0.75);
+    text-align: center;
+    color: white;
+}
+
 .content {
     padding: 0 1rem 1rem;
 }
@@ -96,6 +187,7 @@ input[type=submit] {
     border-style: solid;
     border-width: 2px 2px 2px 2px;
     border-color: rgb(10, 158, 180);
+
 }
 
 .btn-group.special {
@@ -178,86 +270,4 @@ a {
 
 h5>.badge {
     vertical-align: bottom;
-}
-
-table {
-    border-collapse: separate;
-
-}
-
-td {
-    border-radius: 5px;
-    border: 1px solid rgb(11, 7, 7);
-}
-
-td.over-limit-1 {
-    background-color: rgb(8, 29, 252, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-2 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-3 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-4 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-5 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-6 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-7 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-8 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-9 {
-    background-color: rgb(113, 73, 73, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-10 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-11 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
-}
-
-td.over-limit-12 {
-    background-color: rgb(255, 0, 0, .75);
-    text-align: center;
-    color: white;
 }

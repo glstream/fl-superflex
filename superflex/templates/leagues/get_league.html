@@ -1,6 +1,17 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+<div class="">
+    <div style="display: flex;margin-right: 50px;">
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
+            type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
 
-<h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
+        </object>
+        <p></p>
+        <span><b>
+                <h1>{{league_name}}</h1>
+            </b></span>
+    </div>
+</div>
 <br>
 <style>
     table {
@@ -10,6 +21,10 @@
     td {
         border-radius: 5px;
         border: 1px solid rgb(11, 7, 7);
+    }
+
+    th {
+        height: 100%;
     }
 
     td.over-limit-1 {
@@ -84,32 +99,60 @@
         color: white;
     }
 </style>
-<script>$('#t1 .panel-default').on('click', function () {
-        $('#t1 .panel-collapse').collapse('toggle');
-    });</script>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="card" style="width: 18rem;">
-            <div class="header">
-                <h4 style="padding:10px" class="title">Power Rankings</h4>
-            </div>
-            <ul class="list-group list-group-flush">
-                {% for owner in owners %}
-                <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}}
-                    <span style="float:right">{{"{:,}".format(owner.total_value)}}</span>
-                </li>
-                <div class="progress" style="height: 15px;">
-                    <div class="progress-bar" role="progressbar"
-                        style="width: {{pct_values[loop.index-1]}}%;font-size: medium;" aria-valuenow="0"
-                        aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                {% endfor %}
-            </ul>
-            <br>
+<div class="row justify-content-left" style="margin:auto;">
+    <div class="card" style="width: 20rem; margin-right: 50px;">
+        <div class=" header">
+            <h4 style="padding:10px" class="title">Power Rankings</h4>
         </div>
-        <div class="col-auto">
-            <table class="table rounded table-hover">
-                <thead class="" style="text-align:center">
+        <ul class="list-group list-group-flush">
+            {% for owner in owners %}
+            <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}}
+                <span style="float:right">{{"{:,}".format(owner.total_value)}}</span>
+            </li>
+            <div class="progress" style="height: 15px;">
+                <div class="progress-bar" role="progressbar"
+                    style="width: {{pct_values[loop.index-1]}}%;font-size: medium;" aria-valuenow="0" aria-valuemin="0"
+                    aria-valuemax="100"></div>
+            </div>
+            {% endfor %}
+        </ul>
+        <br>
+    </div>
+    <div class="col-auto" style="width: 65em;; margin-right: 50px;">
+        <div class="card-body">
+            <div class="list-group">
+                <form method="post" class="form-inline">
+                    <div class="btn-group">
+                        <div class="dropdown">
+                            <form method="post" class="form-inline">
+                                <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Power Rankings
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" disabled>Keep Trade Cut</a>
+                                        <button class="dropdown-item" type="submit" name="fp_rankings"
+                                            value="{{session_id, user_id, league_id}}">Fantasy Pros</a>
+                                </div>
+                            </form>
+                        </div>
+                        <br>
+                        <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
+                            value="{{session_id, user_id, league_id}}">Trade
+                            Tracker</button>
+                        <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings"
+                            value="{{session_id, user_id, league_id}}">Contender
+                            Rankings</button>
+                    </div>
+                </form>
+                <br>
+            </div>
+
+        </div>
+        <div class="col-auto" style="width:65em;; margin-right: 50px;">
+            <table class="table rounded table-hover" style="width:95%">
+                <thead style="text-align:center">
                     <tr>
                         <th scope="col">Manager</th>
                         <th>Overall</th>
@@ -124,7 +167,7 @@
                 </thead>
                 <tbody>
                     {% for owner in owners %}
-                    <td scope="row" style="text-align:center">{{owner.display_name}}</td>
+                    <td style="text-align:center">{{owner.display_name}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.total_rank}}">
                         {{owner.total_rank | suffix}}
                     </td>
@@ -140,131 +183,124 @@
                         {{owner.starters_rank | suffix}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.bench_rank}}">
                         {{owner.bench_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.picks_rank}}">{{owner.picks_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.picks_rank}}">{{owner.picks_rank |
+                        suffix}}
                     </td>
                     </tr>
                     {% endfor %}
                 </tbody>
 
             </table>
-        </div>
-
-        <div class="card border-0" style="width: 18em;">
-            <div class="card-body">
-                <div class="list-group">
-                    <form method="post" class="form-inline">
-                        <div class="btn-group">
-                            <button class="btn btn-outline-secondary btn-lg" disabled>Power
-                                Rankings</button>
-                            <br>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
-                                value="{{session_id, user_id, league_id}}">Trade
-                                Tracker</button>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings"
-                                value="{{session_id, user_id, league_id}}">Contender
-                                Rankings</button>
-                        </div>
-                    </form>
-                    <br>
-                    <form method="post" class="form-inline">
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-secondary" disabled>KTC</button>
-                            <button class="btn btn-secondary" type="submit" name="fp_rankings"
-                                value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
-                        </div>
-                    </form>
-                </div>
-
+            <br>
+            <div>
+                <span class="align-bottom">KTC Player Values Updated
+                    {{update_diff_minutes}} minutes
+                    ago.</span>
             </div>
         </div>
+
     </div>
+    <div class="card" style="width: 18em;">
+        <div class="header">
+            <h4 style="padding:10px" class="title">Best Available</h4>
+        </div>
 
-    <div>
-
-        <label style="float:right;">KTC Player Values Updated {{update_diff_minutes}} minutes ago.</label>
+        {% for pos, player in best_available.items() %}
+        <div class="d-flex justify-content-between">
+            <h5 class="text-left margin-left: 20px;"><span class="badge bg-primary">{{pos}}</span></h5>
+            <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+        </div>
+        {% for p in player %}
+        <div style="display: flex; justify-content: space-between;">
+            <span class="pb-2">{{p.full_name}}</span>
+            <span><b>{{"{:,}".format(p.player_value) }}</b></span>
+        </div>
+        {%endfor%}
+        {%endfor%}
     </div>
-    <br>
-    <div class="container">
-        <a class="btn btn-primary" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
-            aria-controls="collapseExample">Expand all teams</a>
-        <div class="row justify-content-center">
-            {% for owner in owners %}
-            <div class="col-md-auto">
-                <h5 class="text-center">{{owner.display_name}}</h5>
-                <h5 class="text-center">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
-                <h5 class="text-center"> Rank: {{owner.total_rank | suffix}}</h5>
-                <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}"
-                    aria-expanded="false" aria-controls="collapseExample">
-                    Show Team
-                </a>
+</div>
+<br>
 
-                <div class="card-fr">
-                    {% for k, v in aps.items()%}
-                    {% set designation = k %}
-                    <div class="card-header bg-transparent">{{designation | upper}} Rank: {{owner[designation+"_rank"] |
-                        suffix}}
+<div> <a class="btn btn-primary" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
+        aria-controls="collapseExample">Expand all teams</a>
+</div>
+
+<br>
+<div class="row justify-content-left">
+    {% for owner in owners %}
+    <div class="col-auto">
+        <h5 class="text-left">{{owner.display_name}}</h5>
+        <h5 class="text-left">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
+        <h5 class="text-left"> Rank: {{owner.total_rank | suffix}}</h5>
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
+            aria-controls="collapseExample">
+            Show Team
+        </a>
+        <div class="card-fr" style="width: 18rem;">
+            {% for k, v in aps.items()%}
+            {% set designation = k %}
+            <div class="card-header bg-transparent">{{designation[0] | upper }}{{ designation[1:] | lower}} Rank:
+                {{owner[designation+"_rank"] |
+                suffix}}
+            </div>
+            <br> {% for p,j in v.items() %}
+            <div class="card d-flex border-0">
+                {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
+                <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
+                    <div class="d-flex justify-content-between">
+                        {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position =="RB" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position =="WR" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position =="TE" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-danger">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position =="FLEX" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-info">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position =="SUPER_FLEX" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-dark">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position == "PICKS" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-dark">{{c.fantasy_position}}</span>
+                        </h5>
+                        {%endif%}
+                        <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+                        {%endif%}
                     </div>
-                    <br> {% for p,j in v.items() %}
-                    <div class="card d-flex border-0">
-                        {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
-                        <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
-                            <div class="d-flex justify-content-between">
-                                {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-primary">{{c.fantasy_position}}</span></h5>
-                                {% elif c.fantasy_position =="RB" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-success">{{c.fantasy_position}}</span></h5>
-                                {% elif c.fantasy_position =="WR" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-warning">{{c.fantasy_position}}</span></h5>
-                                {% elif c.fantasy_position =="TE" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-danger">{{c.fantasy_position}}</span>
-                                </h5>
-                                {% elif c.fantasy_position =="FLEX" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-info">{{c.fantasy_position}}</span>
-                                </h5>
-                                {% elif c.fantasy_position =="SUPER_FLEX" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-dark">{{c.fantasy_position}}</span>
-                                </h5>
-                                {% elif c.fantasy_position == "PICKS" %}
-                                <h5 class="text-left margin-left: 20px;"><span
-                                        class="badge bg-dark">{{c.fantasy_position}}</span>
-                                </h5>
-                                {%endif%}
-                                <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
-                                {%endif%}
-                            </div>
 
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center border-0">
-                                    <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}"
-                                        type="image/png">
-                                        <img class="avatar-player"
-                                            src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                                    </object>
-                                    <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
-                                    <b class="text-left"><span class="text-lg-right">
-                                            {{"{:,}".format(c.player_value)|
-                                            replace(-1,"Unranked") }}</b></span>
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-
-                    </div>
-                    {% endfor %}
-
-                    {% endfor %}
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-left border-0">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                            <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
+                            <b><span class="text-lg-right">
+                                    {{"{:,}".format(c.player_value)|
+                                    replace(-1,"Unranked") }}</b></span>
+                        </li>
+                    </ul>
                 </div>
-
+                {% endif %}
+                {% endfor %}
 
             </div>
             {% endfor %}
+            {% endfor %}
         </div>
     </div>
-    {% endblock %}
+    {% endfor %}
+</div>
+
+
+{% endblock %}
