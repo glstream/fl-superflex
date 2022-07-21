@@ -13,6 +13,11 @@ table {
 
 }
 
+.table-all {
+    border: 1px solid black;
+    font-size: 14px;
+}
+
 th {
     height: 100%;
 }
@@ -88,10 +93,10 @@ td.over-limit-11 {
     color: white;
 }
 
-.pl1 {
-    background-color: rgba(14, 150, 61, 0.75);
+.over-limit-pl {
+    background-color: rgba(27, 120, 93, 0.75);
     text-align: center;
-    color: rgb(128, 6, 6);
+    color: white;
 }
 
 .content {

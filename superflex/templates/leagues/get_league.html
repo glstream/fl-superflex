@@ -99,7 +99,6 @@
         color: white;
     }
 </style>
-<link rel="stylesheet" href="url_for('static', filename='style.css')">
 <div class="row justify-content-left" style="margin:auto;">
     <div class="card" style="width: 20rem; margin-right: 50px;">
         <div class=" header">
@@ -168,7 +167,7 @@
                 </thead>
                 <tbody>
                     {% for owner in owners %}
-                    <td scope="row" style="text-align:center">{{owner.display_name}}</td>
+                    <td style="text-align:center">{{owner.display_name}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.total_rank}}">
                         {{owner.total_rank | suffix}}
                     </td>
