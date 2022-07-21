@@ -1740,7 +1740,7 @@ def get_league():
 				        , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
                         from (SELECT
                         asset.user_id
-                        ,asset.display_name
+                        , asset.display_name
                         , asset.full_name
                         , asset.player_position
                         , asset.fantasy_position
@@ -1931,6 +1931,7 @@ def get_league():
                             ,ap.fantasy_position
                             ,'STARTER' as fantasy_designation
                             ,ap.player_order 
+                            , null as league_id
                             from all_starters ap
                             UNION
                             select 
@@ -1941,6 +1942,7 @@ def get_league():
                             ,bp.player_position as fantasy_position
                             ,'BENCH' as fantasy_designation
                             ,bp.player_order
+                            , bp.league_id
                             from base_players bp where bp.player_id not in (select player_id from all_starters)
                             UNION ALL
                             select 
@@ -1951,6 +1953,7 @@ def get_league():
                             ,'PICKS' as fantasy_position
                             ,'PICKS' as fantasy_designation
                             , null as player_order
+                            , null as league_id
                             from base_picks picks
                             ) tp
                     left join dynastr.players p on tp.player_id = p.player_id
@@ -1982,6 +1985,42 @@ def get_league():
             for row in owners
         ]
 
+        ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        ba_cursor.execute(
+            f"""SELECT 
+            ba_t1.player_id as sleeper_id
+            , ba_t1.full_name
+            , ba_t1.player_position
+            , ba_t1.player_value
+            from (select
+            pl.player_id
+            ,pl.full_name
+            ,pl.player_position
+            , ktc.sf_value as player_value
+            , DENSE_RANK() OVER(PARTITION BY pl.player_position ORDER BY ktc.{league_type} desc) rn
+
+            from dynastr.players pl 
+            inner join dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
+            where 1=1 
+            and pl.player_id NOT IN (SELECT
+                            lp.player_id
+                            from dynastr.league_players lp
+                            where lp.session_id = '{session_id}'
+                            and lp.league_id = '{league_id}'
+                        )
+            and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
+            and pl.team is not null
+            order by sf_value desc) ba_t1
+            where ba_t1.rn <= 5
+            order by ba_t1.player_position, ba_t1.player_value desc"""
+        )
+        ba = ba_cursor.fetchall()
+        ba_qb = [player for player in ba if player["player_position"] == "QB"]
+        ba_rb = [player for player in ba if player["player_position"] == "RB"]
+        ba_wr = [player for player in ba if player["player_position"] == "WR"]
+        ba_te = [player for player in ba if player["player_position"] == "TE"]
+        best_available = {"QB": ba_qb, "RB": ba_rb, "WR": ba_wr, "TE": ba_te}
+
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         date_cursor.execute("select max(insert_date) from dynastr.ktc_player_ranks")
@@ -1992,9 +2031,17 @@ def get_league():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
 
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+        )
+        avatar = avatar_cursor.fetchall()
+
         owner_cursor.close()
         player_cursor.close()
+        ba_cursor.close()
         date_cursor.close()
+        avatar_cursor.close()
 
         return render_template(
             "leagues/get_league.html",
@@ -2010,6 +2057,8 @@ def get_league():
             labels=labels,
             values=values,
             pct_values=pct_values,
+            best_available=best_available,
+            avatar=avatar,
         )
     else:
         return redirect(url_for("leagues.index"))
