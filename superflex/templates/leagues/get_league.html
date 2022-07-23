@@ -1,12 +1,7 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 <div class="">
     <div style="display: flex;margin-right: 50px;">
-        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
-            type="image/png">
-            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-
-        </object>
-        <p></p>
+        <img class="avatar-player" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}" />
         <span><b>
                 <h1>{{league_name}}</h1>
             </b></span>
@@ -229,19 +224,26 @@
 <div class="row justify-content-left">
     {% for owner in owners %}
     <div class="col-auto">
-        <h5 class="text-left">{{owner.display_name}}</h5>
-        <h5 class="text-left">Total Value: {{"{:,}".format(owner.total_value)}}</h5>
-        <h5 class="text-left"> Rank: {{owner.total_rank | suffix}}</h5>
+        {% for user in users %}
+        {% if user[1] == owner.user_id %}
+        <img class="avatar-player" src="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" />
+        <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
+            {{owner.display_name}}
+            &bull;
+            {{"{:,}".format(owner.total_value)}}</h5>
+        {% endif %}
+        {%endfor%}
         <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
             aria-controls="collapseExample">
             Show Team
         </a>
-        <div class="card-fr" style="width: 18rem;">
+        <div class="card-fr" style="width: 20rem;">
             {% for k, v in aps.items()%}
             {% set designation = k %}
-            <div class="card-header bg-transparent">{{designation[0] | upper }}{{ designation[1:] | lower}} Rank:
-                {{owner[designation+"_rank"] |
-                suffix}}
+            <div class="card-header bg-transparent">
+                <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
+                    suffix}}
+                </h5>
             </div>
             <br> {% for p,j in v.items() %}
             <div class="card d-flex border-0">
@@ -279,17 +281,35 @@
                     </div>
 
                     <ul class="list-group">
+                        {% if c.fantasy_position != 'PICKS' %}
                         <li class="list-group-item d-flex justify-content-between align-items-left border-0">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
-                                <img class="avatar-player"
-                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                            </object>
-                            <p class="text-left align-middle">{{c.full_name}}</p> &nbsp &nbsp
+                            <a href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
+                                target="_blank">
+                                <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                    <img class="avatar-player"
+                                        href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
+                                        src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                                </object>
+                            </a>
+                            <a class="text-left align-left"
+                                href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}">{{c.full_name}}</a>
                             <b><span class="text-lg-right">
                                     {{"{:,}".format(c.player_value)|
                                     replace(-1,"Unranked") }}</b></span>
                         </li>
                     </ul>
+                    {% else %}
+                    <div>
+                        <p style="float:left">{{c.full_name}}</p>
+                        <b>
+                            <p style="float:right">
+                                {{"{:,}".format(c.player_value)|
+                                replace(-1,"Unranked") }}</p>
+                        </b>
+                    </div>
+
+                    {% endif %}
+
                 </div>
                 {% endif %}
                 {% endfor %}
