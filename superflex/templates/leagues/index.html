@@ -9,7 +9,9 @@
         <form method="post">
             <div class="container">
                 <div class="col-sm" style="max-width: 540px;">
-                    <label for="" class="form-label"><b>Sleeper Username</b></label>
+                    <label for="" class="form-label">
+                        <h4>Sleeper Username</h4>
+                    </label>
                     <input type="text" size="100" class="form-control input-lg" name="username" id="username"
                         value="{{ user_name[1] if user_name else request.form['username'] }}" required
                         placeholder="{{user_name[1] if user_name else 'User Name...'}}">
@@ -21,7 +23,10 @@
                     <p>Use username 'gray_matter' to preview features.</p>
                 </div>
                 <br>
-                <h5 class="text-center">Powered by data from Sleeper and KeepTradeCut.</h5>
+                <h5 class="text-center">Powered by data from Sleeper, KeepTradeCut, FantasyPros, ESPN, and coffee.</h5>
+                <center><a class="text-center" href="https://www.reddit.com/r/DynastyFF/" target=”_blank”><img
+                            src="{{url_for('static', filename='bmc-button.png')}}" width="200" height="40" alt=""></a>
+                </center>
 
         </form>
     </div>
