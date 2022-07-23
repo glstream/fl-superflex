@@ -101,7 +101,7 @@ def get_league_names(user_id, year: str = "2022"):
 def get_users_data(league_id):
     users_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/users")
     return [
-        (user_meta["display_name"], user_meta["user_id"])
+        (user_meta["display_name"], user_meta["user_id"], user_meta["avatar"])
         for user_meta in users_res.json()
     ]
 
@@ -1294,13 +1294,11 @@ order by m.display_name, player_value asc"""
         labels = [row["display_name"] for row in fp_owners]
         values = [row["total_value"] for row in fp_owners]
         total_value = [row["total_value"] for row in fp_owners][0] * 0.95
-        # pct_values = [
-        #     int((((row["total_value"] - total_value) / total_value) + 1) * 100)
-        #     for row in fp_owners
-        # ]
+
         pct_values = [
             100 - abs((total_value / row["total_value"]) - 1) * 100 for row in fp_owners
         ]
+
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         date_cursor.execute(
@@ -1427,15 +1425,15 @@ def get_league():
                     , flex_cnt
                     , sf_cnt
 
-                    from dynastr.league_players lp
-                    inner join dynastr.players pl on lp.player_id = pl.player_id
+                    FROM dynastr.league_players lp
+                    INNER JOIN dynastr.players pl on lp.player_id = pl.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
-                    inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
-                    where lp.session_id = '{session_id}'
+                    INNER JOIN dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
+                    WHERE lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
                     and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))
 
-                    , base_picks as (select t1.user_id
+                    , base_picks as (SELECT t1.user_id
                                 , t1.season
                                 , t1.year
                                 , t1.player_name
@@ -1457,14 +1455,14 @@ def get_league():
                                         , dpos.user_id
                                         , dpos.season
                                         FROM dynastr.draft_picks dp
-                                        inner join dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id and dp.league_id = dpos.league_id
+                                        INNER JOIN dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id and dp.league_id = dpos.league_id
 
-                                        where dpos.league_id = '{league_id}'
+                                        WHERE dpos.league_id = '{league_id}'
                                         and dp.session_id = '{session_id}'
                                         ) al 
-                                    inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
+                                    INNER JOIN dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
-                                LEFT join dynastr.ktc_player_ranks ktc on t1.player_name = ktc.player_full_name
+                                LEFT JOIN dynastr.ktc_player_ranks ktc on t1.player_name = ktc.player_full_name
                                     )						   
                     , starters as (SELECT  
                     qb.user_id
@@ -1478,7 +1476,7 @@ def get_league():
                     and qb.player_position = 'QB'
                     and qb.player_order <= qb.qb_cnt
                     UNION ALL
-                    select 
+                    SELECT 
                     rb.user_id
                     , rb.player_id
                     , rb.ktc_player_id
@@ -1574,9 +1572,10 @@ def get_league():
                     from (select * from starters UNION ALL select * from flex UNION ALL select * from super_flex) ap
                     order by user_id, player_position desc)
                                             
-                    select tp.user_id
+                    SELECT tp.user_id
                     ,m.display_name
-                    ,coalesce(ktc.player_full_name, tp.picks_player_name, p.full_name)as full_name
+                    ,coalesce(ktc.player_full_name, tp.picks_player_name, p.full_name) as full_name
+                    ,ktc.slug as hyper_link
                     ,p.team
                     ,tp.player_id as sleeper_id
                     ,tp.player_position
@@ -2037,6 +2036,10 @@ def get_league():
         )
         avatar = avatar_cursor.fetchall()
 
+        users = get_users_data(league_id)
+        print(users)
+        print(owners)
+
         owner_cursor.close()
         player_cursor.close()
         ba_cursor.close()
@@ -2046,6 +2049,7 @@ def get_league():
         return render_template(
             "leagues/get_league.html",
             owners=owners,
+            users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
             league_type=league_type,

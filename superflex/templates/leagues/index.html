@@ -1,25 +1,30 @@
 {% extends 'base.html' %} {% block header %}
 <h1>{% block title %}{% endblock %}</h1>
 {% endblock %} {% block content %}
-<h5 class="text-center">Superflex takes your dynasty league and combines it with values from
-    KeepTradeCut.</h5>
-<br>
-<div class="row flex-xl-nowrap">
-    <form method="post">
-        <div class="container">
-            <div class="col-sm" style="max-width: 540px;">
-                <label for="" class="form-label"><b>Sleeper Username</b></label>
-                <input type="text" size="100" class="form-control input-lg" name="username" id="username"
-                    value="{{ user_name[1] if user_name else request.form['username'] }}" required
-                    placeholder="{{user_name[1] if user_name else 'User Name...'}}">
+<div class="card border-0">
+    <h5 class="text-center">Superflex takes data from sources across the web into one all up league view to help you
+        understand where you stand and evaluate trade opportunities.</h5>
+    <br>
+    <div class="row flex-xl-nowrap">
+        <form method="post">
+            <div class="container">
+                <div class="col-sm" style="max-width: 540px;">
+                    <label for="" class="form-label"><b>Sleeper Username</b></label>
+                    <input type="text" size="100" class="form-control input-lg" name="username" id="username"
+                        value="{{ user_name[1] if user_name else request.form['username'] }}" required
+                        placeholder="{{user_name[1] if user_name else 'User Name...'}}">
+                    <br>
+                    <button type="submit" class="btn btn-secondary" data-toggle="submit" aria-pressed="false"
+                        autocomplete="off">Submit</button>
+                    <br>
+                    <br>
+                    <p>Use username 'gray_matter' to preview features.</p>
+                </div>
                 <br>
-                <input type="submit" value="Submit">
-                <p>Use username 'gray_matter' to preview features.</p>
-            </div>
-            <h5 class="text-center">Powered by data from Sleeper and KeepTradeCut.</h5>
+                <h5 class="text-center">Powered by data from Sleeper and KeepTradeCut.</h5>
 
-    </form>
-</div>
+        </form>
+    </div>
 </div>
 
 
