@@ -961,6 +961,8 @@ order by user_id, player_position asc)
 select tp.user_id
 ,m.display_name
 ,p.full_name
+,lower(p.first_name) as first_name
+,lower(p.last_name) as last_name
 ,p.team
 ,tp.player_id as sleeper_id
 ,tp.player_position
@@ -1299,6 +1301,42 @@ order by m.display_name, player_value asc"""
             100 - abs((total_value / row["total_value"]) - 1) * 100 for row in fp_owners
         ]
 
+        fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_ba_cursor.execute(
+            f"""SELECT 
+            ba_t1.player_id as sleeper_id
+            , ba_t1.full_name
+            , ba_t1.player_position
+            , ba_t1.player_value
+            from (select
+            pl.player_id
+            ,pl.full_name
+            ,pl.player_position
+            , fp.{lt}_rank_ecr as player_value
+            , DENSE_RANK() OVER(PARTITION BY pl.player_position ORDER BY fp.{lt}_rank_ecr asc) rn
+
+            from dynastr.players pl 
+            inner join dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name)  = concat(fp.player_first_name, fp.player_last_name)
+            where 1=1 
+            and pl.player_id NOT IN (SELECT
+                            lp.player_id
+                            from dynastr.league_players lp
+                            where lp.session_id = '{session_id}'
+                            and lp.league_id = '{league_id}'
+                        )
+            and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
+            and pl.team is not null
+            order by player_value desc) ba_t1
+            where ba_t1.rn <= 5
+            order by ba_t1.player_position, ba_t1.player_value asc"""
+        )
+        fp_ba = fp_ba_cursor.fetchall()
+        fp_ba_qb = [player for player in fp_ba if player["player_position"] == "QB"]
+        fp_ba_rb = [player for player in fp_ba if player["player_position"] == "RB"]
+        fp_ba_wr = [player for player in fp_ba if player["player_position"] == "WR"]
+        fp_ba_te = [player for player in fp_ba if player["player_position"] == "TE"]
+        fp_best_available = {"QB": fp_ba_qb, "RB": fp_ba_rb, "WR": fp_ba_wr, "TE": fp_ba_te}
+
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         date_cursor.execute(
@@ -1311,13 +1349,24 @@ order by m.display_name, player_value asc"""
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
 
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        users = get_users_data(league_id)
+
         fp_owners_cursor.close()
         fp_cursor.close()
         date_cursor.close()
+        fp_ba_cursor.close()
+        avatar_cursor.close()
 
         return render_template(
             "leagues/get_league_fp.html",
             owners=fp_owners,
+            users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
             league_type=league_type,
@@ -1329,6 +1378,8 @@ order by m.display_name, player_value asc"""
             labels=labels,
             values=values,
             pct_values=pct_values,
+            best_available=fp_best_available,
+            avatar=avatar,
         )
 
 
@@ -1991,15 +2042,15 @@ def get_league():
             , ba_t1.full_name
             , ba_t1.player_position
             , ba_t1.player_value
-            from (select
+            from (SELECT
             pl.player_id
             ,pl.full_name
             ,pl.player_position
-            , ktc.sf_value as player_value
+            , ktc.{league_type} as player_value
             , DENSE_RANK() OVER(PARTITION BY pl.player_position ORDER BY ktc.{league_type} desc) rn
 
-            from dynastr.players pl 
-            inner join dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
+            FROM dynastr.players pl 
+            INNER JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
             where 1=1 
             and pl.player_id NOT IN (SELECT
                             lp.player_id
@@ -2009,7 +2060,7 @@ def get_league():
                         )
             and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
             and pl.team is not null
-            order by sf_value desc) ba_t1
+            order by player_value desc) ba_t1
             where ba_t1.rn <= 5
             order by ba_t1.player_position, ba_t1.player_value desc"""
         )
@@ -2037,8 +2088,6 @@ def get_league():
         avatar = avatar_cursor.fetchall()
 
         users = get_users_data(league_id)
-        print(users)
-        print(owners)
 
         owner_cursor.close()
         player_cursor.close()
@@ -2074,6 +2123,33 @@ def trade_tracker():
     date_ = datetime.now().strftime("%m-%d-%Y")
 
     if request.method == "POST":
+        if list(request.form)[0] == "fp_rankings":
+            league_data = eval(request.form["fp_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "ktc_rankings":
+            league_data = eval(request.form["ktc_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+            
         if list(request.form)[0] == "power_rankings":
             league_data = eval(request.form["power_rankings"])
             session_id = league_data[0]
@@ -2361,6 +2437,32 @@ def trade_tracker():
 def contender_rankings():
     db = pg_db()
     if request.method == "POST":
+        if list(request.form)[0] == "fp_rankings":
+            league_data = eval(request.form["fp_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "ktc_rankings":
+            league_data = eval(request.form["ktc_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
         if list(request.form)[0] == "power_rankings":
             league_data = eval(request.form["power_rankings"])
             session_id = league_data[0]
@@ -2896,6 +2998,43 @@ order by m.display_name, player_value desc
             for row in c_owners
         ]
 
+        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        con_ba_cursor.execute(
+            f"""SELECT 
+                ba_t1.player_id as sleeper_id
+                , ba_t1.full_name
+                , ba_t1.player_position
+                , ba_t1.player_value
+                from (SELECT
+                pl.player_id
+                ,pl.full_name
+                ,pl.player_position
+                ,ep.total_projection as player_value
+                ,RANK() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
+
+                FROM dynastr.players pl 
+                INNER JOIN dynastr.espn_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
+                WHERE 1=1 
+                and pl.player_id NOT IN (SELECT
+                                lp.player_id
+                                FROM dynastr.league_players lp
+                                WHERE lp.session_id = '{session_id}'
+                                and lp.league_id = '{league_id}'
+                            )
+                and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
+                and pl.team is not null
+                order by player_value desc) ba_t1
+                where ba_t1.rn <= 5
+                order by ba_t1.player_position, ba_t1.player_value desc"""
+        )
+        con_ba = con_ba_cursor.fetchall()
+        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_best_available = {"QB": con_ba_qb, "RB": con_ba_rb, "WR": con_ba_wr, "TE": con_ba_te}
+
+
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         date_cursor.execute(
@@ -2907,13 +3046,25 @@ order by m.display_name, player_value desc
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        users = get_users_data(league_id)
+
         contenders_cursor.close()
         c_owners_cursor.close()
         date_cursor.close()
+        con_ba_cursor.close()
+        avatar_cursor.close()
 
         return render_template(
             "leagues/contender_rankings.html",
             owners=c_owners,
+            users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
             aps=c_aps,
@@ -2924,6 +3075,8 @@ order by m.display_name, player_value desc
             labels=labels,
             values=values,
             pct_values=pct_values,
+            best_available=con_best_available,
+            avatar=avatar,
         )
     else:
         return redirect(url_for("leagues.index"))
