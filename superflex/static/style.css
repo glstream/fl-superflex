@@ -5,7 +5,10 @@ html {
 
 body {
     margin: 0 auto;
-    /* background: white; */
+}
+
+.progress-bar {
+    background-color: #1FD350 !important;
 }
 
 table {
@@ -22,81 +25,85 @@ th {
     height: 100%;
 }
 
-td {
-    border-radius: 5px;
-    border: 1px solid rgb(11, 7, 7);
+/* td {
+    background-clip: padding-box !important;
+
+    border-radius: 5px !important;
+    background-color: #369 !important;
+    color: white !important;
+    border: 5px solid white !important;
+} */
+
+​ .over-limit-1 {
+    background-color: rgb(8, 29, 252, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-1 {
-    background-color: rgb(8, 29, 252, .75);
-    text-align: center;
-    color: white;
+.over-limit-2 {
+    background-color: rgb(14, 33, 229, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-2 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+.over-limit-3 {
+    background-color: rgb(14, 33, 229, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-3 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+.over-limit-4 {
+    background-color: rgb(14, 33, 229, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-4 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+.over-limit-5 {
+    background-color: rgb(14, 33, 229, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-5 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+.over-limit-6 {
+    background-color: rgb(60, 64, 63, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-6 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
+.over-limit-7 {
+    background-color: rgb(60, 64, 63, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-7 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
+.over-limit-8 {
+    background-color: rgb(60, 64, 63, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-8 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
+.over-limit-9 {
+    background-color: rgb(113, 73, 73, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-9 {
-    background-color: rgb(113, 73, 73, .75);
-    text-align: center;
-    color: white;
+.over-limit-10 {
+    background-color: rgb(228, 9, 9, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-10 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
+.over-limit-11 {
+    background-color: rgb(228, 9, 9, .5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-11 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
-}
-
-.over-limit-pl {
-    background-color: rgba(27, 120, 93, 0.75);
-    text-align: center;
-    color: white;
+.over-limit-12 {
+    background-color: rgba(248, 1, 1, 0.5) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 .content {
@@ -246,7 +253,7 @@ a.right {
 }
 
 html {
-    font-size: .75rem;
+    font-size: .5rem;
 }
 
 .list-group {
