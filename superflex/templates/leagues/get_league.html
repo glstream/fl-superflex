@@ -1,99 +1,18 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 <div class="">
     <div style="display: flex;margin-right: 50px;">
-        <img class="avatar-player" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}" />
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
+        type="image/png">
+        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+        </object>
         <span><b>
                 <h1>{{league_name}}</h1>
             </b></span>
+        
     </div>
+    
 </div>
 <br>
-<style>
-    table {
-        border-collapse: separate;
-    }
-
-    td {
-        border-radius: 5px;
-        border: 1px solid rgb(11, 7, 7);
-    }
-
-    th {
-        height: 100%;
-    }
-
-    td.over-limit-1 {
-        background-color: rgb(8, 29, 252, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-2 {
-        background-color: rgb(14, 33, 229, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-3 {
-        background-color: rgb(14, 33, 229, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-4 {
-        background-color: rgb(14, 33, 229, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-5 {
-        background-color: rgb(49, 56, 105, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-6 {
-        background-color: rgb(60, 64, 63, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-7 {
-        background-color: rgb(60, 64, 63, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-8 {
-        background-color: rgb(60, 64, 63, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-9 {
-        background-color: rgb(142, 37, 37, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-10 {
-        background-color: rgb(193, 20, 20, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-11 {
-        background-color: rgb(228, 9, 9, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-12 {
-        background-color: rgb(255, 0, 0, .75);
-        text-align: center;
-        color: white;
-    }
-</style>
 <div class="row justify-content-left" style="margin:auto;">
     <div class="card" style="width: 20rem; margin-right: 50px;">
         <div class=" header">
@@ -133,12 +52,22 @@
                             </form>
                         </div>
                         <br>
+                        <div class="dropdown">
+                            <form method="post" class="form-inline">
+                                <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Contender Rankings
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" type="submit" name="contender_rankings"
+                                    value="{{session_id, user_id, league_id}}">ESPN Projections</a>
+                                </div>
+                            </form>
+                        </div>
                         <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
                             value="{{session_id, user_id, league_id}}">Trade
                             Tracker</button>
-                        <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings"
-                            value="{{session_id, user_id, league_id}}">Contender
-                            Rankings</button>
                     </div>
                 </form>
                 <br>
@@ -163,22 +92,22 @@
                 <tbody>
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.total_rank}}">
+                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}">
                         {{owner.total_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.qb_rank}}">{{owner.qb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}">{{owner.qb_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.rb_rank}}">{{owner.rb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}">{{owner.rb_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.wr_rank}}">{{owner.wr_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}">{{owner.wr_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.te_rank}}">{{owner.te_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}">{{owner.te_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_rank}}">
+                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}">
                         {{owner.starters_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.bench_rank}}">
+                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}">
                         {{owner.bench_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.picks_rank}}">{{owner.picks_rank |
+                    <td style="text-align:center" class="over-limit-{{owner.picks_tile}}">{{owner.picks_rank |
                         suffix}}
                     </td>
                     </tr>
@@ -188,6 +117,7 @@
             </table>
             <br>
             <div>
+                <p style="float:right;">Source: Keep Trade Cut</p>
                 <span class="align-bottom">KTC Player Values Updated
                     {{update_diff_minutes}} minutes
                     ago.</span>
@@ -202,7 +132,7 @@
 
         {% for pos, player in best_available.items() %}
         <div class="d-flex justify-content-between">
-            <h5 class="text-left margin-left: 20px;"><span class="badge bg-primary">{{pos}}</span></h5>
+            <h5 class="text-left margin-left: 20px;"><span class="badge bg-light">{{pos}}</span></h5>
             <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
         </div>
         {% for p in player %}
@@ -226,7 +156,10 @@
     <div class="col-auto">
         {% for user in users %}
         {% if user[1] == owner.user_id %}
-        <img class="avatar-player" src="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" />
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}"
+                    type="image/png">
+                    <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                </object>
         <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
             {{owner.display_name}}
             &bull;
