@@ -14,15 +14,38 @@
                 <span class="badge alert-secondary">{{league[15] | upper }}</span>
                 <p></p>
                 <form method="post" class="form-inline">
-                    <div class="row">
-                        <div class="btn-group" role="group"><button class="btn btn-outline-secondary" type="submit"
-                                name="sel_league_data" value="{{league[0],league[1],league[3],}}">Power
-                                Rankings</button>
-                            <button class="btn btn-outline-secondary" type="submit" name="sel_trade_tracker"
-                                value="{{league[0],league[1],league[3],}}">Trade Tracker</button>
-                            <button class="btn btn-outline-secondary" type="submit" name="sel_contender_rankings"
-                                value="{{league[0],league[1],league[3],}}">Contender Rankings</button>
+                    <div class="btn-group">
+                        <div class="dropdown">
+                            <form method="post" class="form-inline">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Power Rankings
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" type="submit" name="ktc_rankings"
+                                    value="{{league[0],league[1],league[3]}}">Keep Trade Cut</a>
+                                        <button class="dropdown-item" type="submit" name="fp_rankings"
+                                            value="{{league[0],league[1],league[3]}}">Fantasy Pros</a>
+                                </div>
+                            </form>
                         </div>
+                        <br>
+                        <div class="dropdown">
+                            <form method="post" class="form-inline">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Contender Rankings
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" type="submit" name="contender_rankings"
+                                    value="{{league[0],league[1],league[3]}}">ESPN Projections</a>
+                                </div>
+                            </form>
+                        </div>
+                            <button class="btn btn-outline-primary" type="submit" name="sel_trade_tracker"
+                                value="{{league[0],league[1],league[3],}}">Trade Tracker</button>
                     </div>
                 </form>
             </div>

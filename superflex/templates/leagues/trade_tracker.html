@@ -1,89 +1,6 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 <h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
 <br>
-<style>
-    table {
-        border-collapse: separate;
-
-    }
-
-    td {
-        border-radius: 5px;
-        border: 1px solid rgb(11, 7, 7);
-    }
-
-    td.over-limit-1 {
-        background-color: rgb(8, 29, 252, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-2 {
-        background-color: rgb(14, 33, 229, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-3 {
-        background-color: rgb(14, 33, 229, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-4 {
-        background-color: rgb(14, 33, 229, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-5 {
-        background-color: rgb(49, 56, 105, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-6 {
-        background-color: rgb(60, 64, 63, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-7 {
-        background-color: rgb(60, 64, 63, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-8 {
-        background-color: rgb(60, 64, 63, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-9 {
-        background-color: rgb(142, 37, 37, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-10 {
-        background-color: rgb(193, 20, 20, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-11 {
-        background-color: rgb(228, 9, 9, .75);
-        text-align: center;
-        color: white;
-    }
-
-    td.over-limit-12 {
-        background-color: rgb(255, 0, 0, .75);
-        text-align: center;
-        color: white;
-    }
-</style>
 <div class="container">
     <div class="row justify-content-center">
         <div class="card" style="width: 18rem;">
@@ -113,10 +30,10 @@
 
                     <tr>
                         <td scope="row" style="text-align:center">{{summary.display_name}}</td>
-                        <td style="text-align:center">{{"{:,}".format(summary.total_add)}}</td>
-                        <td style="text-align:center">{{"{:,}".format(summary.total_drop)}}</td>
-                        <td style="text-align:center">{{"{:,}".format(summary.total_diff)}}</td>
-                        <td style="text-align:center">{{"{:,}".format(summary.avg_per_trade)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.add_tile}}">{{"{:,}".format(summary.total_add)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.drop_tile}}">{{"{:,}".format(summary.total_drop)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.diff_tile}}">{{"{:,}".format(summary.total_diff)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.avg_tile}}">{{"{:,}".format(summary.avg_per_trade)}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -128,14 +45,36 @@
                 <div class="list-group">
                     <form method="post" class="form-inline">
                         <div class="btn-group">
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="power_rankings"
-                                value="{{session_id, user_id, league_id}}">Power
-                                Rankings</button>
+                            <div class="dropdown">
+                                <form method="post" class="form-inline">
+                                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
+                                        Power Rankings
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <button class="dropdown-item" type="submit" name="ktc_rankings"
+                                        value="{{session_id, user_id, league_id}}">Keep Trade Cut</a>
+                                            <button class="dropdown-item" type="submit" name="fp_rankings"
+                                                value="{{session_id, user_id, league_id}}">Fantasy Pros</a>
+                                    </div>
+                                </form>
+                            </div>
                             <br>
+                            <div class="dropdown">
+                                <form method="post" class="form-inline">
+                                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
+                                        Contender Rankings
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <button class="dropdown-item" type="submit" name="contender_rankings"
+                                        value="{{session_id, user_id, league_id}}">ESPN Projections</a>
+                                    </div>
+                                </form>
+                            </div>
                             <button class="btn btn-outline-secondary btn-lg" disabled>Trade Tracker</button>
-                            <button class="btn btn-outline-primary btn-lg" type="submit" name="contender_rankings"
-                                value="{{session_id, user_id, league_id}}">Contender
-                                Rankings</button>
                         </div>
                 </div>
                 </form>
@@ -143,6 +82,7 @@
         </div>
     </div>
 </div>
+<p style="float:middle;">Source: Keep Trade Cut</p>
 <p style="text-align: right">KTC Player Values Updated {{update_diff_minutes}} minutes ago.</p>
 
 <div class="row">

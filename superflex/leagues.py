@@ -652,8 +652,8 @@ def select_league():
     user_id = session["user_id"]
 
     if request.method == "POST":
-        if list(request.form)[0] == "sel_league_data":
-            league_data = eval(request.form["sel_league_data"])
+        if list(request.form)[0] == "ktc_rankings":
+            league_data = eval(request.form["ktc_rankings"])
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
@@ -675,6 +675,34 @@ def select_league():
             return redirect(
                 url_for(
                     "leagues.get_league",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_rankings":
+            league_data = eval(request.form["fp_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # delete data players, picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # clean_managers()
+            # clean_draft_trades()
+            # clean_draft_positions()
+
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -706,8 +734,8 @@ def select_league():
                     user_id=user_id,
                 )
             )
-        elif list(request.form)[0] == "sel_contender_rankings":
-            league_data = eval(request.form["sel_contender_rankings"])
+        elif list(request.form)[0] == "contender_rankings":
+            league_data = eval(request.form["contender_rankings"])
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
@@ -1068,22 +1096,30 @@ order by m.display_name, player_value asc"""
                     , t3.display_name
                     , total_value
                     , total_rank
+                    , NTILE(10) OVER (order by total_value asc) total_tile
                     , max(qb_value) as qb_value
-                    , DENSE_RANK() OVER (order by max(qb_value) asc) qb_rank
+                    , DENSE_RANK() OVER (order by sum(qb_value) asc) qb_rank
+                    , NTILE(10) OVER (order by sum(qb_value) asc) qb_tile
                     , max(rb_value) as rb_value
-                    , DENSE_RANK() OVER (order by max(rb_value) asc) rb_rank
+                    , DENSE_RANK() OVER (order by sum(rb_value) asc) rb_rank
+                    , NTILE(10) OVER (order by sum(rb_value) asc) rb_tile
                     , max(wr_value) as wr_value
-                    , DENSE_RANK() OVER (order by max(wr_value) asc) wr_rank
+                    , DENSE_RANK() OVER (order by sum(wr_value) asc) wr_rank
+                    , NTILE(10) OVER (order by sum(wr_value) asc) wr_tile
                     , max(te_value) as te_value
-                    , DENSE_RANK() OVER (order by max(te_value) asc) te_rank
+                    , DENSE_RANK() OVER (order by sum(te_value) asc) te_rank
+                    , NTILE(10) OVER (order by sum(te_value) asc) te_tile
                     , max(flex_value) as flex_value
-                    , DENSE_RANK() OVER (order by max(flex_value) asc) flex_rank
+                    , DENSE_RANK() OVER (order by sum(flex_value) asc) flex_rank
+                    , NTILE(10) OVER (order by sum(flex_value) asc) flex_tile
                     , max(super_flex_value) as super_flex_value
-                    , DENSE_RANK() OVER (order by max(super_flex_value) asc) super_flex_rank
+                    , DENSE_RANK() OVER (order by sum(super_flex_value) asc) super_flex_rank
 					, max(starters_value) as starters_value
-                    , DENSE_RANK() OVER (order by max(starters_value) asc) starters_rank
+                    , DENSE_RANK() OVER (order by sum(starters_value) asc) starters_rank
+                    , NTILE(10) OVER (order by sum(starters_value) asc) starters_tile
 					, max(Bench_value) as Bench_value
-                    , DENSE_RANK() OVER (order by max(bench_value) asc) bench_rank
+                    , DENSE_RANK() OVER (order by sum(bench_value) asc) bench_rank
+                    , NTILE(10) OVER (order by sum(bench_value) asc) bench_tile
 
                     from (select 
                     user_id
@@ -1093,10 +1129,10 @@ order by m.display_name, player_value asc"""
                     , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) asc) position_rank
                     , DENSE_RANK() OVER (order by total_value asc) total_rank
                     , fantasy_position
-                    , case when fantasy_position = 'QB' THEN sum(player_value) else 0 end as qb_value
-                    , case when fantasy_position = 'RB' THEN sum(player_value) else 0 end as rb_value
-                    , case when fantasy_position = 'WR' THEN sum(player_value) else 0 end as wr_value
-                    , case when fantasy_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                    , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                    , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                    , case when player_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                    , case when player_position = 'TE' THEN sum(player_value) else 0 end as te_value
                     , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
                     , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
 				    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
@@ -1282,6 +1318,7 @@ order by m.display_name, player_value asc"""
                     , t2.display_name
                     , t2.total_value
                     , t2.fantasy_position
+                    , t2.player_position
 					, t2.fantasy_designation) t3
                     group by 
                     t3.user_id
@@ -1751,24 +1788,32 @@ def get_league():
                     , t3.display_name
                     , total_value
                     , total_rank
+                    , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
-                    , DENSE_RANK() OVER (order by max(qb_value) desc) qb_rank
+                    , DENSE_RANK() OVER (order by sum(qb_value) desc) qb_rank
+                    , NTILE(10) OVER (order by sum(qb_value) desc) qb_tile
                     , max(rb_value) as rb_value
-                    , DENSE_RANK() OVER (order by max(rb_value) desc) rb_rank
+                    , DENSE_RANK() OVER (order by sum(rb_value) desc) rb_rank
+                    , NTILE(10) OVER (order by sum(rb_value) desc) rb_tile
                     , max(wr_value) as wr_value
-                    , DENSE_RANK() OVER (order by max(wr_value) desc) wr_rank
+                    , DENSE_RANK() OVER (order by sum(wr_value) desc) wr_rank
+                    , NTILE(10) OVER (order by sum(wr_value) desc) wr_tile
                     , max(te_value) as te_value
-                    , DENSE_RANK() OVER (order by max(te_value) desc) te_rank
+                    , DENSE_RANK() OVER (order by sum(te_value) desc) te_rank
+                    , NTILE(10) OVER (order by sum(te_value) desc) te_tile
                     , max(picks_value) as picks_value
-                    , DENSE_RANK() OVER (order by max(picks_value) desc) picks_rank
+                    , DENSE_RANK() OVER (order by sum(picks_value) desc) picks_rank
+                    , NTILE(10) OVER (order by sum(picks_value) desc) picks_tile
                     , max(flex_value) as flex_value
-                    , DENSE_RANK() OVER (order by max(flex_value) desc) flex_rank
+                    , DENSE_RANK() OVER (order by sum(flex_value) desc) flex_rank
                     , max(super_flex_value) as super_flex_value
-                    , DENSE_RANK() OVER (order by max(super_flex_value) desc) super_flex_rank
+                    , DENSE_RANK() OVER (order by sum(super_flex_value) desc) super_flex_rank
 					, max(starters_value) as starters_value
-                    , DENSE_RANK() OVER (order by max(starters_value) desc) starters_rank
+                    , DENSE_RANK() OVER (order by sum(starters_value) desc) starters_rank
+                    , NTILE(10) OVER (order by sum(starters_value) desc) starters_tile
 					, max(Bench_value) as Bench_value
-                    , DENSE_RANK() OVER (order by max(bench_value) desc) bench_rank
+                    , DENSE_RANK() OVER (order by sum(bench_value) desc) bench_rank
+                    , NTILE(10) OVER (order by sum(bench_value) desc) bench_tile
 
 
                     from (select
@@ -1777,13 +1822,12 @@ def get_league():
                         , sum(player_value) as position_value
                         , total_value
                         , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) desc) as position_rank
-                        , DENSE_RANK() OVER (order by total_value desc) as total_rank
-                        , fantasy_position
-                        , case when fantasy_position = 'QB' THEN sum(player_value) else 0 end as qb_value
-                        , case when fantasy_position = 'RB' THEN sum(player_value) else 0 end as rb_value
-                        , case when fantasy_position = 'WR' THEN sum(player_value) else 0 end as wr_value
-                        , case when fantasy_position = 'TE' THEN sum(player_value) else 0 end as te_value
-                        , case when fantasy_position = 'PICKS' THEN sum(player_value) else 0 end as picks_value
+                        , DENSE_RANK() OVER (order by total_value desc) as total_rank                        , fantasy_position
+                        , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                        , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                        , case when player_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                        , case when player_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                        , case when player_position = 'PICKS' THEN sum(player_value) else 0 end as picks_value
                         , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
                         , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
 				        , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
@@ -2017,6 +2061,7 @@ def get_league():
                             , t2.display_name
                             , t2.total_value
                             , t2.fantasy_position
+                            , t2.player_position
                             , t2.fantasy_designation) t3  
                                 GROUP BY
                                     t3.user_id
@@ -2295,7 +2340,20 @@ def trade_tracker():
         analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         analytics_cursor.execute(
-            f"""SELECT display_name
+            f"""select
+display_name
+,trades_cnt
+, NTILE(10) OVER (ORDER BY trades_cnt desc) cnt_tile
+, total_add
+, NTILE(10) OVER (ORDER BY total_add desc) add_tile
+, total_drop
+, NTILE(10) OVER (ORDER BY total_drop asc) drop_tile
+, total_diff
+, NTILE(10) OVER (ORDER BY total_diff desc) diff_tile
+, avg_per_trade
+, NTILE(10) OVER (ORDER BY avg_per_trade desc) avg_tile
+from
+    (SELECT display_name
                     , count(distinct transaction_id) trades_cnt
                     , sum(CASE WHEN transaction_type = 'add' THEN value ELSE 0 END) as total_add
                     , sum(CASE WHEN transaction_type = 'drop' THEN value ELSE 0 END) as total_drop
@@ -2385,7 +2443,7 @@ def trade_tracker():
                                     , value  desc) t2
                                     where t2.num_managers > 1
                     group by display_name
-                    order by trades_cnt desc
+                    order by trades_cnt desc)t3
                     """
         )
 
@@ -2660,6 +2718,7 @@ select tp.user_id
 ,m.display_name
 ,p.full_name
 ,p.team
+,tp.espn_player_id
 ,tp.player_id as sleeper_id
 ,tp.player_position
 ,tp.fantasy_position
@@ -2766,22 +2825,29 @@ order by m.display_name, player_value desc
                     , t3.display_name
                     , total_value
                     , total_rank
+                    , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
-                    , DENSE_RANK() OVER (order by max(qb_value) desc) qb_rank
+                    , DENSE_RANK() OVER (order by sum(qb_value) desc) qb_rank
+                    , NTILE(10) OVER (order by sum(qb_value) desc) qb_tile
                     , max(rb_value) as rb_value
-                    , DENSE_RANK() OVER (order by max(rb_value) desc) rb_rank
+                    , DENSE_RANK() OVER (order by sum(rb_value) desc) rb_rank
+                    , NTILE(10) OVER (order by sum(rb_value) desc) rb_tile
                     , max(wr_value) as wr_value
-                    , DENSE_RANK() OVER (order by max(wr_value) desc) wr_rank
+                    , DENSE_RANK() OVER (order by sum(wr_value) desc) wr_rank
+                    , NTILE(10) OVER (order by sum(wr_value) desc) wr_tile
                     , max(te_value) as te_value
-                    , DENSE_RANK() OVER (order by max(te_value) desc) te_rank
+                    , DENSE_RANK() OVER (order by sum(te_value) desc) te_rank
+                    , NTILE(10) OVER (order by sum(te_value) desc) te_tile
                     , max(flex_value) as flex_value
-                    , DENSE_RANK() OVER (order by max(flex_value) desc) flex_rank
+                    , DENSE_RANK() OVER (order by sum(flex_value) desc) flex_rank
                     , max(super_flex_value) as super_flex_value
-                    , DENSE_RANK() OVER (order by max(super_flex_value) desc) super_flex_rank
+                    , DENSE_RANK() OVER (order by sum(super_flex_value) desc) super_flex_rank
 					, max(starters_value) as starters_value
-                    , DENSE_RANK() OVER (order by max(starters_value) desc) starters_rank
+                    , DENSE_RANK() OVER (order by sum(starters_value) desc) starters_rank
+                    , NTILE(10) OVER (order by sum(starters_value) desc) starters_tile
 					, max(Bench_value) as Bench_value
-                    , DENSE_RANK() OVER (order by max(bench_value) desc) bench_rank
+                    , DENSE_RANK() OVER (order by sum(bench_value) desc) bench_rank
+                    , NTILE(10) OVER (order by sum(bench_value) desc) bench_tile
 
                     from (select 
                         user_id
@@ -2791,10 +2857,10 @@ order by m.display_name, player_value desc
                     , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) desc) position_rank
                     , DENSE_RANK() OVER (order by total_value desc) total_rank
                     , fantasy_position
-                    , case when fantasy_position = 'QB' THEN sum(player_value) else 0 end as qb_value
-                    , case when fantasy_position = 'RB' THEN sum(player_value) else 0 end as rb_value
-                    , case when fantasy_position = 'WR' THEN sum(player_value) else 0 end as wr_value
-                    , case when fantasy_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                    , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                    , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                    , case when player_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                    , case when player_position = 'TE' THEN sum(player_value) else 0 end as te_value
                     , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
                     , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
 				    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
@@ -2980,6 +3046,7 @@ order by m.display_name, player_value desc
                                                 , t2.display_name
                                                 , t2.total_value
                                                 , t2.fantasy_position
+                                                , t2.player_position
                                                 , t2.fantasy_designation ) t3
                                                  group by 
                                                 t3.user_id

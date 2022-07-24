@@ -18,86 +18,165 @@ table {
     font-size: 14px;
 }
 
+.progress-bar{
+    background-color: rgb(39, 125, 161) !important;
+}
+
+.btn-outline-primary {
+    outline-color:  rgb(87, 117, 144) !important;
+    color:rgb(87, 117, 144) !important;
+    border-color: rgb(87, 117, 144) !important;
+}
+
+.btn-outline-primary:hover{
+    color: rgba(87, 117, 144) !important;
+    background-color: rgb(133, 134, 135, 0.45) !important;
+}
+
+
+.btn-primary{
+    outline-color:  rgb(87, 117, 144) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(87, 117, 144) !important;
+    background-color: rgb(87, 117, 144) !important;
+}
+.badge.alert-secondary{
+    outline-color:  rgb(249, 199, 79) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79) !important;
+}
+.badge.bg-primary{
+    outline-color:  rgb(39, 125, 161) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161) !important;
+}
+.badge.bg-success{
+    outline-color:  rgb(144, 190, 109) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(144, 190, 109) !important;
+    background-color: rgb(144, 190, 109) !important;
+}
+.badge.bg-warning{
+    outline-color:  rgb(67, 170, 139) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139) !important;
+}
+.badge.bg-danger{
+    outline-color:  rgb(249, 132, 74) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(249, 132, 74) !important;
+    background-color: rgb(249, 132, 74) !important;
+}
+.badge.bg-info{
+    outline-color:  rgb(77, 144, 142) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(77, 144, 142) !important;
+    background-color: rgb(77, 144, 142) !important;
+}
+.badge.bg-dark{
+    outline-color:  rgb(249, 199, 79) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79) !important;
+}
+
+.badge.bg-light{
+    outline-color:  rgb(39, 125, 161) !important;
+    color:rgb(252, 252, 252) !important;
+    border-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161) !important;
+}
+
+
+
+.card-fr {
+    margin-bottom: 25px;
+    margin-top: 25px;
+    padding: 1.5em .5em .5em;
+    border-radius: 1em;
+    box-shadow: 0 5px 7px rgba(39, 125, 161, 0.2);
+    border: 2em;
+    border-style: solid;
+    border-width: 2px 2px 2px 2px;
+    border-color: rgb(77, 144, 142);
+
+}
+
 th {
     height: 100%;
 }
 
 td {
-    border-radius: 5px;
-    border: 1px solid rgb(11, 7, 7);
-}
+    background-clip: padding-box !important;
+    border-radius: 5px !important;
+    background-color: rgb(39, 125, 161) !important;
+    color: white !important;
+    border: 5px solid white !important;
+} 
 
 td.over-limit-1 {
-    background-color: rgb(8, 29, 252, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(68, 184, 73, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-2 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(88, 171, 72, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-3 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(108, 158, 72, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-4 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+    background-color: rgba(98, 97, 96, 0.69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-5 {
-    background-color: rgb(14, 33, 229, .75);
-    text-align: center;
-    color: white;
+    background-color: rgba(120, 108, 99, 0.69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-6 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(202, 121, 86, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-7 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(214, 107, 82, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-8 {
-    background-color: rgb(60, 64, 63, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(226, 93, 77, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-9 {
-    background-color: rgb(113, 73, 73, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(237, 79, 73, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-10 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
+    background-color: rgb(249, 65, 68, .69)  !important;
+    text-align: center !important;
+    color: white !important;
 }
 
-td.over-limit-11 {
-    background-color: rgb(228, 9, 9, .75);
-    text-align: center;
-    color: white;
-}
-
-.over-limit-pl {
-    background-color: rgba(27, 120, 93, 0.75);
-    text-align: center;
-    color: white;
-}
 
 .content {
     padding: 0 1rem 1rem;
@@ -177,18 +256,6 @@ input[type=submit] {
     margin-bottom: -20px;
 }
 
-.card-fr {
-    margin-bottom: 25px;
-    margin-top: 25px;
-    padding: 1.5em .5em .5em;
-    border-radius: 2em;
-    box-shadow: 0 5px 7px rgba(23, 120, 184, 0.2);
-    border: 2em;
-    border-style: solid;
-    border-width: 2px 2px 2px 2px;
-    border-color: rgb(10, 158, 180);
-
-}
 
 .btn-group.special {
     display: flex;
@@ -246,7 +313,7 @@ a.right {
 }
 
 html {
-    font-size: .75rem;
+    font-size: .69rem;
 }
 
 .list-group {
