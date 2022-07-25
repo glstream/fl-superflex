@@ -1098,28 +1098,28 @@ order by m.display_name, player_value asc"""
                     , total_rank
                     , NTILE(10) OVER (order by total_value asc) total_tile
                     , max(qb_value) as qb_value
-                    , DENSE_RANK() OVER (order by sum(qb_value) asc) qb_rank
-                    , NTILE(10) OVER (order by sum(qb_value) asc) qb_tile
+                    , DENSE_RANK() OVER (order by avg(qb_value) asc) qb_rank
+                    , NTILE(10) OVER (order by avg(qb_value) asc) qb_tile
                     , max(rb_value) as rb_value
-                    , DENSE_RANK() OVER (order by sum(rb_value) asc) rb_rank
-                    , NTILE(10) OVER (order by sum(rb_value) asc) rb_tile
+                    , DENSE_RANK() OVER (order by avg(rb_value) asc) rb_rank
+                    , NTILE(10) OVER (order by avg(rb_value) asc) rb_tile
                     , max(wr_value) as wr_value
-                    , DENSE_RANK() OVER (order by sum(wr_value) asc) wr_rank
-                    , NTILE(10) OVER (order by sum(wr_value) asc) wr_tile
+                    , DENSE_RANK() OVER (order by avg(wr_value) asc) wr_rank
+                    , NTILE(10) OVER (order by avg(wr_value) asc) wr_tile
                     , max(te_value) as te_value
-                    , DENSE_RANK() OVER (order by sum(te_value) asc) te_rank
-                    , NTILE(10) OVER (order by sum(te_value) asc) te_tile
+                    , DENSE_RANK() OVER (order by avg(te_value) asc) te_rank
+                    , NTILE(10) OVER (order by avg(te_value) asc) te_tile
                     , max(flex_value) as flex_value
-                    , DENSE_RANK() OVER (order by sum(flex_value) asc) flex_rank
-                    , NTILE(10) OVER (order by sum(flex_value) asc) flex_tile
+                    , DENSE_RANK() OVER (order by avg(flex_value) asc) flex_rank
+                    , NTILE(10) OVER (order by avg(flex_value) asc) flex_tile
                     , max(super_flex_value) as super_flex_value
-                    , DENSE_RANK() OVER (order by sum(super_flex_value) asc) super_flex_rank
+                    , DENSE_RANK() OVER (order by avg(super_flex_value) asc) super_flex_rank
 					, max(starters_value) as starters_value
-                    , DENSE_RANK() OVER (order by sum(starters_value) asc) starters_rank
-                    , NTILE(10) OVER (order by sum(starters_value) asc) starters_tile
+                    , DENSE_RANK() OVER (order by avg(starters_value) asc) starters_rank
+                    , NTILE(10) OVER (order by avg(starters_value) asc) starters_tile
 					, max(Bench_value) as Bench_value
-                    , DENSE_RANK() OVER (order by sum(bench_value) asc) bench_rank
-                    , NTILE(10) OVER (order by sum(bench_value) asc) bench_tile
+                    , DENSE_RANK() OVER (order by avg(bench_value) asc) bench_rank
+                    , NTILE(10) OVER (order by avg(bench_value) asc) bench_tile
 
                     from (select 
                     user_id
