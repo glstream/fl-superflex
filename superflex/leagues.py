@@ -2620,7 +2620,7 @@ lp.user_id
 , ep.espn_player_id
 , pl.player_position
 , coalesce(ep.total_projection, -1) as player_value
-, RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ep.total_projection, -1) desc) as player_order
+, ROW_NUMBER() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ep.total_projection, -1) desc) as player_order
 , qb_cnt
 , rb_cnt
 , wr_cnt
@@ -2699,7 +2699,7 @@ fp.user_id
 , fp.espn_player_id
 , fp.player_id
 , fp.player_position
-, RANK() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
 , fp.flex_cnt
 from base_players fp
 left join starters s on s.espn_player_id = fp.espn_player_id
@@ -2724,7 +2724,7 @@ fp.user_id
 , fp.espn_player_id
 , fp.player_id
 , fp.player_position
-, RANK() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
 , fp.sf_cnt
 from base_players fp
 left join (select * from starters UNION ALL select * from flex) s on s.espn_player_id = fp.espn_player_id
