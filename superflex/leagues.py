@@ -1372,7 +1372,12 @@ order by m.display_name, player_value asc"""
         fp_ba_rb = [player for player in fp_ba if player["player_position"] == "RB"]
         fp_ba_wr = [player for player in fp_ba if player["player_position"] == "WR"]
         fp_ba_te = [player for player in fp_ba if player["player_position"] == "TE"]
-        fp_best_available = {"QB": fp_ba_qb, "RB": fp_ba_rb, "WR": fp_ba_wr, "TE": fp_ba_te}
+        fp_best_available = {
+            "QB": fp_ba_qb,
+            "RB": fp_ba_rb,
+            "WR": fp_ba_wr,
+            "TE": fp_ba_te,
+        }
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -2173,6 +2178,19 @@ def trade_tracker():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
+
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
             return redirect(
                 url_for(
                     "leagues.get_league_fp",
@@ -2186,6 +2204,18 @@ def trade_tracker():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
             return redirect(
                 url_for(
                     "leagues.get_league_fp",
@@ -2194,7 +2224,7 @@ def trade_tracker():
                     user_id=user_id,
                 )
             )
-            
+
         if list(request.form)[0] == "power_rankings":
             league_data = eval(request.form["power_rankings"])
             session_id = league_data[0]
@@ -3099,8 +3129,12 @@ order by m.display_name, player_value desc
         con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
         con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
         con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
-        con_best_available = {"QB": con_ba_qb, "RB": con_ba_rb, "WR": con_ba_wr, "TE": con_ba_te}
-
+        con_best_available = {
+            "QB": con_ba_qb,
+            "RB": con_ba_rb,
+            "WR": con_ba_wr,
+            "TE": con_ba_te,
+        }
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
