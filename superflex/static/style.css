@@ -18,74 +18,81 @@ table {
     font-size: 14px;
 }
 
-.progress-bar{
+.progress-bar {
     background-color: rgb(39, 125, 161) !important;
 }
 
 .btn-outline-primary {
-    outline-color:  rgb(87, 117, 144) !important;
-    color:rgb(87, 117, 144) !important;
+    outline-color: rgb(87, 117, 144) !important;
+    color: rgb(87, 117, 144) !important;
     border-color: rgb(87, 117, 144) !important;
 }
 
-.btn-outline-primary:hover{
+.btn-outline-primary:hover {
     color: rgba(87, 117, 144) !important;
     background-color: rgb(133, 134, 135, 0.45) !important;
 }
 
 
-.btn-primary{
-    outline-color:  rgb(87, 117, 144) !important;
-    color:rgb(252, 252, 252) !important;
+.btn-primary {
+    outline-color: rgb(87, 117, 144) !important;
+    color: rgb(252, 252, 252) !important;
     border-color: rgb(87, 117, 144) !important;
     background-color: rgb(87, 117, 144) !important;
 }
-.badge.alert-secondary{
-    outline-color:  rgb(249, 199, 79) !important;
-    color:rgb(252, 252, 252) !important;
-    border-color: rgb(249, 199, 79) !important;
-    background-color: rgb(249, 199, 79) !important;
-}
-.badge.bg-primary{
-    outline-color:  rgb(39, 125, 161) !important;
-    color:rgb(252, 252, 252) !important;
-    border-color: rgb(39, 125, 161) !important;
-    background-color: rgb(39, 125, 161) !important;
-}
-.badge.bg-success{
-    outline-color:  rgb(144, 190, 109) !important;
-    color:rgb(252, 252, 252) !important;
-    border-color: rgb(144, 190, 109) !important;
-    background-color: rgb(144, 190, 109) !important;
-}
-.badge.bg-warning{
-    outline-color:  rgb(67, 170, 139) !important;
-    color:rgb(252, 252, 252) !important;
-    border-color: rgb(67, 170, 139) !important;
-    background-color: rgb(67, 170, 139) !important;
-}
-.badge.bg-danger{
-    outline-color:  rgb(249, 132, 74) !important;
-    color:rgb(252, 252, 252) !important;
-    border-color: rgb(249, 132, 74) !important;
-    background-color: rgb(249, 132, 74) !important;
-}
-.badge.bg-info{
-    outline-color:  rgb(77, 144, 142) !important;
-    color:rgb(252, 252, 252) !important;
-    border-color: rgb(77, 144, 142) !important;
-    background-color: rgb(77, 144, 142) !important;
-}
-.badge.bg-dark{
-    outline-color:  rgb(249, 199, 79) !important;
-    color:rgb(252, 252, 252) !important;
+
+.badge.alert-secondary {
+    outline-color: rgb(249, 199, 79) !important;
+    color: rgb(252, 252, 252) !important;
     border-color: rgb(249, 199, 79) !important;
     background-color: rgb(249, 199, 79) !important;
 }
 
-.badge.bg-light{
-    outline-color:  rgb(39, 125, 161) !important;
-    color:rgb(252, 252, 252) !important;
+.badge.bg-primary {
+    outline-color: rgb(39, 125, 161) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161) !important;
+}
+
+.badge.bg-success {
+    outline-color: rgb(144, 190, 109) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(144, 190, 109) !important;
+    background-color: rgb(144, 190, 109) !important;
+}
+
+.badge.bg-warning {
+    outline-color: rgb(67, 170, 139) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139) !important;
+}
+
+.badge.bg-danger {
+    outline-color: rgb(249, 132, 74) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(249, 132, 74) !important;
+    background-color: rgb(249, 132, 74) !important;
+}
+
+.badge.bg-info {
+    outline-color: rgb(77, 144, 142) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(77, 144, 142) !important;
+    background-color: rgb(77, 144, 142) !important;
+}
+
+.badge.bg-dark {
+    outline-color: rgb(249, 199, 79) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79) !important;
+}
+
+.badge.bg-light {
+    outline-color: rgb(39, 125, 161) !important;
+    color: rgb(252, 252, 252) !important;
     border-color: rgb(39, 125, 161) !important;
     background-color: rgb(39, 125, 161) !important;
 }
@@ -110,12 +117,12 @@ th {
 }
 
 td {
-    background-clip: padding-box !important;
-    border-radius: 5px !important;
+    border-radius: .5em !important;
     background-color: rgb(39, 125, 161) !important;
     color: white !important;
-    border: 5px solid white !important;
-} 
+    border: 2px solid white !important;
+    background-clip: padding-box !important;
+}
 
 td.over-limit-1 {
     background-color: rgb(68, 184, 73, .69) !important;
@@ -172,7 +179,7 @@ td.over-limit-9 {
 }
 
 td.over-limit-10 {
-    background-color: rgb(249, 65, 68, .69)  !important;
+    background-color: rgb(249, 65, 68, .69) !important;
     text-align: center !important;
     color: white !important;
 }
