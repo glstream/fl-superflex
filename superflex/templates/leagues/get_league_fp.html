@@ -18,7 +18,7 @@
         </div>
         <ul class="list-group list-group-flush">
             {% for owner in owners %}
-            <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}}
+            <li class="list-group-item">{{owner.avg_rank | suffix}} {{owner.display_name}}
                 <span style="float:right"></span>
             </li>
             <div class="progress" style="height: 15px;">
@@ -90,20 +90,20 @@
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.total_tile}}">
-                        {{owner.total_rank | suffix}}
+                        {{owner.avg_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}">{{owner.qb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.qb_avg_tile}}">{{owner.qb_avg_rank | suffix}} 
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}">{{owner.rb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.rb_avg_tile}}">{{owner.rb_avg_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}">{{owner.wr_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.wr_avg_tile}}">{{owner.wr_avg_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}">{{owner.te_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.te_avg_tile}}">{{owner.te_avg_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}">
-                        {{owner.starters_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}">
-                        {{owner.bench_rank | suffix}}</td>
+                    <td style="text-align:center" class="over-limit-{{owner.starters_avg_tile}}">
+                        {{owner.starters_avg_rank | suffix}}</td>
+                    <td style="text-align:center" class="over-limit-{{owner.bench_avg_tile}}">
+                        {{owner.bench_avg_rank | suffix}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -152,10 +152,9 @@
         type="image/png">
         <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
         </object>
-        <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
+        <h5 class="text-left" style="vertical-align: middle;">{{owner.avg_rank | suffix}} &bull;
             {{owner.display_name}}
-            &bull;
-            {{"{:,}".format(owner.total_value)}}</h5>
+            &bull; Rank/Player {{owner.total_avg | suffix}}</h5>
         {% endif %}
         {%endfor%}
         <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
@@ -166,7 +165,7 @@
             {% for k, v in aps.items()%}
             {% set designation = k %}
             <div class="card-header bg-transparent">
-                <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
+                <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_avg_rank"] |
                     suffix}}
                 </h5>
             </div>

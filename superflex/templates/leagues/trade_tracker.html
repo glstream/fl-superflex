@@ -100,7 +100,7 @@
                 <h5 class="text-left">{{o}}</h5>
                 {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {% set
                 total = asset.owner_total %}
-                <h4 class="text-right">{{total}}</h4>
+                <h4 class="text-right">{{"{:,}".format(total)}}</h4>
 
                 {% endif %}
                 <ul class="list-group">

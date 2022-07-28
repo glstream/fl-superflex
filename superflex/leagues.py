@@ -1091,54 +1091,29 @@ order by m.display_name, player_value asc"""
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_owners_cursor.execute(
-            f"""SELECT 
-                    t3.user_id
-                    , t3.display_name
-                    , total_value
-                    , total_rank
-                    , NTILE(10) OVER (order by total_value asc) total_tile
-                    , max(qb_value) as qb_value
-                    , DENSE_RANK() OVER (order by avg(qb_value) asc) qb_rank
-                    , NTILE(10) OVER (order by avg(qb_value) asc) qb_tile
-                    , max(rb_value) as rb_value
-                    , DENSE_RANK() OVER (order by avg(rb_value) asc) rb_rank
-                    , NTILE(10) OVER (order by avg(rb_value) asc) rb_tile
-                    , max(wr_value) as wr_value
-                    , DENSE_RANK() OVER (order by avg(wr_value) asc) wr_rank
-                    , NTILE(10) OVER (order by avg(wr_value) asc) wr_tile
-                    , max(te_value) as te_value
-                    , DENSE_RANK() OVER (order by avg(te_value) asc) te_rank
-                    , NTILE(10) OVER (order by avg(te_value) asc) te_tile
-                    , max(flex_value) as flex_value
-                    , DENSE_RANK() OVER (order by avg(flex_value) asc) flex_rank
-                    , NTILE(10) OVER (order by avg(flex_value) asc) flex_tile
-                    , max(super_flex_value) as super_flex_value
-                    , DENSE_RANK() OVER (order by avg(super_flex_value) asc) super_flex_rank
-					, max(starters_value) as starters_value
-                    , DENSE_RANK() OVER (order by avg(starters_value) asc) starters_rank
-                    , NTILE(10) OVER (order by avg(starters_value) asc) starters_tile
-					, max(Bench_value) as Bench_value
-                    , DENSE_RANK() OVER (order by avg(bench_value) asc) bench_rank
-                    , NTILE(10) OVER (order by avg(bench_value) asc) bench_tile
+            f"""with base as (SELECT 
+user_id
+, display_name
+, player_position
+, avg_position_value
+, position_cnt
+, avg_value
+, total_value
+, case when player_position = 'QB' then DENSE_RANK() OVER (PARTITION BY player_position order by avg_position_value asc) end as qb_avg_rank
+, case when player_position = 'QB' then total_position_value end as qb_total_value
+, case when player_position = 'RB' then DENSE_RANK() OVER (PARTITION BY player_position order by avg_position_value asc) end as rb_avg_rank
+, case when player_position = 'RB' then total_position_value end as rb_total_value
+, case when player_position = 'WR' then DENSE_RANK() OVER (PARTITION BY player_position order by avg_position_value asc) end as wr_avg_rank
+, case when player_position = 'WR' then total_position_value end as wr_total_value
+, case when player_position = 'TE' then DENSE_RANK() OVER (PARTITION BY player_position order by avg_position_value asc) end as te_avg_rank
+, case when player_position = 'TE' then total_position_value end as te_total_value
+, case when fantasy_designation = 'BENCH' then DENSE_RANK() OVER (PARTITION BY fantasy_designation order by avg_fantasy_value asc) end as bench_avg_rank
+, case when fantasy_designation = 'BENCH' then total_fasntasy_value end as bench_total_value
+, case when fantasy_designation = 'STARTER' then DENSE_RANK() OVER (PARTITION BY fantasy_designation order by avg_fantasy_value asc) end as starters_avg_rank
+, case when fantasy_designation = 'STARTER' then total_fasntasy_value end as starter_total_value
 
-                    from (select 
-                    user_id
-                    ,display_name
-                    , sum(player_value) as position_value
-                    , total_value
-                    , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) asc) position_rank
-                    , DENSE_RANK() OVER (order by total_value asc) total_rank
-                    , fantasy_position
-                    , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
-                    , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
-                    , case when player_position = 'WR' THEN sum(player_value) else 0 end as wr_value
-                    , case when player_position = 'TE' THEN sum(player_value) else 0 end as te_value
-                    , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
-                    , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
-				    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
-				    , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
-                    from 
-                    (select all_players.user_id 
+, DENSE_RANK() OVER (PARTITION BY player_position order by avg_position_value asc) position_rank
+from (select all_players.user_id 
                     , all_players.display_name 
                     , all_players.full_name
                     , all_players.player_position
@@ -1147,6 +1122,12 @@ order by m.display_name, player_value asc"""
                     , all_players.team
                     , all_players.player_value
                     , sum(all_players.player_value) OVER (PARTITION BY all_players.user_id) as total_value  
+                    , avg(all_players.player_value) OVER (PARTITION BY all_players.user_id) as avg_value 
+	  			    , count(all_players.full_name) OVER (PARTITION BY all_players.user_id, all_players.player_position) as position_cnt 
+					, avg(all_players.player_value) OVER (PARTITION BY all_players.user_id, all_players.player_position) as avg_position_value
+	  				, sum(all_players.player_value) OVER (PARTITION BY all_players.user_id, all_players.player_position) as total_position_value
+	  				, avg(all_players.player_value) OVER (PARTITION BY all_players.user_id, all_players.fantasy_designation) as avg_fantasy_value 
+	  				, sum(all_players.player_value) OVER (PARTITION BY all_players.user_id, all_players.fantasy_designation) as total_fasntasy_value
                     from (with base_players as (SELECT
                         lp.user_id
                         , lp.league_id
@@ -1155,8 +1136,8 @@ order by m.display_name, player_value asc"""
                         , pl.player_id
                         , fp.fp_player_id
                         , pl.player_position
-                        , coalesce(fp.{lt}_rank_ecr, 529) as player_value
-                        , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(fp.{lt}_rank_ecr, 529) asc) as player_order
+                        , coalesce(fp.sf_rank_ecr, 529) as player_value
+                        , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(fp.sf_rank_ecr, 529) asc) as player_order
                         , qb_cnt
                         , rb_cnt
                         , wr_cnt
@@ -1240,7 +1221,6 @@ order by m.display_name, player_value asc"""
                         from base_players fp
                         left join starters s on s.fp_player_id = fp.fp_player_id
                         where 1=1
-                        --and lower(fp.user_id) in ('432367510474461184','342397313982976000')
                         and s.fp_player_id IS NULL
                         and fp.player_position IN ('RB','WR','TE')  
                         order by player_order) ns
@@ -1288,7 +1268,7 @@ order by m.display_name, player_value asc"""
                         ,tp.player_position
                         ,tp.fantasy_position
                         ,tp.fantasy_designation
-                        ,fp.{lt}_rank_ecr as player_value
+                        ,fp.sf_rank_ecr as player_value
                         from (select 
                                 user_id
                                 ,ap.player_id
@@ -1311,22 +1291,75 @@ order by m.display_name, player_value asc"""
                         inner join dynastr.players p on tp.player_id = p.player_id
                         inner join dynastr.fp_player_ranks fp on tp.fp_player_id = fp.fp_player_id
                         inner join dynastr.managers m on tp.user_id = m.user_id 
-                        order by m.display_name, player_value asc) all_players
-                                                ) t2 
-                                            group by 
-                    t2.user_id
-                    , t2.display_name
-                    , t2.total_value
-                    , t2.fantasy_position
-                    , t2.player_position
-					, t2.fantasy_designation) t3
-                    group by 
-                    t3.user_id
-                    , t3.display_name
-                    , total_value
-                    , total_rank
-                    order by
-                    total_value asc"""
+                        order by m.display_name, player_value asc) all_players)
+						t1 
+						group by 
+						user_id
+						,display_name
+						,player_position
+			  			,fantasy_designation
+						,avg_position_value
+			            ,avg_fantasy_value
+						,position_cnt
+						,avg_value
+						,total_value
+			  			,total_position_value
+			  			,total_fasntasy_value
+			 )
+	
+SELECT 
+base.user_id
+,display_name 
+,total_value
+,round(avg_value) as total_avg
+,DENSE_RANK() OVER (order by total_value asc) total_rank
+,NTILE(10) OVER (order by total_value asc) total_tile
+,DENSE_RANK() OVER (order by avg_value asc) avg_rank
+,NTILE(10) OVER (order by total_value asc) total_tile
+,qb_avg_rank
+,NTILE(10) OVER (order by qb_avg_rank asc) qb_avg_tile
+,qb_total_value
+,rb.rb_avg_rank
+,NTILE(10) OVER (order by rb.rb_avg_rank asc) rb_avg_tile
+,rb.rb_total_value
+,wr.wr_avg_rank
+,NTILE(10) OVER (order by wr.wr_avg_rank asc) wr_avg_tile
+,wr.wr_total_value
+,te.te_avg_rank
+,NTILE(10) OVER (order by te.te_avg_rank asc) te_avg_tile
+,te.te_total_value
+,bench.bench_avg_rank
+,NTILE(10) OVER (order by bench.bench_avg_rank asc) bench_avg_tile
+,bench.bench_total_value
+,starter.starters_avg_rank 
+,NTILE(10) OVER (order by starter.starters_avg_rank asc) starters_avg_tile
+,starter.starter_total_value
+from base
+inner join (SELECT user_id ,rb_avg_rank, rb_total_value from base where rb_avg_rank is not null) rb on base.user_id = rb.user_id
+inner join (SELECT user_id ,wr_avg_rank, wr_total_value from base where wr_avg_rank is not null) wr on base.user_id = wr.user_id
+inner join (SELECT user_id ,te_avg_rank, te_total_value from base where te_avg_rank is not null) te on base.user_id = te.user_id
+inner join (SELECT user_id ,bench_avg_rank, bench_total_value from base where bench_avg_rank is not null) bench on base.user_id = bench.user_id
+inner join (SELECT user_id ,starters_avg_rank, starter_total_value from base where starters_avg_rank is not null) starter on base.user_id = starter.user_id
+
+where qb_avg_rank is not null 
+group by
+base.user_id
+,display_name 
+,total_value
+,avg_value
+,qb_avg_rank
+,qb_total_value
+,rb.rb_avg_rank
+,rb.rb_total_value
+,wr.wr_avg_rank
+,wr.wr_total_value
+,te.te_avg_rank
+,te.te_total_value
+,bench.bench_avg_rank
+,bench.bench_total_value
+,starter.starters_avg_rank
+,starter.starter_total_value
+						"""
         )
         fp_owners = fp_owners_cursor.fetchall()
 
