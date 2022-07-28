@@ -89,7 +89,7 @@
                 <tbody>
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}">
+                    <td style="text-align:center" class="over-limit-{{owner.avg_tile}}">
                         {{owner.avg_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.qb_avg_tile}}">{{owner.qb_avg_rank | suffix}} 

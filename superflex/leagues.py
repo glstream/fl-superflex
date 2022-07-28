@@ -1315,7 +1315,7 @@ base.user_id
 ,DENSE_RANK() OVER (order by total_value asc) total_rank
 ,NTILE(10) OVER (order by total_value asc) total_tile
 ,DENSE_RANK() OVER (order by avg_value asc) avg_rank
-,NTILE(10) OVER (order by total_value asc) total_tile
+,NTILE(10) OVER (order by avg_value asc) avg_tile
 ,qb_avg_rank
 ,NTILE(10) OVER (order by qb_avg_rank asc) qb_avg_tile
 ,qb_total_value
