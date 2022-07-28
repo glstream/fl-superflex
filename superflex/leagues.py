@@ -1359,16 +1359,18 @@ base.user_id
 ,bench.bench_total_value
 ,starter.starters_avg_rank
 ,starter.starter_total_value
+order by 
+total_avg asc
 						"""
         )
         fp_owners = fp_owners_cursor.fetchall()
 
         labels = [row["display_name"] for row in fp_owners]
-        values = [row["total_value"] for row in fp_owners]
-        total_value = [row["total_value"] for row in fp_owners][0] * 0.95
+        values = [row["total_avg"] for row in fp_owners]
+        total_value = [int(row["total_avg"]) for row in fp_owners][0] * 0.95
 
         pct_values = [
-            100 - abs((total_value / row["total_value"]) - 1) * 100 for row in fp_owners
+            100 - abs((total_value / int(row["total_avg"])) - 1) * 100 for row in fp_owners
         ]
 
         fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
