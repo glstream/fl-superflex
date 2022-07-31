@@ -2,8 +2,8 @@
 <div class="">
     <div style="display: flex;margin-right: 50px;">
         <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
-        type="image/png">
-        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+            type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
         </object>
         <span><b>
                 <h1>{{league_name}}</h1>
@@ -44,9 +44,11 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="ktc_rankings"
-                                    value="{{session_id, user_id, league_id}}">Keep Trade Cut</a>
-                                        <button class="dropdown-item" type="submit" name="fp_rankings"
-                                            value="{{session_id, user_id, league_id}}">Fantasy Pros</a>
+                                        value="{{session_id, user_id, league_id}}">Keep Trade Cut</button>
+                                    <button class="dropdown-item" type="submit" name="fp_rankings"
+                                        value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
+                                    <button class="dropdown-item" type="submit" name="dp_rankings"
+                                        value="{{session_id, user_id, league_id}}">Dynasty Process</button>
                                 </div>
                             </form>
                         </div>
@@ -60,7 +62,7 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="contender_rankings"
-                                    value="{{session_id, user_id, league_id}}" disabled>ESPN Projections</a>
+                                        value="{{session_id, user_id, league_id}}" disabled>ESPN Projections</a>
                                 </div>
                             </form>
                         </div>
@@ -140,94 +142,93 @@
 </div>
 <br>
 <div> <a class="btn btn-primary" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
-    aria-controls="collapseExample">Expand all teams</a>
+        aria-controls="collapseExample">Expand all teams</a>
 </div>
 <br>
 <div class="row justify-content-left">
-{% for owner in owners %}
-<div class="col-auto">
-    {% for user in users %}
-    {% if user[1] == owner.user_id %}
-    <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}"
-        type="image/png">
-        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-    </object>
-    <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
-        {{owner.display_name}}
-        &bull;
-        {{"{:,}".format(owner.total_value)}}</h5>
-    {% endif %}
-    {%endfor%}
-    <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
-        aria-controls="collapseExample">
-        Show Team
-    </a>
-    <div class="card-fr" style="width: 20rem;">
-        {% for k, v in aps.items()%}
-        {% set designation = k %}
-        <div class="card-header bg-transparent">
-            <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
-                suffix}}
-            </h5>
-        </div>
-        <br> {% for p,j in v.items() %}
-        <div class="card d-flex border-0">
-            {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
-            <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
-                <div class="d-flex justify-content-between">
-                    {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
-                    {% elif c.fantasy_position =="RB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
-                    {% elif c.fantasy_position =="WR" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
-                    {% elif c.fantasy_position =="TE" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-danger">{{c.fantasy_position}}</span>
-                    </h5>
-                    {% elif c.fantasy_position =="FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-info">{{c.fantasy_position}}</span>
-                    </h5>
-                    {% elif c.fantasy_position =="SUPER_FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-dark">{{c.fantasy_position}}</span>
-                    </h5>
-                    {%endif%}
-                    <h5 class="text-right"><span class="badge bg-secondary">Proj</span></h5>
-                    {%endif%}
-                </div>
-
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-left border-0">
-                        <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
-                            target="_blank">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
-                                <img class="avatar-player"
-                                    href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
-                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                            </object>
-                        </a>
-                        <a class="text-left align-left"
-                            href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">{{c.full_name}}</a>
-                        <b><span class="text-lg-right">
-                                {{"{:,}".format(c.player_value)|
-                                replace(545,"Unranked") }}</b></span>
-                    </li>
-                </ul>
+    {% for owner in owners %}
+    <div class="col-auto">
+        {% for user in users %}
+        {% if user[1] == owner.user_id %}
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+        </object>
+        <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
+            {{owner.display_name}}
+            &bull;
+            {{"{:,}".format(owner.total_value)}}</h5>
+        {% endif %}
+        {%endfor%}
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
+            aria-controls="collapseExample">
+            Show Team
+        </a>
+        <div class="card-fr" style="width: 20rem;">
+            {% for k, v in aps.items()%}
+            {% set designation = k %}
+            <div class="card-header bg-transparent">
+                <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
+                    suffix}}
+                </h5>
             </div>
-            {% endif %}
-            {% endfor %}
+            <br> {% for p,j in v.items() %}
+            <div class="card d-flex border-0">
+                {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
+                <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
+                    <div class="d-flex justify-content-between">
+                        {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position =="RB" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position =="WR" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                        {% elif c.fantasy_position =="TE" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-danger">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position =="FLEX" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-info">{{c.fantasy_position}}</span>
+                        </h5>
+                        {% elif c.fantasy_position =="SUPER_FLEX" %}
+                        <h5 class="text-left margin-left: 20px;"><span
+                                class="badge bg-dark">{{c.fantasy_position}}</span>
+                        </h5>
+                        {%endif%}
+                        <h5 class="text-right"><span class="badge bg-secondary">Proj</span></h5>
+                        {%endif%}
+                    </div>
 
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-left border-0">
+                            <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
+                                <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                    <img class="avatar-player"
+                                        href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
+                                        src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                                </object>
+                            </a>
+                            <a class="text-left align-left"
+                                href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
+                                target="_blank">{{c.full_name}}</a>
+                            <b><span class="text-lg-right">
+                                    {{"{:,}".format(c.player_value)|
+                                    replace(545,"Unranked") }}</b></span>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+            {% endfor %}
+            {% endfor %}
         </div>
-        {% endfor %}
-        {% endfor %}
     </div>
-</div>
-{% endfor %}
+    {% endfor %}
 </div>
 
 

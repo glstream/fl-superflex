@@ -2,15 +2,15 @@
 <div class="">
     <div style="display: flex;margin-right: 50px;">
         <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
-        type="image/png">
-        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+            type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
         </object>
         <span><b>
                 <h1>{{league_name}}</h1>
             </b></span>
-        
+
     </div>
-    
+
 </div>
 <br>
 <div class="row justify-content-left" style="margin:auto;">
@@ -45,9 +45,12 @@
                                     Power Rankings
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <button class="dropdown-item" disabled>Keep Trade Cut</a>
-                                        <button class="dropdown-item" type="submit" name="fp_rankings"
-                                            value="{{session_id, user_id, league_id}}">Fantasy Pros</a>
+                                    <button class="dropdown-item" type="submit" name="ktc_rankings"
+                                        value="{{session_id, user_id, league_id}}" disabled>Keep Trade Cut</button>
+                                    <button class="dropdown-item" type="submit" name="fp_rankings"
+                                        value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
+                                    <button class="dropdown-item" type="submit" name="dp_rankings"
+                                        value="{{session_id, user_id, league_id}}">Dynasty Process</button>
                                 </div>
                             </form>
                         </div>
@@ -61,7 +64,7 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="contender_rankings"
-                                    value="{{session_id, user_id, league_id}}">ESPN Projections</a>
+                                        value="{{session_id, user_id, league_id}}">ESPN Projections</a>
                                 </div>
                             </form>
                         </div>
@@ -156,10 +159,9 @@
     <div class="col-auto">
         {% for user in users %}
         {% if user[1] == owner.user_id %}
-        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}"
-                    type="image/png">
-                    <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                </object>
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+        </object>
         <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
             {{owner.display_name}}
             &bull;
@@ -225,7 +227,8 @@
                                 </object>
                             </a>
                             <a class="text-left align-left"
-                                href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}" target="_blank">{{c.full_name}}</a>
+                                href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
+                                target="_blank">{{c.full_name}}</a>
                             <b><span class="text-lg-right">
                                     {{"{:,}".format(c.player_value)|
                                     replace(-1,"Unranked") }}</b></span>

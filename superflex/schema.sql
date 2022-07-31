@@ -187,6 +187,23 @@ CREATE TABLE IF NOT EXISTS dynastr.fp_player_ranks (
   PRIMARY KEY (fp_player_id)
   );
 
+CREATE TABLE IF NOT EXISTS dynastr.dp_player_ranks (
+player_first_name  VARCHAR(150),
+player_last_name  VARCHAR(150),
+player_full_name  VARCHAR(150),
+fp_player_id  VARCHAR(150),
+player_position  VARCHAR(150),
+team  VARCHAR(150),
+age  VARCHAR(150),
+one_qb_rank_ecr  VARCHAR(150),
+sf_player_ecr_delta  VARCHAR(150),
+ecr_pos  VARCHAR(150),
+one_qb_value  integer,
+sf_value  integer,
+insert_date  VARCHAR(150),
+PRIMARY KEY (player_full_name)
+);
+
 CREATE TABLE IF NOT EXISTS dynastr.draft_positions (
     season VARCHAR(75),
     rounds VARCHAR(75),
