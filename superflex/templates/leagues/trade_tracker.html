@@ -30,10 +30,14 @@
 
                     <tr>
                         <td scope="row" style="text-align:center">{{summary.display_name}}</td>
-                        <td style="text-align:center" class="over-limit-{{summary.add_tile}}">{{"{:,}".format(summary.total_add)}}</td>
-                        <td style="text-align:center" class="over-limit-{{summary.drop_tile}}">{{"{:,}".format(summary.total_drop)}}</td>
-                        <td style="text-align:center" class="over-limit-{{summary.diff_tile}}">{{"{:,}".format(summary.total_diff)}}</td>
-                        <td style="text-align:center" class="over-limit-{{summary.avg_tile}}">{{"{:,}".format(summary.avg_per_trade)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.add_tile}}">
+                            {{"{:,}".format(summary.total_add)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.drop_tile}}">
+                            {{"{:,}".format(summary.total_drop)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.diff_tile}}">
+                            {{"{:,}".format(summary.total_diff)}}</td>
+                        <td style="text-align:center" class="over-limit-{{summary.avg_tile}}">
+                            {{"{:,}".format(summary.avg_per_trade)}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -54,9 +58,11 @@
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <button class="dropdown-item" type="submit" name="ktc_rankings"
-                                        value="{{session_id, user_id, league_id}}">Keep Trade Cut</a>
-                                            <button class="dropdown-item" type="submit" name="fp_rankings"
-                                                value="{{session_id, user_id, league_id}}">Fantasy Pros</a>
+                                            value="{{session_id, user_id, league_id}}">Keep Trade Cut</button>
+                                        <button class="dropdown-item" type="submit" name="fp_rankings"
+                                            value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
+                                        <button class="dropdown-item" type="submit" name="dp_rankings"
+                                            value="{{session_id, user_id, league_id}}">Dynasty Process</button>
                                     </div>
                                 </form>
                             </div>
@@ -70,7 +76,7 @@
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <button class="dropdown-item" type="submit" name="contender_rankings"
-                                        value="{{session_id, user_id, league_id}}">ESPN Projections</a>
+                                            value="{{session_id, user_id, league_id}}">ESPN Projections</a>
                                     </div>
                                 </form>
                             </div>
