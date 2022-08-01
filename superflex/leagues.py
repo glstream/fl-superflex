@@ -2488,7 +2488,7 @@ def get_league_dp():
                                             
                     SELECT tp.user_id
                     ,m.display_name
-                    ,p.full_name
+                    ,coalesce(p.full_name, ktc.player_full_name) as full_name
                     ,lower(p.first_name) as first_name
 					,lower(p.last_name) as last_name
                     ,p.team
