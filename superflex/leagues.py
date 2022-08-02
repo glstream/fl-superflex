@@ -2265,17 +2265,17 @@ def get_league_dp():
             user_id = league_data[1]
             league_id = league_data[2]
 
-            # # insert managers names
-            # managers = get_managers(league_id)
-            # insert_managers(db, managers)
-            # # delete traded players and picks
-            # clean_player_trades(db, league_id)
-            # clean_draft_trades(db, league_id)
-            # # get trades
-            # trades = get_trades(league_id, get_sleeper_state())
-            # # insert trades draft Positions
-            # draft_positions(db, league_id, user_id)
-            # insert_trades(db, trades, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # delete traded players and picks
+            clean_player_trades(db, league_id)
+            clean_draft_trades(db, league_id)
+            # get trades
+            trades = get_trades(league_id, get_sleeper_state())
+            # insert trades draft Positions
+            draft_positions(db, league_id, user_id)
+            insert_trades(db, trades, league_id)
 
             return redirect(
                 url_for(
@@ -2290,17 +2290,17 @@ def get_league_dp():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
-            # # print("POST SELECT LEAGUE", league_id)
-            # # delete data players and picks
-            # clean_league_rosters(db, session_id, user_id, league_id)
-            # clean_league_picks(db, session_id, league_id)
-            # # insert managers names
-            # managers = get_managers(league_id)
-            # insert_managers(db, managers)
-            # # insert data
-            # insert_league_rosters(db, session_id, user_id, league_id)
-            # total_owned_picks(db, league_id, session_id)
-            # draft_positions(db, league_id, user_id)
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
 
             return redirect(
                 url_for(
@@ -2349,11 +2349,11 @@ def get_league_dp():
                     , lp.league_id
                     , lp.session_id
                     , pl.player_id
-                    , ktc.fp_player_id
-					, ktc.player_full_name
+                    , dp.fp_player_id
+					, dp.player_full_name
                     , pl.player_position
-                    , coalesce(ktc.{league_type}, -1) as player_value
-                    , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ktc.{league_type}, -1) desc) as player_order
+                    , coalesce(dp.{league_type}, -1) as player_value
+                    , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(dp.{league_type}, -1) desc) as player_order
                     , qb_cnt
                     , rb_cnt
                     , wr_cnt
@@ -2363,7 +2363,7 @@ def get_league_dp():
 
                     FROM dynastr.league_players lp
                     INNER JOIN dynastr.players pl on lp.player_id = pl.player_id
-                    LEFT JOIN dynastr.dp_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
+                    LEFT JOIN dynastr.dp_player_ranks dp on concat(pl.first_name, pl.last_name)  = concat(dp.player_first_name, dp.player_last_name)
                     INNER JOIN dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
                     WHERE lp.session_id = '{session_id}'
                     and lp.league_id = '{league_id}'
@@ -2488,7 +2488,7 @@ def get_league_dp():
                                             
                     SELECT tp.user_id
                     ,m.display_name
-                    ,coalesce(p.full_name, ktc.player_full_name) as full_name
+                    ,coalesce(p.full_name, tp.player_full_name) as full_name
                     ,lower(p.first_name) as first_name
 					,lower(p.last_name) as last_name
                     ,p.team
@@ -2496,7 +2496,7 @@ def get_league_dp():
                     ,tp.player_position
                     ,tp.fantasy_position
                     ,tp.fantasy_designation
-                    ,coalesce(ktc.{league_type}, -1) as player_value
+                    ,coalesce(dp.{league_type}, -1) as player_value
                     from (select 
                             user_id
                             ,ap.player_id
@@ -2531,9 +2531,9 @@ def get_league_dp():
                             from (SELECT t1.user_id
                                 , t1.season
                                 , t1.year
-                                , ktc.fp_player_id
+                                , dp.fp_player_id
 								, t1.player_full_name
-								, coalesce(ktc.{league_type}, -1)
+								, coalesce(dp.{league_type}, -1)
                                 FROM (
                                     SELECT  
                                     al.user_id
@@ -2558,13 +2558,13 @@ def get_league_dp():
                                         ) al 
                                     INNER JOIN dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
-                                LEFT JOIN dynastr.dp_player_ranks ktc on t1.player_full_name = ktc.player_full_name
+                                LEFT JOIN dynastr.dp_player_ranks dp on t1.player_full_name = dp.player_full_name
 								) picks
                             ) tp
                     left join dynastr.players p on tp.player_id = p.player_id
-                    LEFT JOIN dynastr.dp_player_ranks ktc on tp.player_full_name = ktc.player_full_name
+                    LEFT JOIN dynastr.dp_player_ranks dp on tp.player_full_name = dp.player_full_name
                     inner join dynastr.managers m on tp.user_id = m.user_id 
-                    order by m.display_name, player_value desc						   
+                    order by m.display_name, player_value desc							   
                 """
         )
         players = player_cursor.fetchall()
