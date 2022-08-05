@@ -572,12 +572,25 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (season, rounds, position, user_id, league_id)
     DO UPDATE SET position_name = EXCLUDED.position_name
-            ,roster_id = EXCLUDED.roster_id
+            , roster_id = EXCLUDED.roster_id
             , draft_id = EXCLUDED.draft_id
     ;""",
         tuple(draft_order),
         page_size=1000,
     )
+    new_values = [
+        (i["owner_id"], str(i["roster_id"]))
+        for i in requests.get(
+            f"https://api.sleeper.app/v1/league/{league_id}/rosters"
+        ).json()
+    ]
+    update_query = f"""UPDATE dynastr.draft_positions AS t 
+                    SET user_id = e.user_id 
+                    FROM (VALUES %s) AS e(user_id, roster_id) 
+                    WHERE e.roster_id = t.roster_id and t.league_id = '{league_id}';"""
+
+    execute_values(cursor, update_query, new_values, template=None, page_size=100)
+    # update_draft_positions = """UPDATE dynastr.draft_positions SET user_id = t.new_user_id from (i['roster_id'], i['owner_id']) as t(roster_id, new_user_id) where dynastr.draft_positions.roster_id = t.roster_id"""
     db.commit()
     cursor.close()
     return
@@ -3085,7 +3098,7 @@ def trade_tracker():
 
             return redirect(
                 url_for(
-                    "leagues.get_league_fp",
+                    "leagues.get_league",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
