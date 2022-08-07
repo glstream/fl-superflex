@@ -62,9 +62,9 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="contender_rankings"
-                                        value="{{session_id, user_id, league_id}}" disabled>ESPN Projections</button>
+                                        value="{{session_id, user_id, league_id}}">ESPN Projections</button>
                                     <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
-                                        value="{{session_id, user_id, league_id}}">NFL Projections</button>
+                                        value="{{session_id, user_id, league_id}}" disabled>NFL Projections</button>
                                 </div>
                             </form>
                         </div>
@@ -115,8 +115,8 @@
             </table>
             <br>
             <div>
-                <p style="float:right;">Source: ESPN Player Projections</p>
-                <span class="align-bottom">ESPN Player Projections Updated
+                <p style="float:right;">Source: NFL Player Projections</p>
+                <span class="align-bottom">NFL Player Projections Updated
                     {{update_diff_minutes}} minutes
                     ago.</span>
             </div>
@@ -206,15 +206,13 @@
 
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-left border-0">
-                            <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
+                            <a href="https://fantasy.nfl.com/{{c.link}}" target="_blank">
                                 <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
-                                    <img class="avatar-player"
-                                        href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
+                                    <img class="avatar-player" href="https://fantasy.nfl.com/{{c.link}}"
                                         src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                                 </object>
                             </a>
-                            <a class="text-left align-left"
-                                href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
+                            <a class="text-left align-left" href="https://fantasy.nfl.com/{{c.link}}"
                                 target="_blank">{{c.full_name}}</a>
                             <b><span class="text-lg-right">
                                     {{"{:,}".format(c.player_value)|
