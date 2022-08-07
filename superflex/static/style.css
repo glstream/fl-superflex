@@ -85,7 +85,7 @@ table {
 
 .badge.bg-dark {
     outline-color: rgb(249, 199, 79) !important;
-    color: rgb(252, 252, 252) !important;
+    color: rgb(252, loc 252, 252) !important;
     border-color: rgb(249, 199, 79) !important;
     background-color: rgb(249, 199, 79) !important;
 }
