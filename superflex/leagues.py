@@ -4240,7 +4240,7 @@ def nfl_contender_rankings():
             league_id = league_data[2]
             return redirect(
                 url_for(
-                    "leagues.get_league_fp",
+                    "leagues.get_league",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
