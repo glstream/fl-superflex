@@ -390,41 +390,45 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
     league_players = []
     entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
     rosters = get_league_rosters(league_id)
-    for roster in rosters:
-        league_roster = roster["players"]
-        for player_id in league_roster:
-            league_players.append(
-                [
-                    session_id,
-                    user_id,
-                    player_id,
-                    roster["league_id"],
-                    roster["owner_id"],
-                    entry_time,
-                ]
-            )
-    with db.cursor() as cursor:
-        execute_values(
-            cursor,
-            """
-                INSERT INTO dynastr.league_players VALUES %s
-                ON CONFLICT (session_id, user_id, player_id)
-                DO UPDATE SET league_id = EXCLUDED.league_id
-	                        , insert_date = EXCLUDED.insert_date;
-                """,
-            [
-                (
-                    league_player[0],
-                    league_player[1],
-                    league_player[2],
-                    league_player[3],
-                    league_player[4],
-                    league_player[5],
+    try:
+        for roster in rosters:
+            league_roster = roster["players"]
+            for player_id in league_roster:
+                league_players.append(
+                    [
+                        session_id,
+                        user_id,
+                        player_id,
+                        roster["league_id"],
+                        roster["owner_id"],
+                        entry_time,
+                    ]
                 )
-                for league_player in iter(league_players)
-            ],
-            page_size=1000,
-        )
+
+        with db.cursor() as cursor:
+            execute_values(
+                cursor,
+                """
+                    INSERT INTO dynastr.league_players VALUES %s
+                    ON CONFLICT (session_id, user_id, player_id)
+                    DO UPDATE SET league_id = EXCLUDED.league_id
+                                , insert_date = EXCLUDED.insert_date;
+                    """,
+                [
+                    (
+                        league_player[0],
+                        league_player[1],
+                        league_player[2],
+                        league_player[3],
+                        league_player[4],
+                        league_player[5],
+                    )
+                    for league_player in iter(league_players)
+                ],
+                page_size=1000,
+            )
+    except:
+        pass
 
     return
 
