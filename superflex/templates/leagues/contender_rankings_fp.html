@@ -8,9 +8,7 @@
         <span><b>
                 <h1>{{league_name}}</h1>
             </b></span>
-
     </div>
-
 </div>
 <br>
 <div class="row justify-content-left" style="margin:auto;">
@@ -50,7 +48,7 @@
                                     <button class="dropdown-item" type="submit" name="fp_rankings"
                                         value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
                                     <button class="dropdown-item" type="submit" name="dp_rankings"
-                                        value="{{session_id, user_id, league_id}}" disabled>Dynasty Process</button>
+                                        value="{{session_id, user_id, league_id}}">Dynasty Process</button>
                                 </div>
                             </form>
                         </div>
@@ -68,7 +66,7 @@
                                     <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
                                         value="{{session_id, user_id, league_id}}">NFL Projections</button>
                                     <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                                        value="{{session_id, user_id, league_id}}">Fantasy Pros
+                                        value="{{session_id, user_id, league_id}}" disabled>Fantasy Pros
                                         Projections</button>
                                 </div>
                             </form>
@@ -80,7 +78,6 @@
                 </form>
                 <br>
             </div>
-
         </div>
         <div class="col-auto" style="width:65em;; margin-right: 50px;">
             <table class="table rounded table-hover" style="width:95%">
@@ -94,7 +91,6 @@
                         <th>TE</th>
                         <th>Starters</th>
                         <th>Bench</th>
-                        <th>Picks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,9 +111,6 @@
                         {{owner.starters_rank | suffix}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.bench_tile}}">
                         {{owner.bench_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.picks_tile}}">{{owner.picks_rank |
-                        suffix}}
-                    </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -125,8 +118,8 @@
             </table>
             <br>
             <div>
-                <p style="float:right;">Source: Dynasty Process</p>
-                <span class="align-bottom">Dynasty Process Values Updated
+                <p style="float:right;">Source: Fantasy Pros ECR Projections</p>
+                <span class="align-bottom">Fantasy Pros ECR Projections Updated
                     {{update_diff_minutes}} minutes
                     ago.</span>
             </div>
@@ -140,8 +133,8 @@
 
         {% for pos, player in best_available.items() %}
         <div class="d-flex justify-content-between">
-            <h5 class="text-left margin-left: 20px;"><span class="badge bg-light">{{pos}}</span></h5>
-            <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+            <h5 class="text-left margin-left: 20px;"><span class="badge bg-primary">{{pos}}</span></h5>
+            <h5 class="text-right"><span class="badge bg-secondary">Proj</span></h5>
         </div>
         {% for p in player %}
         <div style="display: flex; justify-content: space-between;">
@@ -153,11 +146,9 @@
     </div>
 </div>
 <br>
-
 <div> <a class="btn btn-primary" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
         aria-controls="collapseExample">Expand all teams</a>
 </div>
-
 <br>
 <div class="row justify-content-left">
     {% for owner in owners %}
@@ -211,46 +202,28 @@
                         <h5 class="text-left margin-left: 20px;"><span
                                 class="badge bg-dark">{{c.fantasy_position}}</span>
                         </h5>
-                        {% elif c.fantasy_position == "PICKS" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-dark">{{c.fantasy_position}}</span>
-                        </h5>
                         {%endif%}
-                        <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+                        <h5 class="text-right"><span class="badge bg-secondary">Proj</span></h5>
                         {%endif%}
                     </div>
 
                     <ul class="list-group">
-                        {% if c.fantasy_position != 'PICKS' %}
                         <li class="list-group-item d-flex justify-content-between align-items-left border-0">
-                            <a href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
-                                target="_blank">
+                            <a href="https://fantasy.nfl.com/{{c.link}}" target="_blank">
                                 <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
                                     <img class="avatar-player"
-                                        href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
+                                        href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
                                         src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                                 </object>
                             </a>
                             <a class="text-left align-left"
-                                href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
+                                href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
                                 target="_blank">{{c.full_name}}</a>
                             <b><span class="text-lg-right">
                                     {{"{:,}".format(c.player_value)|
-                                    replace(-1,"Unranked") }}</b></span>
+                                    replace(545,"Unranked") }}</b></span>
                         </li>
                     </ul>
-                    {% else %}
-                    <div>
-                        <p style="float:left">{{c.full_name}}</p>
-                        <b>
-                            <p style="float:right">
-                                {{"{:,}".format(c.player_value)|
-                                replace(-1,"Unranked") }}</p>
-                        </b>
-                    </div>
-
-                    {% endif %}
-
                 </div>
                 {% endif %}
                 {% endfor %}
