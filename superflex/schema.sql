@@ -268,3 +268,12 @@ CREATE TABLE IF NOT EXISTS dynastr.nfl_player_projections (
   insert_date VARCHAR(75),
   PRIMARY KEY (nfl_player_id)
 );
+
+CREATE TABLE IF NOT EXISTS dynastr.fp_player_projections (
+  player_first_name VARCHAR(150),
+  player_last_name VARCHAR(150),
+  player_full_name VARCHAR(150),
+  total_projection INTEGER,
+  insert_date VARCHAR(75),
+  PRIMARY KEY (player_full_name)
+);

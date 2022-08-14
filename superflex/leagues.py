@@ -824,6 +824,31 @@ def select_league():
                     user_id=user_id,
                 )
             )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
     cursor = db.cursor()
     cursor.execute(
         f"select * from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
@@ -914,6 +939,31 @@ def get_league_fp():
             return redirect(
                 url_for(
                     "leagues.nfl_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -1642,6 +1692,31 @@ def get_league():
             return redirect(
                 url_for(
                     "leagues.nfl_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -2422,6 +2497,31 @@ def get_league_dp():
             return redirect(
                 url_for(
                     "leagues.nfl_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -3299,6 +3399,31 @@ def trade_tracker():
                     user_id=user_id,
                 )
             )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
     if request.method == "GET":
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
@@ -3608,6 +3733,56 @@ def contender_rankings():
             return redirect(
                 url_for(
                     "leagues.nfl_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
@@ -4881,6 +5056,730 @@ order by m.display_name, player_value desc)all_players
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
             aps=nfl_aps,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+            update_diff_minutes=update_diff_minutes,
+            labels=labels,
+            values=values,
+            pct_values=pct_values,
+            best_available=con_best_available,
+            avatar=avatar,
+        )
+    else:
+        return redirect(url_for("leagues.index"))
+
+
+@bp.route("/contender_rankings_fp", methods=["GET", "POST"])
+def fp_contender_rankings():
+    db = pg_db()
+    if request.method == "POST":
+        if list(request.form)[0] == "fp_rankings":
+            league_data = eval(request.form["fp_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_fp",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "ktc_rankings":
+            league_data = eval(request.form["ktc_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "dp_rankings":
+            league_data = eval(request.form["dp_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            return redirect(
+                url_for(
+                    "leagues.get_league_dp",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "contender_rankings":
+            league_data = eval(request.form["contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "nfl_contender_rankings":
+            league_data = eval(request.form["nfl_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.nfl_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+        if list(request.form)[0] == "trade_tracker":
+
+            league_data = eval(request.form["trade_tracker"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # delete traded players and picks
+            clean_player_trades(db, league_id)
+            clean_draft_trades(db, league_id)
+            # get trades
+            trades = get_trades(league_id, get_sleeper_state())
+            # insert trades draft Positions
+            draft_positions(db, league_id, user_id)
+            insert_trades(db, trades, league_id)
+
+            return redirect(
+                url_for(
+                    "leagues.trade_tracker",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        fp_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_contenders_cursor.execute(
+            f"""WITH base_players as (SELECT
+lp.user_id
+, lp.league_id
+, lp.session_id
+, pl.full_name 
+, pl.player_id
+, ep.player_full_name
+, pl.player_position
+, coalesce(ep.total_projection, -1) as player_value
+, ROW_NUMBER() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ep.total_projection, -1) desc) as player_order
+, qb_cnt
+, rb_cnt
+, wr_cnt
+, te_cnt
+, flex_cnt
+, sf_cnt
+
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
+where lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))  
+						   
+, starters as (SELECT  
+qb.user_id
+, qb.player_id
+, qb.player_full_name
+, qb.player_position
+, qb.player_position as fantasy_position
+, qb.player_order
+from base_players qb
+where 1=1
+and qb.player_position = 'QB'
+and qb.player_order <= qb.qb_cnt
+UNION ALL
+select 
+rb.user_id
+, rb.player_id
+, rb.player_full_name
+, rb.player_position
+, rb.player_position as fantasy_position
+, rb.player_order
+from base_players rb
+where 1=1
+and rb.player_position = 'RB'
+and rb.player_order <= rb.rb_cnt
+UNION ALL
+select 
+wr.user_id
+, wr.player_id
+, wr.player_full_name
+, wr.player_position
+, wr.player_position as fantasy_position
+, wr.player_order
+from base_players wr
+where wr.player_position = 'WR'
+and wr.player_order <= wr.wr_cnt
+
+UNION ALL
+select 
+te.user_id
+, te.player_id
+, te.player_full_name
+, te.player_position
+, te.player_position as fantasy_position
+, te.player_order
+from 	
+base_players te
+where te.player_position = 'TE'
+and te.player_order <= te.te_cnt
+)
+
+, flex as (
+SELECT
+ns.user_id
+, ns.player_id
+, ns.player_full_name
+, ns.player_position
+, 'FLEX' as fantasy_position
+, ns.player_order
+from (
+SELECT
+fp.user_id
+, fp.player_full_name
+, fp.player_id
+, fp.player_position
+, ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, fp.flex_cnt
+from base_players fp
+left join starters s on s.player_full_name = fp.player_full_name
+where 1=1
+and s.player_full_name IS NULL
+and fp.player_position IN ('RB','WR','TE')  
+order by player_order) ns
+where player_order <= ns.flex_cnt)
+
+,super_flex as (
+SELECT
+ns_sf.user_id
+, ns_sf.player_id
+, ns_sf.player_full_name
+, ns_sf.player_position
+, 'SUPER_FLEX' as fantasy_position
+, ns_sf.player_order
+from (
+SELECT
+fp.user_id
+, fp.player_full_name
+, fp.player_id
+, fp.player_position
+, ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, fp.sf_cnt
+from base_players fp
+left join (select * from starters UNION ALL select * from flex) s on s.player_full_name = fp.player_full_name
+where s.player_full_name IS NULL
+and fp.player_position IN ('QB','RB','WR','TE')  
+order by player_order) ns_sf
+where player_order <= ns_sf.sf_cnt)
+
+, all_starters as (select 
+user_id
+,ap.player_id
+,ap.player_full_name
+,ap.player_position 
+,ap.fantasy_position
+,'STARTER' as fantasy_designation
+,ap.player_order
+from (select * from starters UNION ALL select * from flex UNION ALL select * from super_flex) ap
+order by user_id, player_position desc)
+						  
+select tp.user_id
+,m.display_name
+,p.full_name
+,lower(p.first_name) as first_name
+,lower(p.last_name) as last_name
+,p.team
+,tp.player_full_name
+,tp.player_id as sleeper_id
+,tp.player_position
+,tp.fantasy_position
+,tp.fantasy_designation
+,coalesce(ep.total_projection, -1) as player_value
+from (select 
+		user_id
+		,ap.player_id
+		,ap.player_full_name
+		,ap.player_position 
+		,ap.fantasy_position
+		,'STARTER' as fantasy_designation
+		,ap.player_order 
+		from all_starters ap
+		UNION
+		select 
+		bp.user_id
+		,bp.player_id
+		,bp.player_full_name
+		,bp.player_position 
+		,bp.player_position as fantasy_position
+		,'BENCH' as fantasy_designation
+		,bp.player_order
+		from base_players bp where bp.player_id not in (select player_id from all_starters)) tp
+inner join dynastr.players p on tp.player_id = p.player_id
+inner JOIN dynastr.fp_player_projections ep on tp.player_full_name = ep.player_full_name
+
+inner join dynastr.managers m on tp.user_id = m.user_id 
+order by m.display_name, player_value desc
+        """
+        )
+        contenders = fp_contenders_cursor.fetchall()
+
+        starting_qbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "QB"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_rbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "RB"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_wrs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "WR"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        starting_tes = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "TE"
+            if player["fantasy_designation"] == "STARTER"
+        ]
+        flex = [player for player in contenders if player["fantasy_position"] == "FLEX"]
+        super_flex = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "SUPER_FLEX"
+        ]
+        bench_qbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "QB"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_rbs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "RB"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_wrs = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "WR"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+        bench_tes = [
+            player
+            for player in contenders
+            if player["fantasy_position"] == "TE"
+            if player["fantasy_designation"] == "BENCH"
+        ]
+
+        fp_starters = {
+            "qb": starting_qbs,
+            "rb": starting_rbs,
+            "wr": starting_wrs,
+            "te": starting_tes,
+            "flex": flex,
+            "super_flex": super_flex,
+        }
+        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
+        fp_aps = {"starters": fp_starters, "bench": fp_bench}
+
+        fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_owners_cursor.execute(
+            f"""SELECT 
+                     t3.user_id
+                    , t3.display_name
+                    , total_value
+                    , total_rank
+                    , NTILE(10) OVER (order by total_value desc) total_tile
+                    , max(qb_value) as qb_value
+                    , DENSE_RANK() OVER (order by sum(qb_value) desc) qb_rank
+                    , NTILE(10) OVER (order by sum(qb_value) desc) qb_tile
+                    , max(rb_value) as rb_value
+                    , DENSE_RANK() OVER (order by sum(rb_value) desc) rb_rank
+                    , NTILE(10) OVER (order by sum(rb_value) desc) rb_tile
+                    , max(wr_value) as wr_value
+                    , DENSE_RANK() OVER (order by sum(wr_value) desc) wr_rank
+                    , NTILE(10) OVER (order by sum(wr_value) desc) wr_tile
+                    , max(te_value) as te_value
+                    , DENSE_RANK() OVER (order by sum(te_value) desc) te_rank
+                    , NTILE(10) OVER (order by sum(te_value) desc) te_tile
+                    , max(flex_value) as flex_value
+                    , DENSE_RANK() OVER (order by sum(flex_value) desc) flex_rank
+                    , max(super_flex_value) as super_flex_value
+                    , DENSE_RANK() OVER (order by sum(super_flex_value) desc) super_flex_rank
+					, max(starters_value) as starters_value
+                    , DENSE_RANK() OVER (order by sum(starters_value) desc) starters_rank
+                    , NTILE(10) OVER (order by sum(starters_value) desc) starters_tile
+					, max(Bench_value) as Bench_value
+                    , DENSE_RANK() OVER (order by sum(bench_value) desc) bench_rank
+                    , NTILE(10) OVER (order by sum(bench_value) desc) bench_tile
+
+                    from (select 
+                        user_id
+                    ,display_name
+                    , sum(player_value) as position_value
+                    , total_value
+                    , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) desc) position_rank
+                    , DENSE_RANK() OVER (order by total_value desc) total_rank
+                    , fantasy_position
+                    , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                    , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                    , case when player_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                    , case when player_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                    , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
+                    , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
+				    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
+				    , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
+                     from 
+                    (select all_players.user_id 
+                    , all_players.display_name 
+                    , all_players.full_name
+                    , all_players.player_position
+                    , all_players.fantasy_position
+                    , all_players.fantasy_designation
+                    , all_players.team
+                    , all_players.player_value
+                    , sum(all_players.player_value) OVER (PARTITION BY all_players.user_id) as total_value  
+                    from (WITH base_players as (SELECT
+lp.user_id
+, lp.league_id
+, lp.session_id
+, pl.full_name 
+, pl.player_id
+, ep.player_full_name
+, pl.player_position
+, coalesce(ep.total_projection, -1) as player_value
+, ROW_NUMBER() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(ep.total_projection, -1) desc) as player_order
+, qb_cnt
+, rb_cnt
+, wr_cnt
+, te_cnt
+, flex_cnt
+, sf_cnt
+
+from dynastr.league_players lp
+inner join dynastr.players pl on lp.player_id = pl.player_id
+LEFT JOIN dynastr.fp_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
+inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = '{session_id}'
+where lp.session_id = '{session_id}'
+and lp.league_id = '{league_id}'
+and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))  
+						   
+, starters as (SELECT  
+qb.user_id
+, qb.player_id
+, qb.player_full_name
+, qb.player_position
+, qb.player_position as fantasy_position
+, qb.player_order
+from base_players qb
+where 1=1
+and qb.player_position = 'QB'
+and qb.player_order <= qb.qb_cnt
+UNION ALL
+select 
+rb.user_id
+, rb.player_id
+, rb.player_full_name
+, rb.player_position
+, rb.player_position as fantasy_position
+, rb.player_order
+from base_players rb
+where 1=1
+and rb.player_position = 'RB'
+and rb.player_order <= rb.rb_cnt
+UNION ALL
+select 
+wr.user_id
+, wr.player_id
+, wr.player_full_name
+, wr.player_position
+, wr.player_position as fantasy_position
+, wr.player_order
+from base_players wr
+where wr.player_position = 'WR'
+and wr.player_order <= wr.wr_cnt
+
+UNION ALL
+select 
+te.user_id
+, te.player_id
+, te.player_full_name
+, te.player_position
+, te.player_position as fantasy_position
+, te.player_order
+from 	
+base_players te
+where te.player_position = 'TE'
+and te.player_order <= te.te_cnt
+)
+
+, flex as (
+SELECT
+ns.user_id
+, ns.player_id
+, ns.player_full_name
+, ns.player_position
+, 'FLEX' as fantasy_position
+, ns.player_order
+from (
+SELECT
+fp.user_id
+, fp.player_full_name
+, fp.player_id
+, fp.player_position
+, ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, fp.flex_cnt
+from base_players fp
+left join starters s on s.player_full_name = fp.player_full_name
+where 1=1
+and s.player_full_name IS NULL
+and fp.player_position IN ('RB','WR','TE')  
+order by player_order) ns
+where player_order <= ns.flex_cnt)
+
+,super_flex as (
+SELECT
+ns_sf.user_id
+, ns_sf.player_id
+, ns_sf.player_full_name
+, ns_sf.player_position
+, 'SUPER_FLEX' as fantasy_position
+, ns_sf.player_order
+from (
+SELECT
+fp.user_id
+, fp.player_full_name
+, fp.player_id
+, fp.player_position
+, ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
+, fp.sf_cnt
+from base_players fp
+left join (select * from starters UNION ALL select * from flex) s on s.player_full_name = fp.player_full_name
+where s.player_full_name IS NULL
+and fp.player_position IN ('QB','RB','WR','TE')  
+order by player_order) ns_sf
+where player_order <= ns_sf.sf_cnt)
+
+, all_starters as (select 
+user_id
+,ap.player_id
+,ap.player_full_name
+,ap.player_position 
+,ap.fantasy_position
+,'STARTER' as fantasy_designation
+,ap.player_order
+from (select * from starters UNION ALL select * from flex UNION ALL select * from super_flex) ap
+order by user_id, player_position desc)
+						  
+select tp.user_id
+,m.display_name
+,p.full_name
+,p.team
+,tp.player_full_name
+,tp.player_id as sleeper_id
+,tp.player_position
+,tp.fantasy_position
+,tp.fantasy_designation
+,coalesce(ep.total_projection, -1) as player_value
+from (select 
+		user_id
+		,ap.player_id
+		,ap.player_full_name
+		,ap.player_position 
+		,ap.fantasy_position
+		,'STARTER' as fantasy_designation
+		,ap.player_order 
+		from all_starters ap
+		UNION
+		select 
+		bp.user_id
+		,bp.player_id
+		,bp.player_full_name
+		,bp.player_position 
+		,bp.player_position as fantasy_position
+		,'BENCH' as fantasy_designation
+		,bp.player_order
+		from base_players bp where bp.player_id not in (select player_id from all_starters)) tp
+inner join dynastr.players p on tp.player_id = p.player_id
+inner JOIN dynastr.fp_player_projections ep on tp.player_full_name = ep.player_full_name
+
+inner join dynastr.managers m on tp.user_id = m.user_id 
+order by m.display_name, player_value desc)all_players
+									 					) t2
+                                                group by 
+                                                  t2.user_id
+                                                , t2.display_name
+                                                , t2.total_value
+                                                , t2.fantasy_position
+                                                , t2.player_position
+                                                , t2.fantasy_designation ) t3
+                                                 group by 
+                                                t3.user_id
+                                                , t3.display_name
+                                                , total_value
+                                                , total_rank
+                                                order by
+                                                total_value desc"""
+        )
+        fp_owners = fp_owners_cursor.fetchall()
+        labels = [row["display_name"] for row in fp_owners]
+        values = [row["total_value"] for row in fp_owners]
+        total_value = [row["total_value"] for row in fp_owners][0] * 1.05
+        pct_values = [
+            (((row["total_value"] - total_value) / total_value) + 1) * 100
+            for row in fp_owners
+        ]
+
+        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        con_ba_cursor.execute(
+            f"""SELECT 
+                ba_t1.player_id as sleeper_id
+                , ba_t1.full_name
+                , ba_t1.player_position
+                , ba_t1.player_value
+                from (SELECT
+                pl.player_id
+                ,pl.full_name
+                ,pl.player_position
+                ,ep.total_projection as player_value
+                ,RANK() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
+
+                FROM dynastr.players pl 
+                INNER JOIN dynastr.fp_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
+                WHERE 1=1 
+                and pl.player_id NOT IN (SELECT
+                                lp.player_id
+                                FROM dynastr.league_players lp
+                                WHERE lp.session_id = '{session_id}'
+                                and lp.league_id = '{league_id}'
+                            )
+                and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
+                and pl.team is not null
+                order by player_value desc) ba_t1
+                where ba_t1.rn <= 5
+                order by ba_t1.player_position, ba_t1.player_value desc"""
+        )
+        con_ba = con_ba_cursor.fetchall()
+        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_best_available = {
+            "QB": con_ba_qb,
+            "RB": con_ba_rb,
+            "WR": con_ba_wr,
+            "TE": con_ba_te,
+        }
+
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.fp_player_projections"
+        )
+        _date = date_cursor.fetchall()
+        fp_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round((current_time - fp_max_time).total_seconds() / 60.0)
+
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        users = get_users_data(league_id)
+
+        fp_contenders_cursor.close()
+        fp_owners_cursor.close()
+        date_cursor.close()
+        con_ba_cursor.close()
+        avatar_cursor.close()
+
+        return render_template(
+            "leagues/contender_rankings_fp.html",
+            owners=fp_owners,
+            users=users,
+            league_name=get_league_name(league_id),
+            user_name=get_user_name(user_id)[1],
+            aps=fp_aps,
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
