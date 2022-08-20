@@ -278,5 +278,13 @@ CREATE TABLE IF NOT EXISTS dynastr.fp_player_projections (
   PRIMARY KEY (player_full_name)
 );
 
+create table if not exists dynastr.user_meta (
+	session_id VARCHAR(150),
+	ip_address VARCHAR(150),
+	agent VARCHAR(150),
+	host VARCHAR(150),
+	referrer VARCHAR(150)
+); 
+
 CREATE TABLE IF NOT EXISTS history.managers (LIKE dynastr.managers INCLUDING ALL);
 CREATE TABLE IF NOT EXISTS history.current_leagues (LIKE dynastr.current_leagues INCLUDING ALL);

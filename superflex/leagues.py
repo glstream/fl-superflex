@@ -610,11 +610,24 @@ current_year = datetime.now().strftime("%Y")
 @bp.route("/", methods=("GET", "POST"))
 def index():
     db = pg_db()
+    session.get("session_id", str(uuid.uuid4()))
+
+    cursor = db.cursor()
+    query = f"""INSERT INTO dynastr.user_meta (session_id, ip_address, agent, host, referrer) VALUES (%s,%s,%s,%s,%s)"""
+    user_meta = (
+        str(session.get("session_id", "")),
+        str(request.remote_addr),
+        str(request.headers.get("User-Agent", "")),
+        str(request.headers.get("Host", "")),
+        str(request.referrer),
+    )
+    cursor.execute(query, user_meta)
+
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
         return render_template("leagues/index.html", user_name=user_name)
     if request.method == "POST" and is_user(request.form["username"]):
-        session_id = session["session_id"] = str(uuid.uuid4())
+        session_id = session.get("session_id", str(uuid.uuid4()))
         user_name = request.form["username"]
         user_id = session["user_id"] = get_user_id(user_name)
         leagues = user_leagues(str(user_id))
@@ -662,7 +675,7 @@ def select_league():
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
 
-    session_id = session["session_id"]
+    session_id = session.get("session_id", str(uuid.uuid4()))
     user_id = session["user_id"]
 
     if request.method == "POST":
@@ -4299,13 +4312,16 @@ order by m.display_name, player_value desc
                                                 total_value desc"""
         )
         c_owners = c_owners_cursor.fetchall()
-        labels = [row["display_name"] for row in c_owners]
-        values = [row["total_value"] for row in c_owners]
-        total_value = [row["total_value"] for row in c_owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in c_owners
-        ]
+        try:
+            labels = [row["display_name"] for row in c_owners]
+            values = [row["total_value"] for row in c_owners]
+            total_value = [row["total_value"] for row in c_owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in c_owners
+            ]
+        except:
+            pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         con_ba_cursor.execute(
@@ -4974,13 +4990,16 @@ order by m.display_name, player_value desc)all_players
                                                 total_value desc"""
         )
         nfl_owners = nfl_owners_cursor.fetchall()
-        labels = [row["display_name"] for row in nfl_owners]
-        values = [row["total_value"] for row in nfl_owners]
-        total_value = [row["total_value"] for row in nfl_owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in nfl_owners
-        ]
+        try:
+            labels = [row["display_name"] for row in nfl_owners]
+            values = [row["total_value"] for row in nfl_owners]
+            total_value = [row["total_value"] for row in nfl_owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in nfl_owners
+            ]
+        except:
+            pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         con_ba_cursor.execute(
@@ -5700,13 +5719,16 @@ order by m.display_name, player_value desc)all_players
                                                 total_value desc"""
         )
         fp_owners = fp_owners_cursor.fetchall()
-        labels = [row["display_name"] for row in fp_owners]
-        values = [row["total_value"] for row in fp_owners]
-        total_value = [row["total_value"] for row in fp_owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in fp_owners
-        ]
+        try:
+            labels = [row["display_name"] for row in fp_owners]
+            values = [row["total_value"] for row in fp_owners]
+            total_value = [row["total_value"] for row in fp_owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in fp_owners
+            ]
+        except:
+            pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         con_ba_cursor.execute(
