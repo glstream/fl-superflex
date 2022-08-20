@@ -668,13 +668,12 @@ current_year = datetime.now().strftime("%Y")
 def index():
     session["session_id"] = str(uuid.uuid4())
     db = pg_db()
-    session.get("session_id", str(uuid.uuid4()))
 
     cursor = db.cursor()
     query = f"""INSERT INTO dynastr.user_meta (session_id, ip_address, agent, host, referrer) VALUES (%s,%s,%s,%s,%s)"""
     user_meta = (
         str(session.get("session_id", "")),
-        str(request.remote_addr),
+        str(request.headers.get("X-Real-IP")),
         str(request.headers.get("User-Agent", "")),
         str(request.headers.get("Host", "")),
         str(request.referrer),
