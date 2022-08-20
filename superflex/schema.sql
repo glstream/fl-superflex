@@ -277,3 +277,6 @@ CREATE TABLE IF NOT EXISTS dynastr.fp_player_projections (
   insert_date VARCHAR(75),
   PRIMARY KEY (player_full_name)
 );
+
+CREATE TABLE IF NOT EXISTS history.managers (LIKE dynastr.managers INCLUDING ALL);
+CREATE TABLE IF NOT EXISTS history.current_leagues (LIKE dynastr.current_leagues INCLUDING ALL);
