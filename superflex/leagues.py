@@ -170,7 +170,7 @@ def insert_managers(db, managers: list) -> None:
                 DO UPDATE SET source = EXCLUDED.source
 	                        , league_id = EXCLUDED.league_id
                             , avatar = EXCLUDED.avatar
-                            , display_name = EXCLUDED.display_name;;
+                            , display_name = EXCLUDED.display_name;
                 """,
             [
                 (manager[0], manager[1], manager[2], manager[3], manager[4])
@@ -600,6 +600,63 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     return
 
 
+def insert_current_leagues(
+    db, session_id: str, user_id: str, user_name: str, entry_time: str, leagues: list
+) -> None:
+    cursor = db.cursor()
+    execute_batch(
+        cursor,
+        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+   ON CONFLICT (session_id, league_id) DO UPDATE 
+  SET user_id = excluded.user_id,
+  		user_name = excluded.user_name,
+		league_id = excluded.league_id,
+		league_name = excluded.league_name,
+		avatar = excluded.avatar,
+		total_rosters = excluded.total_rosters,
+		qb_cnt = excluded.qb_cnt,
+		rb_cnt = excluded.rb_cnt,
+		wr_cnt = excluded.wr_cnt,
+		te_cnt = excluded.te_cnt,
+		flex_cnt = excluded.flex_cnt,
+		sf_cnt = excluded.sf_cnt,
+		starter_cnt = excluded.starter_cnt,
+		total_roster_cnt = excluded.total_roster_cnt,
+		sport = excluded.sport,
+      	insert_date = excluded.insert_date;
+    """,
+        tuple(
+            [
+                (
+                    session_id,
+                    user_id,
+                    user_name,
+                    league[1],
+                    league[0],
+                    league[2],
+                    league[3],
+                    league[4],
+                    league[5],
+                    league[6],
+                    league[7],
+                    league[8],
+                    league[9],
+                    league[10],
+                    league[11],
+                    league[12],
+                    entry_time,
+                )
+                for league in iter(leagues)
+            ]
+        ),
+        page_size=1000,
+    )
+    db.commit()
+    cursor.close()
+    return
+
+
 league_ids = []
 league_metas = []
 players = []
@@ -633,36 +690,7 @@ def index():
         leagues = user_leagues(str(user_id))
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
-        with db.cursor() as cursor:
-            execute_values(
-                cursor,
-                """
-                INSERT INTO dynastr.current_leagues VALUES %s;
-                """,
-                [
-                    (
-                        session_id,
-                        user_id,
-                        user_name,
-                        league[1],
-                        league[0],
-                        league[2],
-                        league[3],
-                        league[4],
-                        league[5],
-                        league[6],
-                        league[7],
-                        league[8],
-                        league[9],
-                        league[10],
-                        league[11],
-                        league[12],
-                        entry_time,
-                    )
-                    for league in iter(leagues)
-                ],
-                page_size=1000,
-            )
+        insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
 
         return redirect(url_for("leagues.select_league"))
     return render_template("leagues/index.html")
