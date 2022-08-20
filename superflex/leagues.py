@@ -666,7 +666,7 @@ current_year = datetime.now().strftime("%Y")
 
 @bp.route("/", methods=("GET", "POST"))
 def index():
-    session_id["session_id"] = str(uuid.uuid4())
+    session["session_id"] = str(uuid.uuid4())
     db = pg_db()
     session.get("session_id", str(uuid.uuid4()))
 
