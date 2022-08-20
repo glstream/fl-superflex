@@ -170,7 +170,7 @@ def insert_managers(db, managers: list) -> None:
                 DO UPDATE SET source = EXCLUDED.source
 	                        , league_id = EXCLUDED.league_id
                             , avatar = EXCLUDED.avatar
-                            , display_name = EXCLUDED.display_name;;
+                            , display_name = EXCLUDED.display_name;
                 """,
             [
                 (manager[0], manager[1], manager[2], manager[3], manager[4])
@@ -600,6 +600,63 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     return
 
 
+def insert_current_leagues(
+    db, session_id: str, user_id: str, user_name: str, entry_time: str, leagues: list
+) -> None:
+    cursor = db.cursor()
+    execute_batch(
+        cursor,
+        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+   ON CONFLICT (session_id, league_id) DO UPDATE 
+  SET user_id = excluded.user_id,
+  		user_name = excluded.user_name,
+		league_id = excluded.league_id,
+		league_name = excluded.league_name,
+		avatar = excluded.avatar,
+		total_rosters = excluded.total_rosters,
+		qb_cnt = excluded.qb_cnt,
+		rb_cnt = excluded.rb_cnt,
+		wr_cnt = excluded.wr_cnt,
+		te_cnt = excluded.te_cnt,
+		flex_cnt = excluded.flex_cnt,
+		sf_cnt = excluded.sf_cnt,
+		starter_cnt = excluded.starter_cnt,
+		total_roster_cnt = excluded.total_roster_cnt,
+		sport = excluded.sport,
+      	insert_date = excluded.insert_date;
+    """,
+        tuple(
+            [
+                (
+                    session_id,
+                    user_id,
+                    user_name,
+                    league[1],
+                    league[0],
+                    league[2],
+                    league[3],
+                    league[4],
+                    league[5],
+                    league[6],
+                    league[7],
+                    league[8],
+                    league[9],
+                    league[10],
+                    league[11],
+                    league[12],
+                    entry_time,
+                )
+                for league in iter(leagues)
+            ]
+        ),
+        page_size=1000,
+    )
+    db.commit()
+    cursor.close()
+    return
+
+
 league_ids = []
 league_metas = []
 players = []
@@ -610,46 +667,30 @@ current_year = datetime.now().strftime("%Y")
 @bp.route("/", methods=("GET", "POST"))
 def index():
     db = pg_db()
+    session.get("session_id", str(uuid.uuid4()))
+
+    cursor = db.cursor()
+    query = f"""INSERT INTO dynastr.user_meta (session_id, ip_address, agent, host, referrer) VALUES (%s,%s,%s,%s,%s)"""
+    user_meta = (
+        str(session.get("session_id", "")),
+        str(request.remote_addr),
+        str(request.headers.get("User-Agent", "")),
+        str(request.headers.get("Host", "")),
+        str(request.referrer),
+    )
+    cursor.execute(query, user_meta)
+
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
         return render_template("leagues/index.html", user_name=user_name)
     if request.method == "POST" and is_user(request.form["username"]):
-        session_id = session["session_id"] = str(uuid.uuid4())
+        session_id = session.get("session_id", str(uuid.uuid4()))
         user_name = request.form["username"]
         user_id = session["user_id"] = get_user_id(user_name)
         leagues = user_leagues(str(user_id))
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
-        with db.cursor() as cursor:
-            execute_values(
-                cursor,
-                """
-                INSERT INTO dynastr.current_leagues VALUES %s;
-                """,
-                [
-                    (
-                        session_id,
-                        user_id,
-                        user_name,
-                        league[1],
-                        league[0],
-                        league[2],
-                        league[3],
-                        league[4],
-                        league[5],
-                        league[6],
-                        league[7],
-                        league[8],
-                        league[9],
-                        league[10],
-                        league[11],
-                        league[12],
-                        entry_time,
-                    )
-                    for league in iter(leagues)
-                ],
-                page_size=1000,
-            )
+        insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
 
         return redirect(url_for("leagues.select_league"))
     return render_template("leagues/index.html")
@@ -662,7 +703,7 @@ def select_league():
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
 
-    session_id = session["session_id"]
+    session_id = session.get("session_id", str(uuid.uuid4()))
     user_id = session["user_id"]
 
     if request.method == "POST":
@@ -4299,13 +4340,16 @@ order by m.display_name, player_value desc
                                                 total_value desc"""
         )
         c_owners = c_owners_cursor.fetchall()
-        labels = [row["display_name"] for row in c_owners]
-        values = [row["total_value"] for row in c_owners]
-        total_value = [row["total_value"] for row in c_owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in c_owners
-        ]
+        try:
+            labels = [row["display_name"] for row in c_owners]
+            values = [row["total_value"] for row in c_owners]
+            total_value = [row["total_value"] for row in c_owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in c_owners
+            ]
+        except:
+            pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         con_ba_cursor.execute(
@@ -4974,13 +5018,16 @@ order by m.display_name, player_value desc)all_players
                                                 total_value desc"""
         )
         nfl_owners = nfl_owners_cursor.fetchall()
-        labels = [row["display_name"] for row in nfl_owners]
-        values = [row["total_value"] for row in nfl_owners]
-        total_value = [row["total_value"] for row in nfl_owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in nfl_owners
-        ]
+        try:
+            labels = [row["display_name"] for row in nfl_owners]
+            values = [row["total_value"] for row in nfl_owners]
+            total_value = [row["total_value"] for row in nfl_owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in nfl_owners
+            ]
+        except:
+            pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         con_ba_cursor.execute(
@@ -5700,13 +5747,16 @@ order by m.display_name, player_value desc)all_players
                                                 total_value desc"""
         )
         fp_owners = fp_owners_cursor.fetchall()
-        labels = [row["display_name"] for row in fp_owners]
-        values = [row["total_value"] for row in fp_owners]
-        total_value = [row["total_value"] for row in fp_owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in fp_owners
-        ]
+        try:
+            labels = [row["display_name"] for row in fp_owners]
+            values = [row["total_value"] for row in fp_owners]
+            total_value = [row["total_value"] for row in fp_owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in fp_owners
+            ]
+        except:
+            pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         con_ba_cursor.execute(
