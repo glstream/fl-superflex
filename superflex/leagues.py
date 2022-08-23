@@ -4509,6 +4509,31 @@ def nfl_contender_rankings():
                     user_id=user_id,
                 )
             )
+        if list(request.form)[0] == "fp_contender_rankings":
+            league_data = eval(request.form["fp_contender_rankings"])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            # print("POST SELECT LEAGUE", league_id)
+            # delete data players and picks
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, session_id, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
+            # insert data
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+
+            return redirect(
+                url_for(
+                    "leagues.fp_contender_rankings",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
+            )
         if list(request.form)[0] == "trade_tracker":
 
             league_data = eval(request.form["trade_tracker"])
