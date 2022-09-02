@@ -286,5 +286,24 @@ create table if not exists dynastr.user_meta (
 	referrer VARCHAR(150)
 ); 
 
+create table if not exists history.user_geo_meta (
+	session_id VARCHAR(150),
+	ip_address VARCHAR(150),
+	city VARCHAR(150),
+  region VARCHAR(150),
+	country VARCHAR(150),
+	hostname VARCHAR(150),
+	lat VARCHAR(150),
+	lng VARCHAR(150),
+	org VARCHAR(150),
+	postal VARCHAR(150),
+	agent VARCHAR(150),
+	host VARCHAR(150),
+	referrer VARCHAR(150),
+	insert_date VARCHAR(150),
+  PRIMARY KEY (session_id)
+)
+INSERT INTO history.user_geo_meta VALUES ('test',Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,'2021-08-20T23:59:00.761669')
+
 CREATE TABLE IF NOT EXISTS history.managers (LIKE dynastr.managers INCLUDING ALL);
 CREATE TABLE IF NOT EXISTS history.current_leagues (LIKE dynastr.current_leagues INCLUDING ALL);
