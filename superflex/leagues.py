@@ -892,9 +892,9 @@ def select_league():
                     user_id=user_id,
                 )
             )
-    cursor = db.cursor()
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute(
-        f"select * from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
     )
     leagues = cursor.fetchall()
     cursor.close()
