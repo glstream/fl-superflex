@@ -10,14 +10,15 @@
                     <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                 </object>
                 <h5 class="card-title">{{league.league_name}}</h5>
-                <span class="badge alert-secondary">{{league.total_rosters}} TEAM</span>
-                {% if league.qb_cnt + league.sf_cnt > 1 %}
-                <span class="badge alert-secondary">SUPERFLEX</span>
-                {% else %}
-                <span class="badge alert-secondary">SINGLE QB</span>
-                {% endif %}
-                <span class="badge alert-secondary">{{league.starter_cnt}} STARTERS</span>
-                <span class="badge alert-secondary">{{league.sport | upper }}</span>
+                <h5><span class="badge alert-secondary">{{league.total_rosters}} Team</span>
+                    {% if league.qb_cnt + league.sf_cnt > 1 %}
+                    <span class="badge alert-secondary">Superflex</span>
+                    {% else %}
+                    <span class="badge alert-secondary">Single QB</span>
+                    {% endif %}
+                    <span class="badge alert-secondary">{{league.starter_cnt}} Starters</span>
+                    <span class="badge alert-secondary">{{league.sport | upper }}</span>
+                </h5>
 
                 <p></p>
                 <form method="post" class="form-inline">
