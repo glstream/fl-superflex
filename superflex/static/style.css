@@ -42,10 +42,9 @@ table {
 }
 
 .badge.alert-secondary {
-    outline-color: rgb(249, 199, 79) !important;
+    outline-color: rgb(248, 150, 30) !important;
     color: rgb(252, 252, 252) !important;
-    border-color: rgb(249, 199, 79) !important;
-    background-color: rgb(249, 199, 79) !important;
+    background-color: rgb(144, 190, 109) !important;
 }
 
 .badge.bg-primary {

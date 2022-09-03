@@ -5,13 +5,20 @@
     <div class="col-sm-3">
         <div class="card-fr">
             <div class="card-body">
-                <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{league[5]}}"
+                <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{league.avatar}}"
                     type="image/png">
                     <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                 </object>
-                <h5 class="card-title">{{league[4]}}</h5>
-                <span class="badge alert-secondary">{{league[6]}} Team</span>
-                <span class="badge alert-secondary">{{league[15] | upper }}</span>
+                <h5 class="card-title">{{league.league_name}}</h5>
+                <span class="badge alert-secondary">{{league.total_rosters}} TEAM</span>
+                {% if league.qb_cnt + league.sf_cnt > 1 %}
+                <span class="badge alert-secondary">SUPERFLEX</span>
+                {% else %}
+                <span class="badge alert-secondary">SINGLE QB</span>
+                {% endif %}
+                <span class="badge alert-secondary">{{league.starter_cnt}} STARTERS</span>
+                <span class="badge alert-secondary">{{league.sport | upper }}</span>
+
                 <p></p>
                 <form method="post" class="form-inline">
                     <div class="btn-group">
@@ -24,11 +31,13 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="ktc_rankings"
-                                        value="{{league[0],league[1],league[3]}}">Keep Trade Cut</a>
+                                        value="{{league.session_id,league.user_id,league.league_id}}">Keep Trade Cut</a>
                                         <button class="dropdown-item" type="submit" name="fp_rankings"
-                                            value="{{league[0],league[1],league[3]}}">Fantasy Pros</button>
+                                            value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
+                                            Pros</button>
                                         <button class="dropdown-item" type="submit" name="dp_rankings"
-                                            value="{{league[0],league[1],league[3]}}">Dynasty Process</button>
+                                            value="{{league.session_id,league.user_id,league.league_id}}">Dynasty
+                                            Process</button>
                                 </div>
                             </form>
                         </div>
@@ -42,17 +51,19 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="contender_rankings"
-                                        value="{{league[0],league[1],league[3]}}">ESPN Projections</button>
+                                        value="{{league.session_id,league.user_id,league.league_id}}">ESPN
+                                        Projections</button>
                                     <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
-                                        value="{{league[0],league[1],league[3]}}">NFL Projections</button>
+                                        value="{{league.session_id,league.user_id,league.league_id}}">NFL
+                                        Projections</button>
                                     <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                                        value="{{league[0],league[1],league[3]}}">Fantasy Pros
+                                        value="{{league.session_id,league.user_id,league.league_id}}">Fantasy Pros
                                         Projections</button>
                                 </div>
                             </form>
                         </div>
                         <button class="btn btn-outline-primary" type="submit" name="sel_trade_tracker"
-                            value="{{league[0],league[1],league[3],}}">Trade Tracker</button>
+                            value="{{league.session_id,league.user_id,league.league_id,}}">Trade Tracker</button>
                     </div>
                 </form>
             </div>
