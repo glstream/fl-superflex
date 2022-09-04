@@ -17,6 +17,11 @@
     </div>
 
 </div>
+<script>
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+</script> 
 <br>
 <div class="row justify-content-left" style="margin:auto;">
     <div class="card" style="width: 20rem; margin-right: 50px;">
@@ -106,22 +111,22 @@
                 <tbody>
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}">
+                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}"  data-toggle="tooltip" title="Total Value: {{'{:,}'.format(owner.total_value)}}">
                         {{owner.total_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}">{{owner.qb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip" title="QB Value: {{'{:,}'.format(owner.qb_sum)}}">{{owner.qb_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}">{{owner.rb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip" title="RB Value: {{'{:,}'.format(owner.rb_sum)}}">{{owner.rb_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}">{{owner.wr_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip" title="WR Value: {{'{:,}'.format(owner.wr_sum)}}">{{owner.wr_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}">{{owner.te_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip" title="TE Value: {{'{:,}'.format(owner.te_sum)}}">{{owner.te_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}">
+                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip" title="Starters Value: {{'{:,}'.format(owner.starters_sum)}}">
                         {{owner.starters_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}">
+                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip" title="Bench Value: {{'{:,}'.format(owner.bench_sum)}}">
                         {{owner.bench_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.picks_tile}}">{{owner.picks_rank |
+                    <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip" title="Picks Value: {{'{:,}'.format(owner.picks_sum)}}">{{owner.picks_rank |
                         suffix}}
                     </td>
                     </tr>
