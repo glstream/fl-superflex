@@ -101,20 +101,20 @@
                 <tbody>
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" title="Total projection:  {{'{:,}'.format(owner.total_value)}}">
+                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" title="Total projection: {{'{:,}'.format(owner.total_value)}}">
                         {{owner.total_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip" title="QB projection:  {{'{:,}'.format(owner.qb_sum)}}">{{owner.qb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip" title="QB projection: {{'{:,}'.format(owner.qb_sum)}}">{{owner.qb_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip" title="RB projection:  {{'{:,}'.format(owner.rb_sum)}}">{{owner.rb_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip" title="RB projection: {{'{:,}'.format(owner.rb_sum)}}">{{owner.rb_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip" title="WR projection:  {{'{:,}'.format(owner.wr_sum)}}">{{owner.wr_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip" title="WR projection: {{'{:,}'.format(owner.wr_sum)}}">{{owner.wr_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip" title="TE projection:  {{'{:,}'.format(owner.te_sum)}}">{{owner.te_rank | suffix}}
+                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip" title="TE projection: {{'{:,}'.format(owner.te_sum)}}">{{owner.te_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip" title="Starters projection:  {{'{:,}'.format(owner.starters_sum)}}">
+                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip" title="Starters projection: {{'{:,}'.format(owner.starters_sum)}}">
                         {{owner.starters_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip" title="Bench projection:  {{'{:,}'.format(owner.bench_sum)}}">
+                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip" title="Bench projection: {{'{:,}'.format(owner.bench_sum)}}">
                         {{owner.bench_rank | suffix}}</td>
                     </tr>
                     {% endfor %}
