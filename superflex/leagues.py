@@ -1562,15 +1562,17 @@ total_avg asc
 						"""
         )
         fp_owners = fp_owners_cursor.fetchall()
+        try:
+            labels = [row["display_name"] for row in fp_owners]
+            values = [row["total_avg"] for row in fp_owners]
+            total_value = [int(row["total_avg"]) for row in fp_owners][0] * 0.95
 
-        labels = [row["display_name"] for row in fp_owners]
-        values = [row["total_avg"] for row in fp_owners]
-        total_value = [int(row["total_avg"]) for row in fp_owners][0] * 0.95
-
-        pct_values = [
-            100 - abs((total_value / int(row["total_avg"])) - 1) * 100
-            for row in fp_owners
-        ]
+            pct_values = [
+                100 - abs((total_value / int(row["total_avg"])) - 1) * 100
+                for row in fp_owners
+            ]
+        except:
+            pct_values = []
 
         fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         fp_ba_cursor.execute(
@@ -2381,13 +2383,16 @@ def get_league():
                                 total_value desc"""
         )
         owners = owner_cursor.fetchall()
-        labels = [row["display_name"] for row in owners]
-        values = [row["total_value"] for row in owners]
-        total_value = [row["total_value"] for row in owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in owners
-        ]
+        try:
+            labels = [row["display_name"] for row in owners]
+            values = [row["total_value"] for row in owners]
+            total_value = [row["total_value"] for row in owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in owners
+            ]
+        except:
+            pct_values = []
 
         ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         ba_cursor.execute(
@@ -3211,13 +3216,16 @@ def get_league_dp():
                                 total_value desc"""
         )
         owners = owner_cursor.fetchall()
-        labels = [row["display_name"] for row in owners]
-        values = [row["total_value"] for row in owners]
-        total_value = [row["total_value"] for row in owners][0] * 1.05
-        pct_values = [
-            (((row["total_value"] - total_value) / total_value) + 1) * 100
-            for row in owners
-        ]
+        try:
+            labels = [row["display_name"] for row in owners]
+            values = [row["total_value"] for row in owners]
+            total_value = [row["total_value"] for row in owners][0] * 1.05
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in owners
+            ]
+        except:
+            pct_values = []
 
         ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         ba_cursor.execute(
