@@ -66,6 +66,10 @@ CREATE TABLE dynastr.current_leagues (
   PRIMARY KEY (session_id, league_id)
 );
 
+
+ALTER TABLE dynastr.current_leagues ADD rf_cnt integer;
+
+
 CREATE TABLE IF NOT EXISTS dynastr.ktc_player_ranks (
   player_name VARCHAR(75),
   ktc_player_id VARCHAR(75),
