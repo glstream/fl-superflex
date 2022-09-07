@@ -2859,6 +2859,7 @@ def get_league_dp():
                     ns_rf.user_id
                     , ns_rf.player_id
                     , ns_rf.fp_player_id
+                    , ns_rf.player_full_name
                     , ns_rf.player_position
                     , 'REC_FLEX' as fantasy_position
                     , ns_rf.player_order
@@ -2867,6 +2868,7 @@ def get_league_dp():
                     fp.user_id
                     , fp.fp_player_id
                     , fp.player_id
+                    , fp.player_full_name
                     , fp.player_position
                     , ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
                     , fp.rf_cnt
@@ -3245,6 +3247,7 @@ def get_league_dp():
                     ns_rf.user_id
                     , ns_rf.player_id
                     , ns_rf.fp_player_id
+                    , ns_rf.player_full_name
                     , ns_rf.player_position
                     , 'REC_FLEX' as fantasy_position
                     , ns_rf.player_order
@@ -3252,6 +3255,7 @@ def get_league_dp():
                     SELECT
                     fp.user_id
                     , fp.fp_player_id
+                    , fp.player_full_name
                     , fp.player_id
                     , fp.player_position
                     , ROW_NUMBER() OVER (PARTITION BY fp.user_id ORDER BY fp.player_value desc) as player_order
