@@ -5363,7 +5363,7 @@ order by m.display_name, player_value desc)all_players
                 ,pl.full_name
                 ,pl.player_position
                 ,ep.total_projection as player_value
-                ,RANK() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
+                ,ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
 
                 FROM dynastr.players pl 
                 INNER JOIN dynastr.nfl_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
@@ -6150,7 +6150,7 @@ order by m.display_name, player_value desc) all_players
                 ,pl.full_name
                 ,pl.player_position
                 ,ep.total_projection as player_value
-                ,RANK() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
+                ,ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
 
                 FROM dynastr.players pl 
                 INNER JOIN dynastr.fp_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
