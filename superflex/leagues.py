@@ -3128,6 +3128,7 @@ def get_league_dp():
                     , te_cnt
                     , flex_cnt
                     , sf_cnt
+                    ,rf_cnt
 
                     FROM dynastr.league_players lp
                     INNER JOIN dynastr.players pl on lp.player_id = pl.player_id
