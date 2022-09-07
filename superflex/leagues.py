@@ -2970,7 +2970,7 @@ def get_league_dp():
                     left join dynastr.players p on tp.player_id = p.player_id
                     LEFT JOIN dynastr.dp_player_ranks dp on tp.player_full_name = dp.player_full_name
                     inner join dynastr.managers m on tp.user_id = m.user_id 
-                    order by m.display_name, player_value desc							   
+                    order by m.display_name, player_value desc, tp.player_full_name	asc						   
                 """
         )
         players = player_cursor.fetchall()
