@@ -41,7 +41,7 @@ def create_app(test_config=None):
         ith = {1: "st", 2: "nd", 3: "rd"}.get(
             rank % 10 * (rank % 100 not in [11, 12, 13]), "th"
         )
-        return f"{str(rank)}{ith}"
+        return f"{str(rank)}{ith}" if rank else ""
 
     @app.template_filter("sleeper_img")
     def sleeper_img(sleeper_id):
