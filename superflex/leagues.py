@@ -162,7 +162,17 @@ def get_managers(league_id: str) -> list:
     return manager_data
 
 
-def insert_managers(db, managers: list) -> None:
+def clean_league_managers(db, league_id: str):
+    delete_query = f"""DELETE FROM dynastr.managers where league_id = '{league_id}' """
+    cursor = db.cursor()
+    cursor.execute(delete_query)
+    db.commit()
+    cursor.close()
+    print("Managers deleted.")
+    return
+
+
+def insert_managers(db, managers: list):
     with db.cursor() as cursor:
         execute_values(
             cursor,
@@ -206,7 +216,7 @@ def round_suffix(rank: int) -> str:
     return f"{str(rank)}{ith}"
 
 
-def clean_league_rosters(db, session_id: str, user_id: str, league_id: str) -> None:
+def clean_league_rosters(db, session_id: str, user_id: str, league_id: str):
     delete_query = f"""DELETE FROM dynastr.league_players where session_id = '{session_id}' and league_id = '{league_id}' """
     cursor = db.cursor()
     cursor.execute(delete_query)
@@ -239,7 +249,9 @@ def clean_draft_trades(db, league_id: str) -> None:
 
 
 def clean_league_picks(db, session_id: str, league_id: str) -> None:
-    delete_query = f"""DELETE FROM dynastr.draft_picks where session_id = '{session_id}' and league_id = '{league_id}'"""
+    delete_query = (
+        f"""DELETE FROM dynastr.draft_picks where league_id = '{league_id}'"""
+    )
     cursor = db.cursor()
     cursor.execute(delete_query)
     cursor.close()
@@ -556,7 +568,9 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
         else:
             position_name = "Late"
         if int(draft_position) in [
-            int(draft_position) for user_id, draft_position in draft_order_dict.items()
+            int(draft_position)
+            for user_id, draft_position in draft_order_dict.items()
+            if user_id is not None
         ]:
             draft_order.append(
                 [
@@ -565,12 +579,12 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
                     draft_position,
                     position_name,
                     roster_id,
-                    draft_order_[int(draft_position)],
+                    # draft_order_[int(draft_position)],
+                    draft_order_.get(int(draft_position), "Empty"),
                     league_id,
                     draft_id["draft_id"],
                 ]
             )
-
     cursor = db.cursor()
     execute_batch(
         cursor,
@@ -590,12 +604,13 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
             f"https://api.sleeper.app/v1/league/{league_id}/rosters"
         ).json()
     ]
-    update_query = f"""UPDATE dynastr.draft_positions AS t 
-                    SET user_id = e.user_id 
-                    FROM (VALUES %s) AS e(user_id, roster_id) 
-                    WHERE e.roster_id = t.roster_id and t.league_id = '{league_id}';"""
+    # if user_id is not None:
+    #     update_query = f"""UPDATE dynastr.draft_positions AS t
+    #                     SET user_id = e.user_id
+    #                     FROM (VALUES %s) AS e(user_id, roster_id)
+    #                     WHERE e.roster_id = t.roster_id and t.league_id = '{league_id}';"""
 
-    execute_values(cursor, update_query, new_values, template=None, page_size=100)
+    #     execute_values(cursor, update_query, new_values, template=None, page_size=100)
     # update_draft_positions = """UPDATE dynastr.draft_positions SET user_id = t.new_user_id from (i['roster_id'], i['owner_id']) as t(roster_id, new_user_id) where dynastr.draft_positions.roster_id = t.roster_id"""
     db.commit()
     cursor.close()
@@ -718,7 +733,8 @@ def select_league():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
-            # delete data players, picks
+            # delete data players, picks, managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # clean_managers()
@@ -747,6 +763,7 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # delete data players, picks
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # clean_managers()
@@ -775,6 +792,7 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # delete data players, picks
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # clean_managers()
@@ -803,10 +821,8 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
 
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
+            # delete traded players and picks and managersd
+            delete_managers(db, league_id)
             clean_player_trades(db, league_id)
             clean_draft_trades(db, league_id)
             # get trades
@@ -814,6 +830,9 @@ def select_league():
             # insert trades draft Positions
             draft_positions(db, league_id, user_id)
             insert_trades(db, trades, league_id)
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
 
             return redirect(
                 url_for(
@@ -829,7 +848,8 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
 
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -852,7 +872,8 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -877,7 +898,8 @@ def select_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -947,7 +969,8 @@ def get_league_fp():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -972,7 +995,8 @@ def get_league_fp():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -997,7 +1021,8 @@ def get_league_fp():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -1753,7 +1778,8 @@ def get_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -1778,7 +1804,8 @@ def get_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -1803,7 +1830,8 @@ def get_league():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -2175,7 +2203,7 @@ def get_league():
                     t3.user_id
                     , t3.display_name
                     , total_value
-                    , RANK() OVER (order by sum(position_value) desc) total_rank 
+                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank 
                     , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank
@@ -2621,7 +2649,8 @@ def get_league_dp():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -2646,7 +2675,8 @@ def get_league_dp():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -2671,7 +2701,8 @@ def get_league_dp():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3056,7 +3087,7 @@ def get_league_dp():
                     t3.user_id
                     , t3.display_name
                     , total_value
-                    , RANK() OVER (order by sum(position_value) desc) total_rank
+                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank
                     , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank
@@ -3487,7 +3518,8 @@ def trade_tracker():
             league_id = league_data[2]
 
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3512,7 +3544,8 @@ def trade_tracker():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3553,7 +3586,8 @@ def trade_tracker():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3578,7 +3612,8 @@ def trade_tracker():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3603,7 +3638,8 @@ def trade_tracker():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3628,7 +3664,8 @@ def trade_tracker():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3942,7 +3979,8 @@ def contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3967,7 +4005,8 @@ def contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -3992,7 +4031,8 @@ def contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -4316,7 +4356,7 @@ order by m.display_name, player_value desc
                      t3.user_id
                     , t3.display_name
                     , total_value
-                    , RANK() OVER (order by sum(position_value) desc) total_rank
+                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank
                     , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank
@@ -4353,7 +4393,7 @@ order by m.display_name, player_value desc
                     , sum(player_value) as position_value
                     , total_value
                     , DENSE_RANK() OVER (PARTITION BY fantasy_position  order by sum(player_value) desc) position_rank
-                    , DENSE_RANK() OVER (order by total_value desc) total_rank
+                    , RANK() OVER (order by total_value desc) total_rank
                     , fantasy_position
                     , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
                     , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
@@ -4728,7 +4768,8 @@ def nfl_contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -4753,7 +4794,8 @@ def nfl_contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -5077,7 +5119,7 @@ order by m.display_name, player_value desc
                      t3.user_id
                     , t3.display_name
                     , total_value
-                    , RANK() OVER (order by sum(position_value) desc) total_rank
+                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank
                     , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank
@@ -5489,7 +5531,8 @@ def fp_contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -5514,7 +5557,8 @@ def fp_contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -5539,7 +5583,8 @@ def fp_contender_rankings():
             user_id = league_data[1]
             league_id = league_data[2]
             # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks
+            # delete data players and picks and managers
+            clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, session_id, league_id)
             # insert managers names
@@ -5864,7 +5909,7 @@ order by m.display_name, player_value desc
                      t3.user_id
                     , t3.display_name
                     , total_value
-                    , RANK() OVER (order by sum(position_value) desc) total_rank
+                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank
                     , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank

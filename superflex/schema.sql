@@ -285,9 +285,9 @@ CREATE TABLE IF NOT EXISTS dynastr.fp_player_projections (
 create table if not exists dynastr.user_meta (
 	session_id VARCHAR(150),
 	ip_address VARCHAR(150),
-	agent VARCHAR(150),
-	host VARCHAR(150),
-	referrer VARCHAR(150)
+	agent VARCHAR(350),
+	host VARCHAR(350),
+	referrer VARCHAR(350)
 ); 
 
 create table if not exists history.user_geo_meta (
@@ -296,14 +296,14 @@ create table if not exists history.user_geo_meta (
 	city VARCHAR(150),
   region VARCHAR(150),
 	country VARCHAR(150),
-	hostname VARCHAR(150),
+	hostname VARCHAR(350),
 	lat VARCHAR(150),
 	lng VARCHAR(150),
 	org VARCHAR(150),
 	postal VARCHAR(150),
-	agent VARCHAR(150),
-	host VARCHAR(150),
-	referrer VARCHAR(150),
+	agent VARCHAR(350),
+	host VARCHAR(350),
+	referrer VARCHAR(350),
 	insert_date VARCHAR(150),
   PRIMARY KEY (session_id)
 )
