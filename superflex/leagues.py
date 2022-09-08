@@ -579,8 +579,8 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
                     draft_position,
                     position_name,
                     roster_id,
-                    # draft_order_[int(draft_position)],
-                    draft_order_.get(int(draft_position), "Empty"),
+                    draft_order_[int(draft_position)],
+                    # draft_order_.get(int(draft_position), "Empty"),
                     league_id,
                     draft_id["draft_id"],
                 ]
@@ -822,7 +822,7 @@ def select_league():
             league_id = league_data[2]
 
             # delete traded players and picks and managersd
-            delete_managers(db, league_id)
+            clean_league_managers(db, league_id)
             clean_player_trades(db, league_id)
             clean_draft_trades(db, league_id)
             # get trades
