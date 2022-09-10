@@ -409,45 +409,43 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
     league_players = []
     entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
     rosters = get_league_rosters(league_id)
-    try:
-        for roster in rosters:
-            league_roster = roster["players"]
-            for player_id in league_roster:
-                league_players.append(
-                    [
-                        session_id,
-                        user_id,
-                        player_id,
-                        roster["league_id"],
-                        roster["owner_id"],
-                        entry_time,
-                    ]
-                )
 
-        with db.cursor() as cursor:
-            execute_values(
-                cursor,
-                """
-                    INSERT INTO dynastr.league_players VALUES %s
-                    ON CONFLICT (session_id, user_id, player_id)
-                    DO UPDATE SET league_id = EXCLUDED.league_id
-                                , insert_date = EXCLUDED.insert_date;
-                    """,
+    for roster in rosters:
+        league_roster = roster["players"]
+        for player_id in league_roster:
+            league_players.append(
                 [
-                    (
-                        league_player[0],
-                        league_player[1],
-                        league_player[2],
-                        league_player[3],
-                        league_player[4],
-                        league_player[5],
-                    )
-                    for league_player in iter(league_players)
-                ],
-                page_size=1000,
+                    session_id,
+                    user_id,
+                    player_id,
+                    roster["league_id"],
+                    roster["owner_id"] if roster["owner_id"] is not None else "EMPTY",
+                    entry_time,
+                ]
             )
-    except:
-        pass
+
+    with db.cursor() as cursor:
+        execute_values(
+            cursor,
+            """
+                INSERT INTO dynastr.league_players VALUES %s
+                ON CONFLICT (session_id, user_id, player_id)
+                DO UPDATE SET league_id = EXCLUDED.league_id
+                            , insert_date = EXCLUDED.insert_date;
+                """,
+            [
+                (
+                    league_player[0],
+                    league_player[1],
+                    league_player[2],
+                    league_player[3],
+                    league_player[4],
+                    league_player[5],
+                )
+                for league_player in iter(league_players)
+            ],
+            page_size=1000,
+        )
 
     return
 
@@ -561,10 +559,11 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     league = get_full_league(league_id)
     draft_order = []
     draft_dict = draft["draft_order"]
+    draft_slot = {k: v for k, v in draft["slot_to_roster_id"].items() if v is not None}
 
     if len(draft["draft_order"]) < len(draft["slot_to_roster_id"]):
         empty_team_cnt = 0
-        for k, v in draft["slot_to_roster_id"].items():
+        for k, v in draft_slot.items():
             if int(k) not in list(draft["draft_order"].values()):
                 print("DRAFT_POSITION", k, "ROSTER_ID", v)
                 if league[v - 1]["owner_id"] is not None:
@@ -576,9 +575,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
 
     season = draft["season"]
     rounds = draft_id["settings"]["rounds"]
-    roster_slot = {
-        int(k): v for k, v in draft["slot_to_roster_id"].items() if v is not None
-    }
+    roster_slot = {int(k): v for k, v in draft_slot.items() if v is not None}
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
 
     try:
@@ -627,18 +624,18 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     )
 
     # work here new I think i can set the new draft position roster_id rather than the user_id
-    new_values = [
-        (i["owner_id"], str(i["roster_id"]))
-        for i in requests.get(
-            f"https://api.sleeper.app/v1/league/{league_id}/rosters"
-        ).json()
-    ]
-    update_query = f"""UPDATE dynastr.draft_positions AS t
-                        SET user_id = e.user_id
-                        FROM (VALUES %s) AS e(user_id, roster_id)
-                        WHERE e.roster_id = t.roster_id and t.league_id = '{league_id}';"""
+    # new_values = [
+    #     (i["owner_id"], str(i["roster_id"]))
+    #     for i in requests.get(
+    #         f"https://api.sleeper.app/v1/league/{league_id}/rosters"
+    #     ).json()
+    # ]
+    # update_query = f"""UPDATE dynastr.draft_positions AS t
+    #                     SET user_id = e.user_id
+    #                     FROM (VALUES %s) AS e(user_id, roster_id)
+    #                     WHERE e.roster_id = t.roster_id and t.league_id = '{league_id}';"""
 
-    execute_values(cursor, update_query, new_values, template=None, page_size=100)
+    # execute_values(cursor, update_query, new_values, template=None, page_size=100)
     # update_draft_positions = """UPDATE dynastr.draft_positions SET user_id = t.new_user_id from (i['roster_id'], i['owner_id']) as t(roster_id, new_user_id) where dynastr.draft_positions.roster_id = t.roster_id"""
     db.commit()
     cursor.close()
