@@ -812,6 +812,7 @@ def get_league_fp():
         folder = Path("sql/")
         print(folder)
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        print("FILE_PATH", Path.cwd())
         with open(
             Path.cwd() / "superflex" / "sql" / "details" / "get_league_fp.sql", "r"
         ) as sql_file:
