@@ -195,17 +195,6 @@ def insert_managers(db, managers: list):
             ],
             page_size=1000,
         )
-    # cursor = db.cursor()
-    # execute_batch(cursor, """INSERT INTO dynastr.managers (source, user_id, league_id, avatar, display_name)
-    # VALUES (%s, %s, %s, %s, %s)
-    # ON CONFLICT (user_id)
-    # DO UPDATE SET source = EXCLUDED.source
-    #     , league_id = EXCLUDED.league_id
-    #     , avatar = EXCLUDED.avatar
-    #     , display_name = EXCLUDED.display_name;
-    # """, tuple(managers), page_size=1000)
-    # db.commit()
-    # cursor.close()
     return
 
 
@@ -530,15 +519,6 @@ def total_owned_picks(
                     page_size=1000,
                 )
 
-            # cursor = db.cursor()
-            # execute_batch(cursor, """INSERT INTO dynastr.draft_picks (year, round, round_name, roster_id,owner_id, league_id,draft_id, session_id)
-            # VALUES (%s, %s, %s, %s, %s, %s,%s,%s)
-            # ON CONFLICT (year, round, roster_id, owner_id, league_id, session_id)
-            # DO UPDATE SET round_name = EXCLUDED.round_name
-            #     , draft_id = EXCLUDED.draft_id;
-            # """, tuple(draft_picks), page_size=1000)
-            # db.commit()
-
     return
 
 
@@ -701,6 +681,39 @@ def insert_current_leagues(
     return
 
 
+def player_manager_upates(
+    db, button: str, session_id: str, user_id: str, league_id: str
+) -> None:
+
+    if button == "trade_tracker":
+        # insert managers names
+        managers = get_managers(league_id)
+        insert_managers(db, managers)
+
+        # delete traded players and picks
+        clean_player_trades(db, league_id)
+        clean_draft_trades(db, league_id)
+        # get trades
+        trades = get_trades(league_id, get_sleeper_state())
+        # insert trades draft Positions
+        draft_positions(db, league_id, user_id)
+        insert_trades(db, trades, league_id)
+    else:
+        clean_league_managers(db, league_id)
+        clean_league_rosters(db, session_id, user_id, league_id)
+        clean_league_picks(db, league_id)
+        clean_draft_positions(db, league_id)
+
+        managers = get_managers(league_id)
+        insert_managers(db, managers)
+
+        insert_league_rosters(db, session_id, user_id, league_id)
+        total_owned_picks(db, league_id, session_id)
+        draft_positions(db, league_id, user_id)
+
+    return
+
+
 league_ids = []
 league_metas = []
 players = []
@@ -753,201 +766,21 @@ def select_league():
     user_id = session["user_id"]
 
     if request.method == "POST":
-        if list(request.form)[0] == "ktc_rankings":
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # delete data players, picks, managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # clean_managers()
-            # clean_draft_trades()
-            # clean_draft_positions()
-
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # delete data players, picks
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # clean_managers()
-            # clean_draft_trades()
-            # clean_draft_positions()
+        )
 
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "dp_rankings":
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # delete data players, picks
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # clean_managers()
-            # clean_draft_trades()
-            # clean_draft_positions()
-
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "sel_trade_tracker":
-            league_data = eval(request.form["sel_trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-
-            # delete traded players and picks and managersd
-            clean_league_managers(db, league_id)
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute(
         f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
@@ -966,142 +799,20 @@ def get_league_fp():
     db = pg_db()
     date_ = datetime.now().strftime("%m/%d/%Y")
     if request.method == "POST":
-        if list(request.form)[0] == "trade_tracker":
-
-            league_data = eval(request.form["trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "ktc_rankings":
-            print(request.form)
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "dp_rankings":
-            print(request.form)
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
+        )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")
@@ -1777,141 +1488,24 @@ total_avg asc
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
+
     if request.method == "POST":
-        if list(request.form)[0] == "trade_tracker":
 
-            league_data = eval(request.form["trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
 
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "dp_rankings":
-            print(request.form)
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
+        )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")
@@ -2651,139 +2245,22 @@ def get_league():
 def get_league_dp():
     db = pg_db()
     if request.method == "POST":
-        if list(request.form)[0] == "trade_tracker":
 
-            league_data = eval(request.form["trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
 
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "ktc_rankings":
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
+        )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")
@@ -3547,182 +3024,23 @@ def trade_tracker():
     db = pg_db()
 
     if request.method == "POST":
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
 
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
 
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "ktc_rankings":
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
+        )
 
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-
-        if list(request.form)[0] == "dp_rankings":
-            print(request.form)
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-
-        if list(request.form)[0] == "power_rankings":
-            league_data = eval(request.form["power_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
     if request.method == "GET":
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
@@ -3973,153 +3291,22 @@ from
 def contender_rankings():
     db = pg_db()
     if request.method == "POST":
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "ktc_rankings":
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "dp_rankings":
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
 
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "trade_tracker":
-
-            league_data = eval(request.form["trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
+        )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")
@@ -4765,126 +3952,22 @@ order by m.display_name, player_value desc
 def nfl_contender_rankings():
     db = pg_db()
     if request.method == "POST":
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "ktc_rankings":
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "dp_rankings":
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
 
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "trade_tracker":
-
-            league_data = eval(request.form["trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
+        )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")
@@ -5530,153 +4613,22 @@ order by m.display_name, player_value desc)all_players
 def fp_contender_rankings():
     db = pg_db()
     if request.method == "POST":
-        if list(request.form)[0] == "fp_rankings":
-            league_data = eval(request.form["fp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_fp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "ktc_rankings":
-            league_data = eval(request.form["ktc_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "dp_rankings":
-            league_data = eval(request.form["dp_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            return redirect(
-                url_for(
-                    "leagues.get_league_dp",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "contender_rankings":
-            league_data = eval(request.form["contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
 
-            return redirect(
-                url_for(
-                    "leagues.contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
             )
-        if list(request.form)[0] == "nfl_contender_rankings":
-            league_data = eval(request.form["nfl_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.nfl_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "fp_contender_rankings":
-            league_data = eval(request.form["fp_contender_rankings"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            # print("POST SELECT LEAGUE", league_id)
-            # delete data players and picks and managers
-            clean_league_managers(db, league_id)
-            clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
-            clean_draft_positions(db, league_id)
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # insert data
-            insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
-            draft_positions(db, league_id, user_id)
-
-            return redirect(
-                url_for(
-                    "leagues.fp_contender_rankings",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
-        if list(request.form)[0] == "trade_tracker":
-
-            league_data = eval(request.form["trade_tracker"])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-
-            # insert managers names
-            managers = get_managers(league_id)
-            insert_managers(db, managers)
-            # delete traded players and picks
-            clean_player_trades(db, league_id)
-            clean_draft_trades(db, league_id)
-            # get trades
-            trades = get_trades(league_id, get_sleeper_state())
-            # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
-            insert_trades(db, trades, league_id)
-
-            return redirect(
-                url_for(
-                    "leagues.trade_tracker",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                )
-            )
+        )
 
     if request.method == "GET":
         session_id = request.args.get("session_id")
