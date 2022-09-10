@@ -31,12 +31,12 @@
                                     Power Rankings
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <button class="dropdown-item" type="submit" name="ktc_rankings"
+                                    <button class="dropdown-item" type="submit" name="get_league"
                                         value="{{league.session_id,league.user_id,league.league_id}}">Keep Trade Cut</a>
-                                        <button class="dropdown-item" type="submit" name="fp_rankings"
+                                        <button class="dropdown-item" type="submit" name="get_league_fp"
                                             value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
                                             Pros</button>
-                                        <button class="dropdown-item" type="submit" name="dp_rankings"
+                                        <button class="dropdown-item" type="submit" name="get_league_dp"
                                             value="{{league.session_id,league.user_id,league.league_id}}">Dynasty
                                             Process</button>
                                 </div>
@@ -63,7 +63,7 @@
                                 </div>
                             </form>
                         </div>
-                        <button class="btn btn-outline-primary" type="submit" name="sel_trade_tracker"
+                        <button class="btn btn-outline-primary" type="submit" name="trade_tracker"
                             value="{{league.session_id,league.user_id,league.league_id,}}">Trade Tracker</button>
                     </div>
                 </form>
