@@ -2178,6 +2178,8 @@ def fp_contender_rankings():
 
         users = get_users_data(league_id)
 
+        nfl_current_week = get_sleeper_state()["leg"]
+
         fp_contenders_cursor.close()
         fp_owners_cursor.close()
         date_cursor.close()
@@ -2200,6 +2202,7 @@ def fp_contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
+            nfl_current_week=nfl_current_week,
         )
     else:
         return redirect(url_for("leagues.index"))
