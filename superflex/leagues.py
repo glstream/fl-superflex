@@ -263,13 +263,17 @@ def get_sleeper_state():
 def get_trades(league_id: str, nfl_state: dict) -> list:
 
     leg = nfl_state["leg"] if nfl_state["leg"] > 0 else 1
+    print("leg", leg)
     all_trades = []
+    week = 1
     for i in range(1, leg + 1):
+
         trans_call = requests.get(
-            f"https://api.sleeper.app/v1/league/{league_id}/transactions/{leg}"
+            f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
         ).json()
-        all_trades.append(trans_call)
-    trades_payload = [p for p in [i for i in trans_call] if p["type"] == "trade"]
+        all_trades.extend(trans_call)
+        week += 1
+    trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
     return trades_payload
 
 
@@ -671,8 +675,8 @@ def insert_current_leagues(
 
 def player_manager_upates(
     db, button: str, session_id: str, user_id: str, league_id: str
-) -> None:
-
+):
+    print("Button", button)
     if button == "trade_tracker":
         # insert managers names
         managers = get_managers(league_id)
@@ -686,6 +690,7 @@ def player_manager_upates(
         # insert trades draft Positions
         draft_positions(db, league_id, user_id)
         insert_trades(db, trades, league_id)
+
     else:
         clean_league_managers(db, league_id)
         clean_league_rosters(db, session_id, user_id, league_id)
