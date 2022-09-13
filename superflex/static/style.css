@@ -326,7 +326,6 @@ html {
     display: inline-block;
 }
 
-
 /* ul {
   column-count: 2;
   column-rule: dotted 1px #333;
@@ -343,4 +342,16 @@ a {
 
 h5>.badge {
     vertical-align: bottom;
+}
+
+.tooltip>.tooltip-inner {
+    background-color: #ffffff !important;
+    color: rgb(0, 0, 0) !important;
+    border: 1px solid rgb(98, 97, 97) !important;
+    font-size: 12px !important;
+    border-radius: .5em !important;
+}
+
+.tooltip.show {
+    opacity: 1.0 !important;
 }

@@ -97,46 +97,57 @@
             <table class="table rounded table-hover" style="width:95%">
                 <thead style="text-align:center">
                     <tr>
-                        <th scope="col">Manager</th>
+                        <th scope="col"></th>
                         <th>Overall</th>
+                        <th>Starters</th>
                         <th>QB</th>
                         <th>RB</th>
                         <th>WR</th>
                         <th>TE</th>
-                        <th>Starters</th>
-                        <th>Bench</th>
                         <th>Picks</th>
+                        <th>Bench</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip"
-                        title="Total Value: {{'{:,}'.format(owner.total_value)}}">
+                        data-html="true" title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
                         {{owner.total_rank | suffix}}
                     </td>
+                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="Starters Value: <b>{{'{:,}'.format(owner.starters_sum)}}</b><br>Starters Avg. <b>{{'{:,}'.format(owner.starters_average)}} </b>">
+                        {{owner.starters_rank | suffix}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip"
-                        title="QB Value: {{'{:,}'.format(owner.qb_sum)}}">{{owner.qb_rank | suffix}}
+                        data-html="true"
+                        title="QB Value: <b>{{'{:,}'.format(owner.qb_sum)}}</b><br>QB Avg. <b>{{'{:,}'.format(owner.qb_average)}} </b>">
+                        {{owner.qb_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip"
-                        title="RB Value: {{'{:,}'.format(owner.rb_sum)}}">{{owner.rb_rank | suffix}}
+                        data-html="true"
+                        title="RB Value: <b>{{'{:,}'.format(owner.rb_sum)}}</b><br>RB Avg. <b>{{'{:,}'.format(owner.rb_average)}} </b>">
+                        {{owner.rb_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip"
-                        title="WR Value: {{'{:,}'.format(owner.wr_sum)}}">{{owner.wr_rank | suffix}}
+                        data-html="true"
+                        title="WR Value: <b>{{'{:,}'.format(owner.wr_sum)}}</b><br>WR Avg. <b>{{'{:,}'.format(owner.wr_average)}} </b>">
+                        {{owner.wr_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip"
-                        title="TE Value: {{'{:,}'.format(owner.te_sum)}}">{{owner.te_rank | suffix}}
+                        data-html="true"
+                        title="TE Value: <b>{{'{:,}'.format(owner.te_sum)}}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average)}} </b>">
+                        {{owner.te_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
-                        title="Starters Value: {{'{:,}'.format(owner.starters_sum)}}">
-                        {{owner.starters_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip"
-                        title="Bench Value: {{'{:,}'.format(owner.bench_sum)}}">
-                        {{owner.bench_rank | suffix}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip"
-                        title="Picks Value: {{'{:,}'.format(owner.picks_sum)}}">{{owner.picks_rank |
+                        data-html="true" title="Picks Value: <b>{{'{:,}'.format(owner.picks_sum)}}</b>">
+                        {{owner.picks_rank |
                         suffix}}
                     </td>
+                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="Bench Value: <b>{{'{:,}'.format(owner.bench_sum)}}</b><br>Bench Avg. <b>{{'{:,}'.format(owner.bench_average)}} </b>">
+                        {{owner.bench_rank | suffix}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

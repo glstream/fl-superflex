@@ -77,7 +77,7 @@ def league_managers(league_id: str, user_id: str) -> list:
     return managers
 
 
-def get_user_name(user_id: str) -> str:
+def get_user_name(user_id: str):
     user_req = requests.get(f"https://api.sleeper.app/v1/user/{user_id}")
     user_meta = user_req.json()
     return (user_meta["username"], user_meta["display_name"])
@@ -108,7 +108,7 @@ def get_users_data(league_id):
     ]
 
 
-def get_league_type(league_id: str) -> str:
+def get_league_type(league_id: str):
     league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
     return (
         "sf_value"
