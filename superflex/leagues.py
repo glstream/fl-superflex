@@ -59,6 +59,7 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
                 len(league["roster_positions"]),
                 league["sport"],
                 rec_flexes,
+                league["settings"]["type"],
             )
         )
     return leagues
@@ -620,8 +621,8 @@ def insert_current_leagues(
     cursor = db.cursor()
     execute_batch(
         cursor,
-        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
    ON CONFLICT (session_id, league_id) DO UPDATE 
   SET user_id = excluded.user_id,
   		user_name = excluded.user_name,
@@ -639,7 +640,8 @@ def insert_current_leagues(
 		total_roster_cnt = excluded.total_roster_cnt,
 		sport = excluded.sport,
       	insert_date = excluded.insert_date,
-        rf_cnt = excluded.rf_cnt;
+        rf_cnt = excluded.rf_cnt,
+        league_cat = excluded.league_cat;
     """,
         tuple(
             [
@@ -662,6 +664,7 @@ def insert_current_leagues(
                     league[12],
                     entry_time,
                     league[13],
+                    league[14],
                 )
                 for league in iter(leagues)
             ]
@@ -750,8 +753,8 @@ def index():
 
 @bp.route("/select_league", methods=["GET", "POST"])
 def select_league():
-    # db = get_db()
     db = pg_db()
+
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
 
@@ -776,7 +779,7 @@ def select_league():
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute(
-        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
     )
     leagues = cursor.fetchall()
     cursor.close()
