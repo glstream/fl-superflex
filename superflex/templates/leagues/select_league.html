@@ -3,21 +3,26 @@
     {% for league in leagues[:leagues|length] %}
 
     <div class="col-sm-3">
-        <div class="card-fr">
+        <div class="card-top-sl">
             <div class="card-body">
                 <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{league.avatar}}"
                     type="image/png">
                     <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                 </object>
                 <h5 class="card-title">{{league.league_name}}</h5>
-                <h5><span class="badge alert-secondary">{{league.total_rosters}} Team</span>
+
+                <h5><span class="badge alert-success">{{league.league_cat | league_cat}}</span>
+                    <span class="badge alert-dark">{{league.total_rosters}} Team</span>
                     {% if league.qb_cnt + league.sf_cnt > 1 %}
                     <span class="badge alert-secondary">Superflex</span>
                     {% else %}
                     <span class="badge alert-secondary">Single QB</span>
                     {% endif %}
-                    <span class="badge alert-secondary">{{league.starter_cnt}} Starters</span>
-                    <span class="badge alert-secondary">{{league.sport | upper }}</span>
+
+                    <span class="badge alert-primary">{{league.starter_cnt}} Starters</span>
+                    <span class="badge alert-info">{{league.sport | upper }}</span>
+
+
                 </h5>
 
                 <p></p>
@@ -32,7 +37,8 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <button class="dropdown-item" type="submit" name="get_league"
-                                        value="{{league.session_id,league.user_id,league.league_id}}">Keep Trade Cut</a>
+                                        value="{{league.session_id,league.user_id,league.league_id}}">Keep
+                                        Trade Cut</a>
                                         <button class="dropdown-item" type="submit" name="get_league_fp"
                                             value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
                                             Pros</button>
@@ -58,13 +64,15 @@
                                         value="{{league.session_id,league.user_id,league.league_id}}">NFL
                                         Projections</button>
                                     <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                                        value="{{league.session_id,league.user_id,league.league_id}}">Fantasy Pros
+                                        value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
+                                        Pros
                                         Projections</button>
                                 </div>
                             </form>
                         </div>
                         <button class="btn btn-outline-primary" type="submit" name="trade_tracker"
-                            value="{{league.session_id,league.user_id,league.league_id,}}">Trade Tracker</button>
+                            value="{{league.session_id,league.user_id,league.league_id,}}">Trade
+                            Tracker</button>
                     </div>
                 </form>
             </div>
