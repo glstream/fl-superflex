@@ -226,8 +226,9 @@ WITH base_players as (SELECT
                             ,'PICKS' as fantasy_designation
                             , null as player_order
                             from base_picks picks
+                            order by picks_player_name asc
                             ) tp
                     left join dynastr.players p on tp.player_id = p.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
                     inner join dynastr.managers m on tp.user_id = m.user_id 
-                    order by m.display_name, player_full_name asc, player_value desc
+                    order by m.display_name, picks_player_name asc, player_value desc
