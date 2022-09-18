@@ -763,6 +763,7 @@ def select_league():
 
     if request.method == "POST":
         button = list(request.form)[0]
+        print(button)
         league_data = eval(request.form[button])
         session_id = league_data[0]
         user_id = league_data[1]
@@ -915,6 +916,20 @@ def get_league_fp():
             )
         fp_owners_cursor.execute(summary_sql)
         fp_owners = fp_owners_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_avg_rank"],
+                i["rb_avg_rank"],
+                i["wr_avg_rank"],
+                i["te_avg_rank"],
+                i["starters_avg_rank"],
+                i["bench_avg_rank"],
+            )
+            for i in fp_owners
+            if i["user_id"] == user_id
+        ]
+
         try:
             labels = [row["display_name"] for row in fp_owners]
             values = [row["total_avg"] for row in fp_owners]
@@ -997,6 +1012,7 @@ def get_league_fp():
         return render_template(
             "leagues/get_league_fp.html",
             owners=fp_owners,
+            page_user=page_user,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1141,6 +1157,21 @@ def get_league():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["picks_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in owners
+            if i["user_id"] == user_id
+        ]
+
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1215,6 +1246,7 @@ def get_league():
         return render_template(
             "leagues/get_league.html",
             owners=owners,
+            page_user=page_user,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1364,6 +1396,20 @@ def get_league_dp():
 
         owner_cursor.execute(get_league_dp_summary_sql)
         owners = owner_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["picks_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in owners
+            if i["user_id"] == user_id
+        ]
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1438,6 +1484,7 @@ def get_league_dp():
         return render_template(
             "leagues/get_league_dp.html",
             owners=owners,
+            page_user=page_user,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1676,6 +1723,20 @@ def contender_rankings():
             )
         c_owners_cursor.execute(contender_rankings_summary_sql)
         c_owners = c_owners_cursor.fetchall()
+
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in c_owners
+            if i["user_id"] == user_id
+        ]
         try:
             labels = [row["display_name"] for row in c_owners]
             values = [row["total_value"] for row in c_owners]
@@ -1757,6 +1818,7 @@ def contender_rankings():
         return render_template(
             "leagues/contender_rankings.html",
             owners=c_owners,
+            page_user=page_user,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1896,6 +1958,20 @@ def nfl_contender_rankings():
         nfl_owners_cursor.execute(contender_rankings_nfl_summary_sql)
 
         nfl_owners = nfl_owners_cursor.fetchall()
+
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in nfl_owners
+            if i["user_id"] == user_id
+        ]
         try:
             labels = [row["display_name"] for row in nfl_owners]
             values = [row["total_value"] for row in nfl_owners]
@@ -1977,6 +2053,7 @@ def nfl_contender_rankings():
         return render_template(
             "leagues/contender_rankings_nfl.html",
             owners=nfl_owners,
+            page_user=page_user,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -2116,6 +2193,21 @@ def fp_contender_rankings():
         fp_owners_cursor.execute(contender_rankings_fp_summary_sql)
 
         fp_owners = fp_owners_cursor.fetchall()
+
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in fp_owners
+            if i["user_id"] == user_id
+        ]
+
         try:
             labels = [row["display_name"] for row in fp_owners]
             values = [row["total_value"] for row in fp_owners]
@@ -2197,6 +2289,7 @@ def fp_contender_rankings():
         return render_template(
             "leagues/contender_rankings_fp.html",
             owners=fp_owners,
+            page_user=page_user,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],

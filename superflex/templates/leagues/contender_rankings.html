@@ -1,4 +1,10 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+</script>
 <div class="">
     <div style="display: flex;margin-right: 50px;">
         <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
@@ -17,7 +23,7 @@
 </script>
 <br>
 <div class="row justify-content-left" style="margin:auto;">
-    <div class="card" style="width: 20rem; margin-right: 50px;">
+    <div class="card" style="width: 20rem;">
         <div class=" header">
             <h4 style="padding:10px" class="title">Contender Rankings</h4>
         </div>
@@ -35,7 +41,7 @@
         </ul>
         <br>
     </div>
-    <div class="col-auto" style="width: 65em;; margin-right: 50px;">
+    <div class="col-auto" style="width: 65em;">
         <div class="card-body">
             <div class="list-group">
                 <form method="post" class="form-inline">
@@ -76,25 +82,36 @@
                                 </div>
                             </form>
                         </div>
-                        <button class="btn btn-outline-primary btn-lg" type="submit" name="trade_tracker"
-                            value="{{session_id, user_id, league_id}}">Trade
-                            Tracker</button>
+                        <div class="dropdown">
+                            <form method="post" class="form-inline">
+                                <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Trade Tracker
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item" type="submit" name="trade_tracker"
+                                        value="{{session_id, user_id, league_id}}">KTC
+                                        Rankings</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </form>
                 <br>
             </div>
         </div>
-        <div class="col-auto" style="width:65em;; margin-right: 50px;">
+        <div class="col-auto" style="width:65em;margin-right: 50px;">
             <table class="table rounded table-hover" style="width:95%">
                 <thead style="text-align:center">
                     <tr>
                         <th scope="col">Manager</th>
                         <th>Overall</th>
+                        <th>Starters</th>
                         <th>QB</th>
                         <th>RB</th>
                         <th>WR</th>
                         <th>TE</th>
-                        <th>Starters</th>
                         <th>Bench</th>
                     </tr>
                 </thead>
@@ -102,26 +119,36 @@
                     {% for owner in owners %}
                     <td style="text-align:center">{{owner.display_name}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip"
-                        title="Total projection: {{'{:,}'.format(owner.total_value)}}">
+                        data-html="true" title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
                         {{owner.total_rank | suffix}}
                     </td>
+                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="Starters Value: <b>{{'{:,}'.format(owner.starters_sum) | default('', True)}}</b><br>Starters Avg. <b>{{'{:,}'.format(owner.starters_average)}} </b>">
+                        {{owner.starters_rank | suffix}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip"
-                        title="QB projection: {{'{:,}'.format(owner.qb_sum)}}">{{owner.qb_rank | suffix}}
+                        data-html="true"
+                        title="QB Value: <b>{{'{:,}'.format(owner.qb_sum)}}</b><br>QB Avg. <b>{{'{:,}'.format(owner.qb_average) | default('', True)}} </b>">
+                        {{owner.qb_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip"
-                        title="RB projection: {{'{:,}'.format(owner.rb_sum)}}">{{owner.rb_rank | suffix}}
+                        data-html="true"
+                        title="RB Value: <b>{{'{:,}'.format(owner.rb_sum)}}</b><br>RB Avg. <b>{{'{:,}'.format(owner.rb_average) | default('', True)}} </b>">
+                        {{owner.rb_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip"
-                        title="WR projection: {{'{:,}'.format(owner.wr_sum)}}">{{owner.wr_rank | suffix}}
+                        data-html="true"
+                        title="WR Value: <b>{{'{:,}'.format(owner.wr_sum)}}</b><br>WR Avg. <b>{{'{:,}'.format(owner.wr_average) | default('', True)}} </b>">
+                        {{owner.wr_rank | suffix}}
                     </td>
                     <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip"
-                        title="TE projection: {{'{:,}'.format(owner.te_sum)}}">{{owner.te_rank | suffix}}
+                        data-html="true"
+                        title="TE Value: <b>{{'{:,}'.format(owner.te_sum)}}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
+                        {{owner.te_rank | suffix}}
                     </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
-                        title="Starters projection: {{'{:,}'.format(owner.starters_sum)}}">
-                        {{owner.starters_rank | suffix}}</td>
                     <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip"
-                        title="Bench projection: {{'{:,}'.format(owner.bench_sum)}}">
+                        data-html="true"
+                        title="Bench Value: <b>{{'{:,}'.format(owner.bench_sum)}}</b><br>Bench Avg. <b>{{'{:,}'.format(owner.bench_average) | default('', True)}} </b>">
                         {{owner.bench_rank | suffix}}</td>
                     </tr>
                     {% endfor %}
@@ -138,6 +165,57 @@
         </div>
 
     </div>
+    <div class="col-auto" style="margin-top: 90px;">
+        <canvas id="myChart" width="300" height="300"></canvas>
+        <script>
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['QB', 'RB', 'WR', 'TE', 'Starters', 'Bench'],
+                    datasets: [{
+                        label: '{{page_user[0][0]}}',
+                        data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}'],
+                        backgroundColor: 'rgb(39, 125, 161,.7)',
+                        borderColor: 'rgb(249, 199, 79, 0.7)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    plugins: {
+                        tooltip: {
+                            bodyColor: '#F9C74F'
+                        }
+                    },
+
+                    scales: {
+
+                        r: {
+                            reverse: true,
+                            max: 12,
+                            min: 1,
+                            beginAtZero: false,
+
+                            ticks: {
+                                stepSize: 3,
+                                display: true,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            pointLabels: {
+                                display: true
+                            },
+
+
+                        },
+                    },
+                    responsive: false,
+
+                }
+            });
+        </script>
+    </div>
     <div class="card" style="width: 18em;">
         <div class="header">
             <h4 style="padding:10px" class="title">Best Available</h4>
@@ -145,8 +223,8 @@
 
         {% for pos, player in best_available.items() %}
         <div class="d-flex justify-content-between">
-            <h5 class="text-left margin-left: 20px;"><span class="badge bg-primary">{{pos}}</span></h5>
-            <h5 class="text-right"><span class="badge bg-secondary">Proj</span></h5>
+            <h5 class="text-left margin-left: 20px;"><span class="badge bg-light">{{pos}}</span></h5>
+            <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
         </div>
         {% for p in player %}
         <div style="display: flex; justify-content: space-between;">
