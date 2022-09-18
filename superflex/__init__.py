@@ -65,7 +65,10 @@ def create_app(test_config=None):
     @app.template_filter("league_cat")
     def league_cat(cat: int) -> str:
         category = {0: "Redraft", 1: "Keeper", 2: "Dynasty"}
-        return category[cat]
+        try:
+            return category[cat]
+        except:
+            return "Redraft"
 
     @app.route("/favicon.ico")
     def favicon():
