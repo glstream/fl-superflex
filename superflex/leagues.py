@@ -1003,6 +1003,8 @@ def get_league_fp():
 
         users = get_users_data(league_id)
 
+        total_rosters = get_league_rosters_size(league_id)
+
         fp_owners_cursor.close()
         fp_cursor.close()
         date_cursor.close()
@@ -1013,6 +1015,7 @@ def get_league_fp():
             "leagues/get_league_fp.html",
             owners=fp_owners,
             page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1237,6 +1240,8 @@ def get_league():
 
         users = get_users_data(league_id)
 
+        total_rosters = int(get_league_rosters_size(league_id))
+
         owner_cursor.close()
         player_cursor.close()
         ba_cursor.close()
@@ -1247,6 +1252,7 @@ def get_league():
             "leagues/get_league.html",
             owners=owners,
             page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1475,6 +1481,8 @@ def get_league_dp():
 
         users = get_users_data(league_id)
 
+        total_rosters = get_league_rosters_size(league_id)
+
         owner_cursor.close()
         player_cursor.close()
         ba_cursor.close()
@@ -1485,6 +1493,7 @@ def get_league_dp():
             "leagues/get_league_dp.html",
             owners=owners,
             page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1808,6 +1817,7 @@ def contender_rankings():
         avatar = avatar_cursor.fetchall()
 
         users = get_users_data(league_id)
+        total_rosters = get_league_rosters_size(league_id)
 
         contenders_cursor.close()
         c_owners_cursor.close()
@@ -1819,6 +1829,7 @@ def contender_rankings():
             "leagues/contender_rankings.html",
             owners=c_owners,
             page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -2043,6 +2054,7 @@ def nfl_contender_rankings():
         avatar = avatar_cursor.fetchall()
 
         users = get_users_data(league_id)
+        total_rosters = get_league_rosters_size(league_id)
 
         nfl_contenders_cursor.close()
         nfl_owners_cursor.close()
@@ -2054,6 +2066,7 @@ def nfl_contender_rankings():
             "leagues/contender_rankings_nfl.html",
             owners=nfl_owners,
             page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -2279,6 +2292,7 @@ def fp_contender_rankings():
         users = get_users_data(league_id)
 
         nfl_current_week = get_sleeper_state()["leg"]
+        total_rosters = get_league_rosters_size(league_id)
 
         fp_contenders_cursor.close()
         fp_owners_cursor.close()
@@ -2290,6 +2304,7 @@ def fp_contender_rankings():
             "leagues/contender_rankings_fp.html",
             owners=fp_owners,
             page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
