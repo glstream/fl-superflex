@@ -25,7 +25,7 @@
 <div class="row justify-content-left" style="margin:auto;">
     <div class="card" style="width: 20rem;">
         <div class=" header">
-            <h4 style="padding:10px" class="title">Contender Rankings</h4>
+            <h4 style="padding:10px" class="title">Contender Rankings Week {{nfl_current_week}}</h4>
         </div>
         <ul class="list-group list-group-flush">
             {% for owner in owners %}
@@ -157,7 +157,7 @@
             </table>
             <br>
             <div>
-                <p style="float:right;">Source: NFL Player Projections</p>
+                <p style="float:right;">Source: Fantasy Pros Projections</p>
                 <span class="align-bottom">NFL Player Projections Updated
                     {{update_diff_minutes}} minutes
                     ago.</span>
