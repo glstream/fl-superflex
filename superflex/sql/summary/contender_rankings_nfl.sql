@@ -8,25 +8,25 @@ SELECT
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank
                     , NTILE(10) OVER (order by sum(qb_value) desc) qb_tile
                     , sum(qb_value) as qb_sum
-					, round(sum(qb_value) / NULLIF(sum(qb_count), 0),0) as qb_average
+					, coalesce(round(sum(qb_value) / NULLIF(sum(qb_count), 0),0) ,0) as qb_average
 					, sum(qb_count) as qb_count
                     , max(rb_value) as rb_value
                     , RANK() OVER (order by sum(rb_value) desc) rb_rank
                     , NTILE(10) OVER (order by sum(rb_value) desc) rb_tile
                     , sum(rb_value) as rb_sum
-					, round(sum(rb_value) / NULLIF(sum(rb_count), 0),0) as rb_average
+					, coalesce(round(sum(rb_value) / NULLIF(sum(rb_count), 0),0) ,0) as rb_average
 					, sum(rb_count) as rb_count
                     , max(wr_value) as wr_value
                     , RANK() OVER (order by sum(wr_value) desc) wr_rank
                     , NTILE(10) OVER (order by sum(wr_value) desc) wr_tile
                     , sum(wr_value) as wr_sum
-					, round(sum(wr_value) / NULLIF(sum(wr_count), 0),0) as wr_average
+					, coalesce(round(sum(wr_value) / NULLIF(sum(wr_count), 0),0) ,0) as wr_average
 					, sum(wr_count) as wr_count
                     , max(te_value) as te_value
                     , RANK() OVER (order by sum(te_value) desc) te_rank
                     , NTILE(10) OVER (order by sum(te_value) desc) te_tile
                     , sum(te_value) as te_sum
-					, round(sum(te_value) / NULLIF(sum(te_count), 0),0) as te_average
+					, coalesce(round(sum(te_value) / NULLIF(sum(te_count), 0),0) ,0) as te_average
 					, sum(te_count) as wr_count
                     , max(flex_value) as flex_value
                     , RANK() OVER (order by sum(flex_value) desc) flex_rank
@@ -36,13 +36,13 @@ SELECT
                     , RANK() OVER (order by sum(starters_value) desc) starters_rank
                     , NTILE(10) OVER (order by sum(starters_value) desc) starters_tile
                     , sum(starters_value) as starters_sum
-					, round(sum(starters_value) / NULLIF(sum(starters_count), 0),0) as starters_average
+					, coalesce(round(sum(starters_value) / NULLIF(sum(starters_count), 0),0) ,0) as starters_average
 					, sum(starters_count) as starters_count
 					, max(Bench_value) as Bench_value
                     , RANK() OVER (order by sum(bench_value) desc) bench_rank
                     , NTILE(10) OVER (order by sum(bench_value) desc) bench_tile
                     , sum(bench_value) as bench_sum
-					, round(sum(bench_value) / NULLIF(sum(bench_count), 0),0) as bench_average
+					, coalesce(round(sum(bench_value) / NULLIF(sum(bench_count), 0),0) ,0) as bench_average
 					, sum(bench_count) as bench_count
 
                     from (select 

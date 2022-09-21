@@ -45,7 +45,7 @@ CREATE TABLE dynastr.league_players (
   PRIMARY KEY (user_id, player_id)
 );
 
-CREATE TABLE dynastr.current_leagues (
+CREATE TABLE IF NOT EXISTS dynastr.current_leagues (
   session_id VARCHAR(75),
   user_id VARCHAR(75),
   user_name VARCHAR(75),
@@ -63,11 +63,14 @@ CREATE TABLE dynastr.current_leagues (
   total_roster_cnt integer,
   sport VARCHAR(75),
   insert_date VARCHAR(75),
+  rf_cnt integer,
+  league_cat integer,
   PRIMARY KEY (session_id, league_id)
 );
 
 
 ALTER TABLE dynastr.current_leagues ADD rf_cnt integer;
+ALTER TABLE dynastr.current_leagues ADD league_cat integer;
 
 
 CREATE TABLE IF NOT EXISTS dynastr.ktc_player_ranks (
