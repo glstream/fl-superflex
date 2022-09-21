@@ -143,7 +143,7 @@
                         </td>
                         <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip"
                             data-html="true"
-                            title="TE Value: <b>{{'{:,}'.format(owner.te_sum)}}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
+                            title="TE Value: <b>{{'{:,}'.format(owner.te_sum) | default('', True) }}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
                             {{owner.te_rank | suffix}}
                         </td>
                         <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip"
