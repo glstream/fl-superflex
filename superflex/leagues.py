@@ -409,17 +409,22 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
 
     for roster in rosters:
         league_roster = roster["players"]
-        for player_id in league_roster:
-            league_players.append(
-                [
-                    session_id,
-                    user_id,
-                    player_id,
-                    roster["league_id"],
-                    roster["owner_id"] if roster["owner_id"] is not None else "EMPTY",
-                    entry_time,
-                ]
-            )
+        try:
+            for player_id in league_roster:
+                league_players.append(
+                    [
+                        session_id,
+                        user_id,
+                        player_id,
+                        roster["league_id"],
+                        roster["owner_id"]
+                        if roster["owner_id"] is not None
+                        else "EMPTY",
+                        entry_time,
+                    ]
+                )
+        except:
+            league_players = []
 
     with db.cursor() as cursor:
         execute_values(
