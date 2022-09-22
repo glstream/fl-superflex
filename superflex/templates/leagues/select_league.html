@@ -27,48 +27,48 @@
 
                 <p></p>
                 <form method="post" class="form-inline">
-                    <div class="btn-group">
+                    <div class="btn-group flex-wrap">
                         <div class="dropdown">
-                            <form method="post" class="form-inline">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false">
-                                    Power Rankings
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <button class="dropdown-item" type="submit" name="get_league"
-                                        value="{{league.session_id,league.user_id,league.league_id}}">Keep
-                                        Trade Cut</a>
-                                        <button class="dropdown-item" type="submit" name="get_league_fp"
-                                            value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
-                                            Pros</button>
-                                        <button class="dropdown-item" type="submit" name="get_league_dp"
-                                            value="{{league.session_id,league.user_id,league.league_id}}">Dynasty
-                                            Process</button>
-                                </div>
-                            </form>
+
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                Power Rankings
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <button class="dropdown-item" type="submit" name="get_league"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">Keep
+                                    Trade Cut</button>
+                                <button class="dropdown-item" type="submit" name="get_league_fp"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
+                                    Pros</button>
+                                <button class="dropdown-item" type="submit" name="get_league_dp"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">Dynasty
+                                    Process</button>
+                            </div>
+
                         </div>
                         <br>
                         <div class="dropdown">
-                            <form method="post" class="form-inline">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false">
-                                    Contender Rankings
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <button class="dropdown-item" type="submit" name="contender_rankings"
-                                        value="{{league.session_id,league.user_id,league.league_id}}">ESPN
-                                        Projections</button>
-                                    <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
-                                        value="{{league.session_id,league.user_id,league.league_id}}">NFL
-                                        Projections</button>
-                                    <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                                        value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
-                                        Pros
-                                        Projections</button>
-                                </div>
-                            </form>
+
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                Contender Rankings
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <button class="dropdown-item" type="submit" name="contender_rankings"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">ESPN
+                                    Projections</button>
+                                <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">NFL
+                                    Projections</button>
+                                <button class="dropdown-item" type="submit" name="fp_contender_rankings"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
+                                    Pros
+                                    Projections</button>
+                            </div>
+
                         </div>
                         <div class="dropdown">
                             <form method="post" class="form-inline">
@@ -82,7 +82,7 @@
                                         value="{{league.session_id,league.user_id,league.league_id}}">KTC
                                         Rankings</button>
                                 </div>
-                            </form>
+
                         </div>
                     </div>
                 </form>
