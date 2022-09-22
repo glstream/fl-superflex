@@ -41,6 +41,13 @@ table {
     background-color: rgb(87, 117, 144) !important;
 }
 
+.btn-secondary {
+    outline-color: rgb(67, 170, 139) !important;
+    color: rgb(252, 252, 252) !important;
+    border-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139) !important;
+}
+
 .badge.alert-secondary {
     outline-color: rgb(248, 150, 30) !important;
     color: rgb(252, 252, 252) !important;
