@@ -19,7 +19,7 @@
 </div>
 <br>
 
-<div class="row justify-content-left" style="margin:auto;">
+<div class="row justify-content-center">
     <div class="card" style="width: 20rem;">
         <div class=" header">
             <h4 style="padding:10px" class="title">Power Rankings</h4>
@@ -39,139 +39,127 @@
         <br>
     </div>
     <div class="col-auto" style="width: 65em;">
+        <form method="post" class="form-inline">
+            <div class="btn-group flex-wrap">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Power Rankings
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <button class="dropdown-item" type="submit" name="get_league"
+                            value="{{session_id, user_id, league_id}}">Keep Trade Cut</button>
+                        <button class="dropdown-item" type="submit" name="get_league_fp"
+                            value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
+                        <button class="dropdown-item" type="submit" name="get_league_dp"
+                            value="{{session_id, user_id, league_id}}" disabled>Dynasty Process</button>
 
-        <div class="container">
-            <form method="post" class="form-inline">
-                <div class="btn-group">
-                    <div class="dropdown">
-                        <form method="post" class="form-inline">
-                            <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                Power Rankings
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <button class="dropdown-item" type="submit" name="get_league"
-                                    value="{{session_id, user_id, league_id}}">Keep Trade Cut</button>
-                                <button class="dropdown-item" type="submit" name="get_league_fp"
-                                    value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
-                                <button class="dropdown-item" type="submit" name="get_league_dp"
-                                    value="{{session_id, user_id, league_id}}" disabled>Dynasty Process</button>
-
-                            </div>
-                        </form>
-                    </div>
-                    <br>
-                    <div class="dropdown">
-                        <form method="post" class="form-inline">
-                            <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                Contender Rankings
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <button class="dropdown-item" type="submit" name="contender_rankings"
-                                    value="{{session_id, user_id, league_id}}">ESPN Projections</button>
-                                <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
-                                    value="{{session_id, user_id, league_id}}">NFL Projections</button>
-                                <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                                    value="{{session_id, user_id, league_id}}">Fantasy Pros
-                                    Projections</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="dropdown">
-                        <form method="post" class="form-inline">
-                            <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                Trade Tracker
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <button class="dropdown-item" type="submit" name="trade_tracker"
-                                    value="{{session_id, user_id, league_id}}">KTC Rankings</button>
-                            </div>
-                        </form>
                     </div>
                 </div>
-
-            </form>
-            <br>
-
-        </div>
-        <div class="container">
-            <div class="col-auto" style="width:65em;; margin-right: 50px;">
-                <table class="table rounded table-hover" style="width:95%">
-                    <thead style="text-align:center">
-                        <tr>
-                            <th scope="col"></th>
-                            <th>Overall</th>
-                            <th>Starters</th>
-                            <th>QB</th>
-                            <th>RB</th>
-                            <th>WR</th>
-                            <th>TE</th>
-                            <th>Picks</th>
-                            <th>Bench</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for owner in owners %}
-                        <td style="text-align:center">{{owner.display_name}}</td>
-                        <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip"
-                            data-html="true" title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
-                            {{owner.total_rank | suffix}}
-                        </td>
-                        <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="Starters Value: <b>{{'{:,}'.format(owner.starters_sum) | default('', True)}}</b><br>Starters Avg. <b>{{'{:,}'.format(owner.starters_average)}} </b>">
-                            {{owner.starters_rank | suffix}}</td>
-                        <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="QB Value: <b>{{'{:,}'.format(owner.qb_sum)}}</b><br>QB Avg. <b>{{'{:,}'.format(owner.qb_average) | default('', True)}} </b>">
-                            {{owner.qb_rank | suffix}}
-                        </td>
-                        <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="RB Value: <b>{{'{:,}'.format(owner.rb_sum)}}</b><br>RB Avg. <b>{{'{:,}'.format(owner.rb_average) | default('', True)}} </b>">
-                            {{owner.rb_rank | suffix}}
-                        </td>
-                        <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="WR Value: <b>{{'{:,}'.format(owner.wr_sum)}}</b><br>WR Avg. <b>{{'{:,}'.format(owner.wr_average) | default('', True)}} </b>">
-                            {{owner.wr_rank | suffix}}
-                        </td>
-                        <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="TE Value: <b>{{'{:,}'.format(owner.te_sum)}}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
-                            {{owner.te_rank | suffix}}
-                        </td>
-                        <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="Picks Value: <b>{{'{:,}'.format(owner.picks_sum) | default('', True)}}</b>">
-                            {{owner.picks_rank |
-                            suffix}}
-                        </td>
-                        <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip"
-                            data-html="true"
-                            title="Bench Value: <b>{{'{:,}'.format(owner.bench_sum)}}</b><br>Bench Avg. <b>{{'{:,}'.format(owner.bench_average) | default('', True)}} </b>">
-                            {{owner.bench_rank | suffix}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-
-                </table>
                 <br>
-                <div>
-                    <p style="float:right;">Source: Dynasty Process</p>
-                    <span class="align-bottom">Dynasty Process Player Values Updated
-                        {{update_diff_minutes}} minutes
-                        ago.</span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Contender Rankings
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <button class="dropdown-item" type="submit" name="contender_rankings"
+                            value="{{session_id, user_id, league_id}}">ESPN Projections</button>
+                        <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
+                            value="{{session_id, user_id, league_id}}">NFL Projections</button>
+                        <button class="dropdown-item" type="submit" name="fp_contender_rankings"
+                            value="{{session_id, user_id, league_id}}">Fantasy Pros
+                            Projections</button>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <form method="post" class="form-inline">
+                        <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Trade Tracker
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <button class="dropdown-item" type="submit" name="trade_tracker"
+                                value="{{session_id, user_id, league_id}}">KTC Rankings</button>
+                        </div>
                 </div>
             </div>
-        </div>
 
+        </form>
+        <br>
+
+
+        <div class="col-auto" style="width:65em; margin-right: 50px;">
+            <table class="table rounded table-hover" style="width:95%">
+                <thead style="text-align:center">
+                    <tr>
+                        <th scope="col"></th>
+                        <th>Overall</th>
+                        <th>Starters</th>
+                        <th>QB</th>
+                        <th>RB</th>
+                        <th>WR</th>
+                        <th>TE</th>
+                        <th>Picks</th>
+                        <th>Bench</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for owner in owners %}
+                    <td style="text-align:center">{{owner.display_name}}</td>
+                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip"
+                        data-html="true" title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
+                        {{owner.total_rank | suffix}}
+                    </td>
+                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="Starters Value: <b>{{'{:,}'.format(owner.starters_sum) | default('', True)}}</b><br>Starters Avg. <b>{{'{:,}'.format(owner.starters_average)}} </b>">
+                        {{owner.starters_rank | suffix}}</td>
+                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="QB Value: <b>{{'{:,}'.format(owner.qb_sum)}}</b><br>QB Avg. <b>{{'{:,}'.format(owner.qb_average) | default('', True)}} </b>">
+                        {{owner.qb_rank | suffix}}
+                    </td>
+                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="RB Value: <b>{{'{:,}'.format(owner.rb_sum)}}</b><br>RB Avg. <b>{{'{:,}'.format(owner.rb_average) | default('', True)}} </b>">
+                        {{owner.rb_rank | suffix}}
+                    </td>
+                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="WR Value: <b>{{'{:,}'.format(owner.wr_sum)}}</b><br>WR Avg. <b>{{'{:,}'.format(owner.wr_average) | default('', True)}} </b>">
+                        {{owner.wr_rank | suffix}}
+                    </td>
+                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="TE Value: <b>{{'{:,}'.format(owner.te_sum) | default('', True) }}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
+                        {{owner.te_rank | suffix}}
+                    </td>
+                    <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="Picks Value: <b>{{'{:,}'.format(owner.picks_sum) | default('', True)}}</b>">
+                        {{owner.picks_rank |
+                        suffix}}
+                    </td>
+                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip"
+                        data-html="true"
+                        title="Bench Value: <b>{{'{:,}'.format(owner.bench_sum)}}</b><br>Bench Avg. <b>{{'{:,}'.format(owner.bench_average) | default('', True)}} </b>">
+                        {{owner.bench_rank | suffix}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+            <br>
+            <div>
+                <p style="float:right;">Source: Dynasty Process</p>
+                <span class="align-bottom">Dynasty Process Player Values Updated
+                    {{update_diff_minutes}} minutes
+                    ago.</span>
+            </div>
+        </div>
     </div>
+
     <div class="col-auto" style="margin-top: 90px;">
         <canvas id="myChart" width="300" height="300"></canvas>
         <script>
