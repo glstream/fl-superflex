@@ -753,7 +753,7 @@ def index():
         insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
 
         return redirect(url_for("leagues.select_league"))
-    return render_template("leagues/index.html")
+    return render_template("leagues/index.html", unknown_user="Username not found. Please enter a valid sleeper username.")
 
 
 @bp.route("/select_league", methods=["GET", "POST"])
@@ -793,13 +793,13 @@ def select_league():
     if len(leagues) > 0:
         return render_template("leagues/select_league.html", leagues=leagues)
     else:
-        return redirect(url_for("leagues.index"))
+        return redirect(url_for("leagues.index", unknown="Unknown User Name."))
 
 
 @bp.route("/get_league_fp", methods=("GET", "POST"))
 def get_league_fp():
     db = pg_db()
-    date_ = datetime.now().strftime("%m/%d/%Y")
+
     if request.method == "POST":
         button = list(request.form)[0]
         league_data = eval(request.form[button])
@@ -824,7 +824,7 @@ def get_league_fp():
         lt = "sf" if league_type == "sf_value" else "one_qb"
         print("LEAGUE_TYPE", league_type)
         folder = Path("sql/")
-        print(folder)
+
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         print("FILE_PATH", Path.cwd())
         with open(
@@ -838,6 +838,9 @@ def get_league_fp():
             )
         fp_cursor.execute(sql)
         fp_players = fp_cursor.fetchall()
+
+        if len(fp_players) < 1:
+            return redirect(url_for("leagues.index"))
 
         starting_qbs = [
             player
@@ -1079,6 +1082,9 @@ def get_league():
         player_cursor.execute(get_league_detail_sql)
         players = player_cursor.fetchall()
 
+        if len(players) < 1:
+            return redirect(url_for("leagues.index"))
+
         starting_qbs = [
             player
             for player in players
@@ -1317,6 +1323,9 @@ def get_league_dp():
 
         player_cursor.execute(get_league_dp_details_sql)
         players = player_cursor.fetchall()
+
+        if len(players) < 1:
+            return redirect(url_for("leagues.index"))
 
         starting_qbs = [
             player
@@ -1655,6 +1664,8 @@ def contender_rankings():
             )
         contenders_cursor.execute(contender_rankings_details_sql)
         contenders = contenders_cursor.fetchall()
+        if len(contenders) < 1:
+            return redirect(url_for("leagues.index"))
 
         starting_qbs = [
             player
@@ -1890,6 +1901,8 @@ def nfl_contender_rankings():
             )
         nfl_contenders_cursor.execute(contender_rankings_nfl_details_sql)
         contenders = nfl_contenders_cursor.fetchall()
+        if len(contenders) < 1:
+            return redirect(url_for("leagues.index"))
 
         starting_qbs = [
             player
@@ -2127,6 +2140,9 @@ def fp_contender_rankings():
             )
         fp_contenders_cursor.execute(contender_rankings_fp_details_sql)
         contenders = fp_contenders_cursor.fetchall()
+
+        if len(contenders) < 1:
+            return redirect(url_for("leagues.index"))
 
         starting_qbs = [
             player
