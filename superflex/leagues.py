@@ -686,33 +686,47 @@ def player_manager_upates(
 ):
     print("Button", button)
     if button == "trade_tracker":
-        # insert managers names
-        managers = get_managers(league_id)
-        insert_managers(db, managers)
+        try:
+            # insert managers names
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
 
-        # delete traded players and picks
-        clean_player_trades(db, league_id)
-        clean_draft_trades(db, league_id)
-        # get trades
-        trades = get_trades(league_id, get_sleeper_state())
-        # insert trades draft Positions
-        draft_positions(db, league_id, user_id)
-        insert_trades(db, trades, league_id)
+            # delete traded players and picks
+            clean_player_trades(db, league_id)
+            clean_draft_trades(db, league_id)
+            # get trades
+            trades = get_trades(league_id, get_sleeper_state())
+            # insert trades draft Positions
+            draft_positions(db, league_id, user_id)
+            insert_trades(db, trades, league_id)
+        except:
+            return redirect(
+                url_for(
+                    "leagues.index",
+                    error_message="Issue processing trades for that league please contact @superlfex_app for support.",
+                )
+            )
 
     else:
-        clean_league_managers(db, league_id)
-        clean_league_rosters(db, session_id, user_id, league_id)
-        clean_league_picks(db, league_id)
-        clean_draft_positions(db, league_id)
+        try:
+            clean_league_managers(db, league_id)
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, league_id)
+            clean_draft_positions(db, league_id)
 
-        managers = get_managers(league_id)
-        insert_managers(db, managers)
+            managers = get_managers(league_id)
+            insert_managers(db, managers)
 
-        insert_league_rosters(db, session_id, user_id, league_id)
-        total_owned_picks(db, league_id, session_id)
-        draft_positions(db, league_id, user_id)
-
-    return
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id)
+            draft_positions(db, league_id, user_id)
+        except:
+            return redirect(
+                url_for(
+                    "leagues.index",
+                    error_message="Issue processing this league please contact @superlfex_app for support.",
+                )
+            )
 
 
 league_ids = []
@@ -753,7 +767,10 @@ def index():
         insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
 
         return redirect(url_for("leagues.select_league"))
-    return render_template("leagues/index.html", unknown_user="Username not found. Please enter a valid sleeper username.")
+    return render_template(
+        "leagues/index.html",
+        error_message="Username not found. Please enter a valid sleeper username.",
+    )
 
 
 @bp.route("/select_league", methods=["GET", "POST"])
@@ -793,7 +810,7 @@ def select_league():
     if len(leagues) > 0:
         return render_template("leagues/select_league.html", leagues=leagues)
     else:
-        return redirect(url_for("leagues.index", unknown="Unknown User Name."))
+        return redirect(url_for("leagues.index", error_message="No leagues found."))
 
 
 @bp.route("/get_league_fp", methods=("GET", "POST"))
@@ -822,11 +839,8 @@ def get_league_fp():
         user_id = request.args.get("user_id")
         league_type = get_league_type(league_id)
         lt = "sf" if league_type == "sf_value" else "one_qb"
-        print("LEAGUE_TYPE", league_type)
-        folder = Path("sql/")
 
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        print("FILE_PATH", Path.cwd())
         with open(
             Path.cwd() / "superflex" / "sql" / "details" / "get_league_fp.sql", "r"
         ) as sql_file:
