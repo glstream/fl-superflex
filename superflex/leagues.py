@@ -59,6 +59,7 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
                 len(league["roster_positions"]),
                 league["sport"],
                 rec_flexes,
+                league["settings"]["type"],
             )
         )
     return leagues
@@ -408,17 +409,22 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
 
     for roster in rosters:
         league_roster = roster["players"]
-        for player_id in league_roster:
-            league_players.append(
-                [
-                    session_id,
-                    user_id,
-                    player_id,
-                    roster["league_id"],
-                    roster["owner_id"] if roster["owner_id"] is not None else "EMPTY",
-                    entry_time,
-                ]
-            )
+        try:
+            for player_id in league_roster:
+                league_players.append(
+                    [
+                        session_id,
+                        user_id,
+                        player_id,
+                        roster["league_id"],
+                        roster["owner_id"]
+                        if roster["owner_id"] is not None
+                        else "EMPTY",
+                        entry_time,
+                    ]
+                )
+        except:
+            league_players = []
 
     with db.cursor() as cursor:
         execute_values(
@@ -620,8 +626,8 @@ def insert_current_leagues(
     cursor = db.cursor()
     execute_batch(
         cursor,
-        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
    ON CONFLICT (session_id, league_id) DO UPDATE 
   SET user_id = excluded.user_id,
   		user_name = excluded.user_name,
@@ -639,7 +645,8 @@ def insert_current_leagues(
 		total_roster_cnt = excluded.total_roster_cnt,
 		sport = excluded.sport,
       	insert_date = excluded.insert_date,
-        rf_cnt = excluded.rf_cnt;
+        rf_cnt = excluded.rf_cnt,
+        league_cat = excluded.league_cat;
     """,
         tuple(
             [
@@ -662,6 +669,7 @@ def insert_current_leagues(
                     league[12],
                     entry_time,
                     league[13],
+                    league[14],
                 )
                 for league in iter(leagues)
             ]
@@ -750,8 +758,8 @@ def index():
 
 @bp.route("/select_league", methods=["GET", "POST"])
 def select_league():
-    # db = get_db()
     db = pg_db()
+
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
 
@@ -760,6 +768,7 @@ def select_league():
 
     if request.method == "POST":
         button = list(request.form)[0]
+        print(button)
         league_data = eval(request.form[button])
         session_id = league_data[0]
         user_id = league_data[1]
@@ -776,7 +785,7 @@ def select_league():
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute(
-        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
     )
     leagues = cursor.fetchall()
     cursor.close()
@@ -912,6 +921,20 @@ def get_league_fp():
             )
         fp_owners_cursor.execute(summary_sql)
         fp_owners = fp_owners_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_avg_rank"],
+                i["rb_avg_rank"],
+                i["wr_avg_rank"],
+                i["te_avg_rank"],
+                i["starters_avg_rank"],
+                i["bench_avg_rank"],
+            )
+            for i in fp_owners
+            if i["user_id"] == user_id
+        ]
+
         try:
             labels = [row["display_name"] for row in fp_owners]
             values = [row["total_avg"] for row in fp_owners]
@@ -985,6 +1008,8 @@ def get_league_fp():
 
         users = get_users_data(league_id)
 
+        total_rosters = get_league_rosters_size(league_id)
+
         fp_owners_cursor.close()
         fp_cursor.close()
         date_cursor.close()
@@ -994,6 +1019,8 @@ def get_league_fp():
         return render_template(
             "leagues/get_league_fp.html",
             owners=fp_owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1138,6 +1165,21 @@ def get_league():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["picks_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in owners
+            if i["user_id"] == user_id
+        ]
+
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1203,6 +1245,8 @@ def get_league():
 
         users = get_users_data(league_id)
 
+        total_rosters = int(get_league_rosters_size(league_id))
+
         owner_cursor.close()
         player_cursor.close()
         ba_cursor.close()
@@ -1212,6 +1256,8 @@ def get_league():
         return render_template(
             "leagues/get_league.html",
             owners=owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1361,6 +1407,20 @@ def get_league_dp():
 
         owner_cursor.execute(get_league_dp_summary_sql)
         owners = owner_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["picks_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in owners
+            if i["user_id"] == user_id
+        ]
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1426,6 +1486,8 @@ def get_league_dp():
 
         users = get_users_data(league_id)
 
+        total_rosters = get_league_rosters_size(league_id)
+
         owner_cursor.close()
         player_cursor.close()
         ba_cursor.close()
@@ -1435,6 +1497,8 @@ def get_league_dp():
         return render_template(
             "leagues/get_league_dp.html",
             owners=owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1673,6 +1737,20 @@ def contender_rankings():
             )
         c_owners_cursor.execute(contender_rankings_summary_sql)
         c_owners = c_owners_cursor.fetchall()
+
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in c_owners
+            if i["user_id"] == user_id
+        ]
         try:
             labels = [row["display_name"] for row in c_owners]
             values = [row["total_value"] for row in c_owners]
@@ -1744,6 +1822,7 @@ def contender_rankings():
         avatar = avatar_cursor.fetchall()
 
         users = get_users_data(league_id)
+        total_rosters = get_league_rosters_size(league_id)
 
         contenders_cursor.close()
         c_owners_cursor.close()
@@ -1754,6 +1833,8 @@ def contender_rankings():
         return render_template(
             "leagues/contender_rankings.html",
             owners=c_owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -1893,6 +1974,20 @@ def nfl_contender_rankings():
         nfl_owners_cursor.execute(contender_rankings_nfl_summary_sql)
 
         nfl_owners = nfl_owners_cursor.fetchall()
+
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in nfl_owners
+            if i["user_id"] == user_id
+        ]
         try:
             labels = [row["display_name"] for row in nfl_owners]
             values = [row["total_value"] for row in nfl_owners]
@@ -1964,6 +2059,7 @@ def nfl_contender_rankings():
         avatar = avatar_cursor.fetchall()
 
         users = get_users_data(league_id)
+        total_rosters = get_league_rosters_size(league_id)
 
         nfl_contenders_cursor.close()
         nfl_owners_cursor.close()
@@ -1974,6 +2070,8 @@ def nfl_contender_rankings():
         return render_template(
             "leagues/contender_rankings_nfl.html",
             owners=nfl_owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
@@ -2113,6 +2211,21 @@ def fp_contender_rankings():
         fp_owners_cursor.execute(contender_rankings_fp_summary_sql)
 
         fp_owners = fp_owners_cursor.fetchall()
+
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in fp_owners
+            if i["user_id"] == user_id
+        ]
+
         try:
             labels = [row["display_name"] for row in fp_owners]
             values = [row["total_value"] for row in fp_owners]
@@ -2184,6 +2297,7 @@ def fp_contender_rankings():
         users = get_users_data(league_id)
 
         nfl_current_week = get_sleeper_state()["leg"]
+        total_rosters = get_league_rosters_size(league_id)
 
         fp_contenders_cursor.close()
         fp_owners_cursor.close()
@@ -2194,6 +2308,8 @@ def fp_contender_rankings():
         return render_template(
             "leagues/contender_rankings_fp.html",
             owners=fp_owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],

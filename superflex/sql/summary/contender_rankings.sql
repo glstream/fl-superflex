@@ -1,25 +1,33 @@
-SELECT 
-                     t3.user_id
+SELECT
+                    t3.user_id
                     , t3.display_name
                     , total_value
-                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank
+                    , ROW_NUMBER() OVER (order by sum(position_value) desc) total_rank 
                     , NTILE(10) OVER (order by total_value desc) total_tile
                     , max(qb_value) as qb_value
                     , RANK() OVER (order by sum(qb_value) desc) qb_rank
                     , NTILE(10) OVER (order by sum(qb_value) desc) qb_tile
                     , sum(qb_value) as qb_sum
+					, coalesce(round(sum(qb_value) / NULLIF(sum(qb_count), 0),0) ,0) as qb_average
+					, sum(qb_count) as qb_count
                     , max(rb_value) as rb_value
                     , RANK() OVER (order by sum(rb_value) desc) rb_rank
                     , NTILE(10) OVER (order by sum(rb_value) desc) rb_tile
                     , sum(rb_value) as rb_sum
+					, coalesce(round(sum(rb_value) / NULLIF(sum(rb_count), 0),0) ,0) as rb_average
+					, sum(rb_count) as rb_count
                     , max(wr_value) as wr_value
                     , RANK() OVER (order by sum(wr_value) desc) wr_rank
                     , NTILE(10) OVER (order by sum(wr_value) desc) wr_tile
                     , sum(wr_value) as wr_sum
+					, coalesce(round(sum(wr_value) / NULLIF(sum(wr_count), 0),0) ,0) as wr_average
+					, sum(wr_count) as wr_count
                     , max(te_value) as te_value
                     , RANK() OVER (order by sum(te_value) desc) te_rank
                     , NTILE(10) OVER (order by sum(te_value) desc) te_tile
                     , sum(te_value) as te_sum
+					, coalesce(round(sum(te_value) / NULLIF(sum(te_count), 0),0) ,0) as te_average
+					, sum(te_count) as wr_count
                     , max(flex_value) as flex_value
                     , RANK() OVER (order by sum(flex_value) desc) flex_rank
                     , max(super_flex_value) as super_flex_value
@@ -28,10 +36,15 @@ SELECT
                     , RANK() OVER (order by sum(starters_value) desc) starters_rank
                     , NTILE(10) OVER (order by sum(starters_value) desc) starters_tile
                     , sum(starters_value) as starters_sum
+					, coalesce(round(sum(starters_value) / NULLIF(sum(starters_count), 0),0) ,0) as starters_average
+					, sum(starters_count) as starters_count
 					, max(Bench_value) as Bench_value
                     , RANK() OVER (order by sum(bench_value) desc) bench_rank
                     , NTILE(10) OVER (order by sum(bench_value) desc) bench_tile
                     , sum(bench_value) as bench_sum
+					, coalesce(round(sum(bench_value) / NULLIF(sum(bench_count), 0),0) ,0) as bench_average
+					, sum(bench_count) as bench_count
+
 
                     from (select 
                         user_id
@@ -42,13 +55,19 @@ SELECT
                     , RANK() OVER (order by total_value desc) total_rank
                     , fantasy_position
                     , case when player_position = 'QB' THEN sum(player_value) else 0 end as qb_value
+                    , case when player_position = 'QB' THEN count(full_name) else 0 end as qb_count
                     , case when player_position = 'RB' THEN sum(player_value) else 0 end as rb_value
+                    , case when player_position = 'RB' THEN count(full_name) else 0 end as rb_count
                     , case when player_position = 'WR' THEN sum(player_value) else 0 end as wr_value
+                    , case when player_position = 'WR' THEN count(full_name) else 0 end as wr_count
                     , case when player_position = 'TE' THEN sum(player_value) else 0 end as te_value
+                    , case when player_position = 'TE' THEN count(full_name) else 0 end as te_count
                     , case when fantasy_position = 'FLEX' THEN sum(player_value) else 0 end as flex_value
                     , case when fantasy_position = 'SUPER_FLEX' THEN sum(player_value) else 0 end as super_flex_value
-				    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
-				    , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
+                    , case when fantasy_designation = 'STARTER' THEN sum(player_value) else 0 end as starters_value
+                    , case when fantasy_designation = 'STARTER' THEN count(full_name) else 0 end as starters_count
+                    , case when fantasy_designation = 'BENCH' THEN sum(player_value) else 0 end as bench_value
+                    , case when fantasy_designation = 'BENCH' THEN count(full_name) else 0 end as bench_count
                      from 
                     (select all_players.user_id 
                     , all_players.display_name 

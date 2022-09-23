@@ -41,6 +41,7 @@ table {
     background-color: rgb(87, 117, 144) !important;
 }
 
+<<<<<<< HEAD
 .btn-secondary {
     outline-color: rgb(67, 170, 139) !important;
     color: rgb(252, 252, 252) !important;
@@ -54,6 +55,8 @@ table {
     background-color: rgb(144, 190, 109) !important;
 }
 
+=======
+>>>>>>> cec8531c28914080a168919167b064159b51c1db
 .badge.bg-primary {
     outline-color: rgb(39, 125, 161) !important;
     color: rgb(252, 252, 252) !important;
@@ -103,7 +106,53 @@ table {
     background-color: rgb(39, 125, 161) !important;
 }
 
+.badge.alert-secondary {
+    outline-color: rgb(248, 150, 30) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(144, 190, 109, .75) !important;
+}
 
+.badge.alert-primary {
+    outline-color: rgb(67, 170, 139) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(67, 170, 139, .75) !important;
+}
+
+.badge.alert-success {
+    outline-color: rgb(39, 125, 161) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(39, 125, 161, .75) !important;
+}
+
+.badge.alert-danger {
+    outline-color: rgb(249, 132, 74, .5) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(249, 132, 74, .75) !important;
+}
+
+.badge.alert-info {
+    outline-color: rgb(243, 114, 44) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(243, 114, 44, .75) !important;
+}
+
+.badge.alert-warning {
+    outline-color: rgb(77, 144, 142) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(77, 144, 142, .75) !important;
+}
+
+.badge.alert-light {
+    outline-color: rgb(249, 199, 79) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(249, 199, 79, .75) !important;
+}
+
+.badge.alert-dark {
+    outline-color: rgb(248, 150, 30) !important;
+    color: rgb(252, 252, 252) !important;
+    background-color: rgb(248, 150, 30, .75) !important;
+}
 
 .card-fr {
     margin-bottom: 25px;
@@ -117,6 +166,23 @@ table {
     border-color: rgb(77, 144, 142);
 
 }
+
+.card-top-sl {
+    margin-bottom: 25px;
+    margin-top: 25px;
+    padding: 1.5em .5em .5em;
+    border-radius: 1em;
+    box-shadow: 0 5px 7px rgba(39, 125, 161, 0.2);
+    border: 2em;
+    border-style: solid;
+    border-width: 2px 2px 2px 2px;
+    border-color: rgb(77, 144, 142);
+    background-color: rgba(87, 117, 144, .25);
+}
+
+/* .card {
+    background-color: rgba(87, 117, 144, .25) !important;
+} */
 
 th {
     height: 100%;

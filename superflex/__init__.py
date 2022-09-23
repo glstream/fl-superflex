@@ -62,6 +62,14 @@ def create_app(test_config=None):
         trade_datetime = datetime.utcfromtimestamp(int(str(timestamp)[:10]))
         return trade_datetime.strftime("%m-%d-%Y")
 
+    @app.template_filter("league_cat")
+    def league_cat(cat: int) -> str:
+        category = {0: "Redraft", 1: "Keeper", 2: "Dynasty"}
+        try:
+            return category[cat]
+        except:
+            return "Redraft"
+
     @app.route("/favicon.ico")
     def favicon():
         return send_from_directory(
