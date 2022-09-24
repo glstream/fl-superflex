@@ -1,0 +1,134 @@
+{% macro player_cards(owners, users, aps, source) %}
+
+{% for owner in owners %}
+<div class="col-auto">
+    {% for user in users %}
+    {% if user[1] == owner.user_id %}
+    <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
+        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+    </object>
+    <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
+        {{owner.display_name}}
+        &bull;
+        {{"{:,}".format(owner.total_value)}}</h5>
+    {% endif %}
+    {%endfor%}
+    <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
+        aria-controls="collapseExample">
+        Show Team
+    </a>
+    <div class="card-fr" style="width: 20rem;">
+        {% for k, v in aps.items()%}
+        {% set designation = k %}
+        <div class="card-header bg-transparent">
+            <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
+                suffix}}
+            </h5>
+        </div>
+        <br> {% for p,j in v.items() %}
+        <div class="card d-flex border-0">
+            {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
+            <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
+                <div class="d-flex justify-content-between">
+                    {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
+                    <h5 class="text-left margin-left: 20px;"><span
+                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                    {% elif c.fantasy_position =="RB" %}
+                    <h5 class="text-left margin-left: 20px;"><span
+                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                    {% elif c.fantasy_position =="WR" %}
+                    <h5 class="text-left margin-left: 20px;"><span
+                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                    {% elif c.fantasy_position =="TE" %}
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
+                    </h5>
+                    {% elif c.fantasy_position =="FLEX" %}
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
+                    </h5>
+                    {% elif c.fantasy_position =="SUPER_FLEX" %}
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
+                    </h5>
+                    {% elif c.fantasy_position == "PICKS" %}
+                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
+                    </h5>
+                    {%endif%}
+                    <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+                    {%endif%}
+                </div>
+
+                <ul class="list-group">
+                    {% if c.fantasy_position != 'PICKS' %}
+                    <li class="list-group-item d-flex justify-content-between align-items-left border-0">
+                        {% if source in ['dp', 'nfl'] %}
+                        <a href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/" target="_blank">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                        </a>
+                        <a class="text-left align-left"
+                            href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
+                            target="_blank">{{c.full_name}}</a>
+                        {% elif source == 'ktc' %}
+                        <a href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}" target="_blank">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                        </a>
+                        <a class="text-left align-left"
+                            href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
+                            target="_blank">{{c.full_name}}</a>
+                        {% elif source == 'espn' %}
+                        <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                        </a>
+                        <a class="text-left align-left" href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
+                            target="_blank">{{c.full_name}}</a>
+                        {% elif source == 'fp_c' %}
+                        <a href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
+                            target="_blank">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                        </a>
+                        <a class="text-left align-left"
+                            href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
+                            target="_blank">{{c.full_name}}</a>
+                        {% endif %}
+                        <b><span class="text-lg-right">
+                                {{"{:,}".format(c.player_value)|
+                                replace(-1,"Unranked") }}</b></span>
+                    </li>
+                </ul>
+                {% else %}
+                <div>
+                    <p style="float:left">{{c.full_name}}</p>
+                    <b>
+                        <p style="float:right">
+                            {{"{:,}".format(c.player_value)|
+                            replace(-1,"Unranked") }}</p>
+                    </b>
+                </div>
+
+                {% endif %}
+
+            </div>
+            {% endif %}
+            {% endfor %}
+
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endmacro %}
