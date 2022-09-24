@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+{% from 'buttons.html' import buttons_large %}
 <h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
 <br>
 <div class="container">
@@ -45,104 +46,48 @@
             </table>
         </div>
         <div class="card border-0" style="width: 18em;">
-            <div class="card-body border-0">
-                <div class="list-group">
-                    <form method="post" class="form-inline">
-                        <div class="btn-group">
-                            <div class="dropdown">
-                                <form method="post" class="form-inline">
-                                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false">
-                                        Power Rankings
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <button class="dropdown-item" type="submit" name="get_league"
-                                            value="{{session_id, user_id, league_id}}">Keep Trade Cut</button>
-                                        <button class="dropdown-item" type="submit" name="get_league_fp"
-                                            value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
-                                        <button class="dropdown-item" type="submit" name="get_league_dp"
-                                            value="{{session_id, user_id, league_id}}">Dynasty Process</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <br>
-                            <div class="dropdown">
-                                <form method="post" class="form-inline">
-                                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false">
-                                        Contender Rankings
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <button class="dropdown-item" type="submit" name="contender_rankings"
-                                            value="{{session_id, user_id, league_id}}">ESPN Projections</button>
-                                        <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
-                                            value="{{session_id, user_id, league_id}}">NFL Projections</button>
-                                        <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                                            value="{{session_id, user_id, league_id}}">Fantasy Pros Projections</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="dropdown">
-                                <form method="post" class="form-inline">
-                                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false" disabled>
-                                        Trade Tracker
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <button class="dropdown-item" type="submit" name="trade_tracker"
-                                            value="{{session_id, user_id, league_id}}">KTC
-                                            Rankings</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+            {{buttons_large(session_id, user_id, league_id,tt_button='disabled')}}
+        </div>
+    </div>
+    <p style="float:middle;">Source: Keep Trade Cut</p>
+    <p style="text-align: right">KTC Player Values Updated {{update_diff_minutes}} minutes ago.</p>
+
+    <div class="row">
+        <div class="header text-center">
+            <h4 style="padding:10px" class="title">Trade History</h4>
+        </div>
+        {% for transaction_id in transaction_ids %}
+
+        <div class="card border-0">
+            <div class="row justify-content-center">
+                <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
+                </h4>
+                {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
+                <div class="card-fr" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
+                    <h5 class="text-left">{{o}}</h5>
+                    {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {%
+                    set
+                    total = asset.owner_total %}
+                    <h4 class="text-right">{{"{:,}".format(total)}}</h4>
+
+                    {% endif %}
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex align-items-center border-0">
+                            <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object> {{ asset.asset }} &nbsp<b>{{"{:,}".format(asset.value)}}</b>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                </form>
+
+                {% endfor %}
             </div>
         </div>
+
+        {% endfor %}
     </div>
-</div>
-<p style="float:middle;">Source: Keep Trade Cut</p>
-<p style="text-align: right">KTC Player Values Updated {{update_diff_minutes}} minutes ago.</p>
-
-<div class="row">
-    <div class="header text-center">
-        <h4 style="padding:10px" class="title">Trade History</h4>
-    </div>
-    {% for transaction_id in transaction_ids %}
-
-    <div class="card border-0">
-        <div class="row justify-content-center">
-            <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
-            </h4>
-            {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
-            <div class="card-fr" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
-                <h5 class="text-left">{{o}}</h5>
-                {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {% set
-                total = asset.owner_total %}
-                <h4 class="text-right">{{"{:,}".format(total)}}</h4>
-
-                {% endif %}
-                <ul class="list-group">
-                    <li class="list-group-item d-flex align-items-center border-0">
-                        <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
-                            <img class="avatar-player"
-                                src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                        </object> {{ asset.asset }} &nbsp<b>{{"{:,}".format(asset.value)}}</b>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            {% endfor %}
-        </div>
-    </div>
-
     {% endfor %}
-</div>
-{% endfor %}
 </div>
 {% endblock %}
