@@ -1,5 +1,5 @@
 {% macro buttons_large(session_id, user_id, league_id, ktc_button='', fp_button='', dp_button='', espn_button='',
-nfl_button='',fp_c_button='') %}
+nfl_button='',fp_c_button='', tt_button='') %}
 <form method="post" class="form-inline">
     <div class="btn-group flex-wrap">
         <div class="dropdown">
@@ -41,7 +41,7 @@ nfl_button='',fp_c_button='') %}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <button class="dropdown-item" type="submit" name="trade_tracker"
-                        value="{{session_id, user_id, league_id}}">KTC Rankings</button>
+                        value="{{session_id, user_id, league_id}}" {{tt_button}}>KTC Rankings</button>
                 </div>
         </div>
     </div>
