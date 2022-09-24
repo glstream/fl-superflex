@@ -1,162 +1,28 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+{% from 'buttons.html' import buttons_large %}
+{% from 'tables.html' import power_ranks %}
+{% from 'ranks.html' import ranks %}
+{% from 'best_available.html' import ba %}
+{% from 'header_page.html' import league_header %}
+{% from 'player_cards.html' import player_cards %}
+{% from 'table_footer.html' import table_footer %}
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
 
 </script>
-<div class="">
-    <div style="display: flex;margin-right: 50px;">
-        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
-            type="image/png">
-            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-        </object>
-        <span><b>
-                <h1>{{league_name}}</h1>
-            </b></span>
-
-    </div>
-</div>
+{{league_header(league_name, avatar)}}
 <br>
-
 <div class="row justify-content-center">
-    <div class="card" style="width: 20rem;">
-        <div class=" header">
-            <h4 style="padding:10px" class="title">Power Rankings</h4>
-        </div>
-        <ul class="list-group list-group-flush">
-            {% for owner in owners %}
-            <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}}
-                <span style="float:right">{{"{:,}".format(owner.total_value)}}</span>
-            </li>
-            <div class="progress" style="height: 15px;">
-                <div class="progress-bar" role="progressbar"
-                    style="width: {{pct_values[loop.index-1]}}%;font-size: medium;" aria-valuenow="0" aria-valuemin="0"
-                    aria-valuemax="100"></div>
-            </div>
-            {% endfor %}
-        </ul>
-        <br>
-    </div>
+    {{ranks(owners, pct_values, 'Power Rankings')}}
     <div class="col-auto" style="width: 65em;">
-        <form method="post" class="form-inline">
-            <div class="btn-group flex-wrap">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Power Rankings
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <button class="dropdown-item" type="submit" name="get_league"
-                            value="{{session_id, user_id, league_id}}">Keep Trade Cut</button>
-                        <button class="dropdown-item" type="submit" name="get_league_fp"
-                            value="{{session_id, user_id, league_id}}">Fantasy Pros</button>
-                        <button class="dropdown-item" type="submit" name="get_league_dp"
-                            value="{{session_id, user_id, league_id}}" disabled>Dynasty Process</button>
-
-                    </div>
-                </div>
-                <br>
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Contender Rankings
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <button class="dropdown-item" type="submit" name="contender_rankings"
-                            value="{{session_id, user_id, league_id}}">ESPN Projections</button>
-                        <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
-                            value="{{session_id, user_id, league_id}}">NFL Projections</button>
-                        <button class="dropdown-item" type="submit" name="fp_contender_rankings"
-                            value="{{session_id, user_id, league_id}}">Fantasy Pros
-                            Projections</button>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <form method="post" class="form-inline">
-                        <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Trade Tracker
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <button class="dropdown-item" type="submit" name="trade_tracker"
-                                value="{{session_id, user_id, league_id}}">KTC Rankings</button>
-                        </div>
-                </div>
-            </div>
-
-        </form>
+        {{buttons_large(session_id, user_id, league_id,dp_button='disabled')}}
         <br>
-
-
         <div class="col-auto" style="width:65em; margin-right: 50px;">
-            <table class="table rounded table-hover" style="width:95%">
-                <thead style="text-align:center">
-                    <tr>
-                        <th scope="col"></th>
-                        <th>Overall</th>
-                        <th>Starters</th>
-                        <th>QB</th>
-                        <th>RB</th>
-                        <th>WR</th>
-                        <th>TE</th>
-                        <th>Picks</th>
-                        <th>Bench</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for owner in owners %}
-                    <td style="text-align:center">{{owner.display_name}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip"
-                        data-html="true" title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
-                        {{owner.total_rank | suffix}}
-                    </td>
-                    <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="Starters Value: <b>{{'{:,}'.format(owner.starters_sum) | default('', True)}}</b><br>Starters Avg. <b>{{'{:,}'.format(owner.starters_average)}} </b>">
-                        {{owner.starters_rank | suffix}}</td>
-                    <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="QB Value: <b>{{'{:,}'.format(owner.qb_sum)}}</b><br>QB Avg. <b>{{'{:,}'.format(owner.qb_average) | default('', True)}} </b>">
-                        {{owner.qb_rank | suffix}}
-                    </td>
-                    <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="RB Value: <b>{{'{:,}'.format(owner.rb_sum)}}</b><br>RB Avg. <b>{{'{:,}'.format(owner.rb_average) | default('', True)}} </b>">
-                        {{owner.rb_rank | suffix}}
-                    </td>
-                    <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="WR Value: <b>{{'{:,}'.format(owner.wr_sum)}}</b><br>WR Avg. <b>{{'{:,}'.format(owner.wr_average) | default('', True)}} </b>">
-                        {{owner.wr_rank | suffix}}
-                    </td>
-                    <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="TE Value: <b>{{'{:,}'.format(owner.te_sum) | default('', True) }}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
-                        {{owner.te_rank | suffix}}
-                    </td>
-                    <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="Picks Value: <b>{{'{:,}'.format(owner.picks_sum) | default('', True)}}</b>">
-                        {{owner.picks_rank |
-                        suffix}}
-                    </td>
-                    <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip"
-                        data-html="true"
-                        title="Bench Value: <b>{{'{:,}'.format(owner.bench_sum)}}</b><br>Bench Avg. <b>{{'{:,}'.format(owner.bench_average) | default('', True)}} </b>">
-                        {{owner.bench_rank | suffix}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
+            {{power_ranks(owners)}}
             <br>
-            <div>
-                <p style="float:right;">Source: Dynasty Process</p>
-                <span class="align-bottom">Dynasty Process Player Values Updated
-                    {{update_diff_minutes}} minutes
-                    ago.</span>
-            </div>
+            {{table_footer('Dynasty Process Player Values', update_diff_minutes)}}
         </div>
     </div>
 
@@ -201,34 +67,17 @@
             pointLabels: {
                 display: true
             },
-
-
-                        },
-                    },
+        
+        
+                                },
+                            },
             responsive: false,
-
-                }
-            });
+        
+                        }
+                    });
         </script>
     </div>
-    <div class="card" style="width: 18em;">
-        <div class="header">
-            <h4 style="padding:10px" class="title">Best Available</h4>
-        </div>
-
-        {% for pos, player in best_available.items() %}
-        <div class="d-flex justify-content-between">
-            <h5 class="text-left margin-left: 20px;"><span class="badge bg-light">{{pos}}</span></h5>
-            <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
-        </div>
-        {% for p in player %}
-        <div style="display: flex; justify-content: space-between;">
-            <span class="pb-2">{{p.full_name}}</span>
-            <span><b>{{"{:,}".format(p.player_value) }}</b></span>
-        </div>
-        {%endfor%}
-        {%endfor%}
-    </div>
+    {{ba(best_available)}}
 </div>
 <br>
 
@@ -238,108 +87,6 @@
 
 <br>
 <div class="row justify-content-left">
-    {% for owner in owners %}
-    <div class="col-auto">
-        {% for user in users %}
-        {% if user[1] == owner.user_id %}
-        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
-            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-        </object>
-        <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
-            {{owner.display_name}}
-            &bull;
-            {{"{:,}".format(owner.total_value)}}</h5>
-        {% endif %}
-        {%endfor%}
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
-            aria-controls="collapseExample">
-            Show Team
-        </a>
-        <div class="card-fr" style="width: 20rem;">
-            {% for k, v in aps.items()%}
-            {% set designation = k %}
-            <div class="card-header bg-transparent">
-                <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
-                    suffix}}
-                </h5>
-            </div>
-            <br> {% for p,j in v.items() %}
-            <div class="card d-flex border-0">
-                {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
-                <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
-                    <div class="d-flex justify-content-between">
-                        {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-primary">{{c.fantasy_position}}</span></h5>
-                        {% elif c.fantasy_position =="RB" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-success">{{c.fantasy_position}}</span></h5>
-                        {% elif c.fantasy_position =="WR" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-warning">{{c.fantasy_position}}</span></h5>
-                        {% elif c.fantasy_position =="TE" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-danger">{{c.fantasy_position}}</span>
-                        </h5>
-                        {% elif c.fantasy_position =="FLEX" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-info">{{c.fantasy_position}}</span>
-                        </h5>
-                        {% elif c.fantasy_position =="SUPER_FLEX" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-dark">{{c.fantasy_position}}</span>
-                        </h5>
-                        {% elif c.fantasy_position == "PICKS" %}
-                        <h5 class="text-left margin-left: 20px;"><span
-                                class="badge bg-dark">{{c.fantasy_position}}</span>
-                        </h5>
-                        {%endif%}
-                        <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
-                        {%endif%}
-                    </div>
-
-                    <ul class="list-group">
-                        {% if c.fantasy_position != 'PICKS' %}
-                        <li class="list-group-item d-flex justify-content-between align-items-left border-0">
-                            <a href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
-                                target="_blank">
-                                <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
-                                    <img class="avatar-player"
-                                        href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
-                                        src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                                </object>
-                            </a>
-                            <a class="text-left align-left"
-                                href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
-                                target="_blank">{{c.full_name}}</a>
-                            <b><span class="text-lg-right">
-                                    {{"{:,}".format(c.player_value)|
-                                    replace(-1,"Unranked") }}</b></span>
-                        </li>
-                    </ul>
-                    {% else %}
-                    <div>
-                        <p style="float:left">{{c.full_name}}</p>
-                        <b>
-                            <p style="float:right">
-                                {{"{:,}".format(c.player_value)|
-                                replace(-1,"Unranked") }}</p>
-                        </b>
-                    </div>
-
-                    {% endif %}
-
-                </div>
-                {% endif %}
-                {% endfor %}
-
-            </div>
-            {% endfor %}
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
+    {{ player_cards(owners, users, aps, 'dp') }}
 </div>
-
-
 {% endblock %}

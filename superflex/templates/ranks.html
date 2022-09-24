@@ -1,0 +1,19 @@
+{% macro ranks(owners,pct_values, rank_name) %}
+<div class="card" style="width: 20rem;">
+    <div class=" header">
+        <h4 style="padding:10px" class="title">{{rank_name}}</h4>
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for owner in owners %}
+        <li class="list-group-item">{{owner.total_rank | suffix}} {{owner.display_name}}
+            <span style="float:right">{{"{:,}".format(owner.total_value)}}</span>
+        </li>
+        <div class="progress" style="height: 15px;">
+            <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%;font-size: medium;"
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        {% endfor %}
+    </ul>
+    <br>
+</div>
+{% endmacro %}

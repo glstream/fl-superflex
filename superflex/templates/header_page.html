@@ -1,0 +1,16 @@
+{% macro league_header(league_name, avatar) %}
+
+<div class="">
+    <div style="display: flex;margin-right: 50px;">
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
+            type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+        </object>
+        <span><b>
+                <h1>{{league_name}}</h1>
+            </b></span>
+
+    </div>
+</div>
+
+{% endmacro %}
