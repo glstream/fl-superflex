@@ -734,11 +734,14 @@ league_metas = []
 players = []
 current_year = datetime.now().strftime("%Y")
 # START ROUTES
+@bp.route("/faqs", methods=["GET"])
+def faqs():
+    return render_template("leagues/faqs.html")
 
 
 @bp.route("/", methods=("GET", "POST"))
 def index():
-    session["session_id"] = str(uuid.uuid4())
+    session["session_id"] = session.get("session_id", str(uuid.uuid4()))
     entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
     db = pg_db()
 
@@ -757,20 +760,26 @@ def index():
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
         return render_template("leagues/index.html", user_name=user_name)
-    if request.method == "POST" and is_user(request.form["username"]):
-        session_id = session.get("session_id", str(uuid.uuid4()))
-        user_name = request.form["username"]
-        user_id = session["user_id"] = get_user_id(user_name)
-        leagues = user_leagues(str(user_id))
-        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+    if request.method == "POST":
+        if is_user(request.form["username"]):
+            session_id = session.get("session_id", str(uuid.uuid4()))
+            user_name = request.form["username"]
+            user_id = session["user_id"] = get_user_id(user_name)
+            leagues = user_leagues(str(user_id))
+            entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
-        insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
+            insert_current_leagues(
+                db, session_id, user_id, user_name, entry_time, leagues
+            )
+        else:
+            return render_template(
+                "leagues/index.html",
+                error_message="Username not found. Please enter a valid sleeper username.",
+            )
 
         return redirect(url_for("leagues.select_league"))
-    return render_template(
-        "leagues/index.html",
-        error_message="Username not found. Please enter a valid sleeper username.",
-    )
+
+    return render_template("leagues/index.html")
 
 
 @bp.route("/select_league", methods=["GET", "POST"])
@@ -779,26 +788,29 @@ def select_league():
 
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
+    try:
 
-    session_id = session.get("session_id", str(uuid.uuid4()))
-    user_id = session["user_id"]
+        session_id = session.get("session_id", str(uuid.uuid4()))
+        user_id = session["user_id"]
 
-    if request.method == "POST":
-        button = list(request.form)[0]
-        print(button)
-        league_data = eval(request.form[button])
-        session_id = league_data[0]
-        user_id = league_data[1]
-        league_id = league_data[2]
-        player_manager_upates(db, button, session_id, user_id, league_id)
-        return redirect(
-            url_for(
-                f"leagues.{button}",
-                session_id=session_id,
-                league_id=league_id,
-                user_id=user_id,
+        if request.method == "POST":
+            button = list(request.form)[0]
+            print(button)
+            league_data = eval(request.form[button])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            player_manager_upates(db, button, session_id, user_id, league_id)
+            return redirect(
+                url_for(
+                    f"leagues.{button}",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                )
             )
-        )
+    except:
+        return redirect(url_for("leagues.index"))
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute(
@@ -810,7 +822,7 @@ def select_league():
     if len(leagues) > 0:
         return render_template("leagues/select_league.html", leagues=leagues)
     else:
-        return redirect(url_for("leagues.index", error_message="No leagues found."))
+        return redirect(url_for("leagues.index"))
 
 
 @bp.route("/get_league_fp", methods=("GET", "POST"))

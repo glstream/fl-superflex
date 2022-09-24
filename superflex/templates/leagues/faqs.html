@@ -1,0 +1,71 @@
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}{% endblock %}</h1>
+{% endblock %} {% block content %}
+<div id="accordion">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+                    aria-controls="collapseOne">
+                    What are Power Rankings?
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body">
+                Power Rankings are sourced from Keep Trade Cut, Fantasy Pros and Dynasty Process. These rankings are the
+                best way to determine the power of your team from a dynasty league perspective.
+                They combine player values from those sites with your fantasy football league. The teams are then ranked
+                based on thier total aggregate values. The heatmap
+                table shown has rankings for each of the aggregate position groups QB, RB, WR, and TE as well as
+                aggregates for your
+                starters, bench, and draft picks. You can hover over the table to see the actual values.
+
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="headingTwo">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="false" aria-controls="collapseTwo">
+                    What are Contender Rankings?
+                </button>
+            </h5>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+            <div class="card-body">
+                Contender Rankings are sourced from ESPN, Fantasy Pros and NFL. These rankings are the best way to
+                determine if your team can contend this year and from a redraft perspective.
+                They combine the player projections from those sites with your fantasy football league. The teams are
+                then ranked based on thier total aggregate projections. The heatmap
+                table shown has rankings for each of the aggregate position groups QB, RB, WR, and TE as well as
+                aggregates for your
+                starters and bench. You can hover over the table to see the actual values.
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="headingThree">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="false" aria-controls="collapseThree">
+                    How often are rankings and projections updated?
+                </button>
+            </h5>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+            <div class="card-body">
+                Superflex source refresh times ->
+                Keep Trade Cut: 60 minutes
+                Fantasy Pros: 60 minutes
+                Dynasty Process: 60 Minutes
+                ESPN: 60 Minutes
+                NFL Projections: 4 hours
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
