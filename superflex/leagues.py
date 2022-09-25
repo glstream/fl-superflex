@@ -2,7 +2,6 @@ import requests, uuid
 import psycopg2
 from psycopg2.extras import execute_batch, execute_values
 from pathlib import Path
-import os
 
 
 from flask import (
@@ -729,6 +728,87 @@ def player_manager_upates(
             )
 
 
+def render_players(players: list, rank_type: str):
+    starting_qbs = [
+        player
+        for player in players
+        if player["fantasy_position"] == "QB"
+        if player["fantasy_designation"] == "STARTER"
+    ]
+    starting_rbs = [
+        player
+        for player in players
+        if player["fantasy_position"] == "RB"
+        if player["fantasy_designation"] == "STARTER"
+    ]
+    starting_wrs = [
+        player
+        for player in players
+        if player["fantasy_position"] == "WR"
+        if player["fantasy_designation"] == "STARTER"
+    ]
+    starting_tes = [
+        player
+        for player in players
+        if player["fantasy_position"] == "TE"
+        if player["fantasy_designation"] == "STARTER"
+    ]
+    flex = [player for player in players if player["fantasy_position"] == "FLEX"]
+    super_flex = [
+        player for player in players if player["fantasy_position"] == "SUPER_FLEX"
+    ]
+    rec_flex = [
+        player for player in players if player["fantasy_position"] == "REC_FLEX"
+    ]
+    bench_qbs = [
+        player
+        for player in players
+        if player["fantasy_position"] == "QB"
+        if player["fantasy_designation"] == "BENCH"
+    ]
+    bench_rbs = [
+        player
+        for player in players
+        if player["fantasy_position"] == "RB"
+        if player["fantasy_designation"] == "BENCH"
+    ]
+    bench_wrs = [
+        player
+        for player in players
+        if player["fantasy_position"] == "WR"
+        if player["fantasy_designation"] == "BENCH"
+    ]
+    bench_tes = [
+        player
+        for player in players
+        if player["fantasy_position"] == "TE"
+        if player["fantasy_designation"] == "BENCH"
+    ]
+
+    starters = {
+        "qb": starting_qbs,
+        "rb": starting_rbs,
+        "wr": starting_wrs,
+        "te": starting_tes,
+        "flex": flex,
+        "super_flex": super_flex,
+        "rec_flex": rec_flex,
+    }
+
+    bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
+
+    if rank_type == "power":
+        picks = [
+            player for player in players if player["fantasy_designation"] == "PICKS"
+        ]
+        picks_ = {"picks": picks}
+        team_spots = {"starters": starters, "bench": bench, "picks": picks_}
+    elif rank_type == "contender":
+        team_spots = {"starters": starters, "bench": bench}
+
+    return team_spots
+
+
 league_ids = []
 league_metas = []
 players = []
@@ -868,75 +948,7 @@ def get_league_fp():
         if len(fp_players) < 1:
             return redirect(url_for("leagues.index"))
 
-        starting_qbs = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_rbs = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_wrs = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_tes = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        flex = [player for player in fp_players if player["fantasy_position"] == "FLEX"]
-        super_flex = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "SUPER_FLEX"
-        ]
-        rec_flex = [
-            player for player in fp_players if player["fantasy_position"] == "REC_FLEX"
-        ]
-        bench_qbs = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_rbs = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_wrs = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_tes = [
-            player
-            for player in fp_players
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-
-        fp_starters = {
-            "qb": starting_qbs,
-            "rb": starting_rbs,
-            "wr": starting_wrs,
-            "te": starting_tes,
-            "flex": flex,
-            "super_flex": super_flex,
-            "rec_flex": rec_flex,
-        }
-        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        fp_team_spots = {"starters": fp_starters, "bench": fp_bench}
+        fp_team_spots = render_players(fp_players, "contender")
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -977,34 +989,16 @@ def get_league_fp():
             pct_values = []
 
         fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        fp_ba_cursor.execute(
-            f"""SELECT 
-            ba_t1.player_id as sleeper_id
-            , ba_t1.full_name
-            , ba_t1.player_position
-            , ba_t1.player_value
-            from (select
-            pl.player_id
-            ,pl.full_name
-            ,pl.player_position
-            , fp.{lt}_rank_ecr as player_value
-            , ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY fp.{lt}_rank_ecr asc) rn
-
-            from dynastr.players pl 
-            inner join dynastr.fp_player_ranks fp on concat(pl.first_name, pl.last_name)  = concat(fp.player_first_name, fp.player_last_name)
-            where 1=1 
-            and pl.player_id NOT IN (SELECT
-                            lp.player_id
-                            from dynastr.league_players lp
-                            where lp.session_id = '{session_id}'
-                            and lp.league_id = '{league_id}'
-                        )
-            and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
-            and pl.team is not null
-            order by player_value desc) ba_t1
-            where ba_t1.rn <= 5
-            order by ba_t1.player_position, ba_t1.player_value asc"""
-        )
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "fp_ba.sql", "r"
+        ) as sql_file:
+            ba_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
+            )
+        fp_ba_cursor.execute(ba_sql)
         fp_ba = fp_ba_cursor.fetchall()
         fp_ba_qb = [player for player in fp_ba if player["player_position"] == "QB"]
         fp_ba_rb = [player for player in fp_ba if player["player_position"] == "RB"]
@@ -1111,80 +1105,6 @@ def get_league():
         if len(players) < 1:
             return redirect(url_for("leagues.index"))
 
-        starting_qbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_rbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_wrs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_tes = [
-            player
-            for player in players
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        flex = [player for player in players if player["fantasy_position"] == "FLEX"]
-        super_flex = [
-            player for player in players if player["fantasy_position"] == "SUPER_FLEX"
-        ]
-        rec_flex = [
-            player for player in players if player["fantasy_position"] == "REC_FLEX"
-        ]
-        bench_qbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_rbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_wrs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_tes = [
-            player
-            for player in players
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-
-        picks = [
-            player for player in players if player["fantasy_designation"] == "PICKS"
-        ]
-
-        starters = {
-            "qb": starting_qbs,
-            "rb": starting_rbs,
-            "wr": starting_wrs,
-            "te": starting_tes,
-            "flex": flex,
-            "super_flex": super_flex,
-            "rec_flex": rec_flex,
-        }
-
-        bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        picks_ = {"picks": picks}
-        team_spots = {"starters": starters, "bench": bench, "picks": picks_}
-
         owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd() / "superflex" / "sql" / "summary" / "get_league.sql", "r"
@@ -1223,36 +1143,19 @@ def get_league():
         except:
             pct_values = []
 
-        ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        ba_cursor.execute(
-            f"""SELECT 
-            ba_t1.player_id as sleeper_id
-            , ba_t1.full_name
-            , ba_t1.player_position
-            , ba_t1.player_value
-            from (SELECT
-            pl.player_id
-            ,pl.full_name
-            ,pl.player_position
-            , ktc.{league_type} as player_value
-            , ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY ktc.{league_type} desc) rn
+        ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "ktc_ba.sql", "r"
+        ) as sql_file:
+            ktc_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+            )
+        ktc_ba_cursor.execute(ktc_sql)
+        ba = ktc_ba_cursor.fetchall()
 
-            FROM dynastr.players pl 
-            INNER JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
-            where 1=1 
-            and pl.player_id NOT IN (SELECT
-                            lp.player_id
-                            from dynastr.league_players lp
-                            where lp.session_id = '{session_id}'
-                            and lp.league_id = '{league_id}'
-                        )
-            and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
-            and pl.team is not null
-            order by player_value desc) ba_t1
-            where ba_t1.rn <= 5
-            order by ba_t1.player_position, ba_t1.player_value desc"""
-        )
-        ba = ba_cursor.fetchall()
         ba_qb = [player for player in ba if player["player_position"] == "QB"]
         ba_rb = [player for player in ba if player["player_position"] == "RB"]
         ba_wr = [player for player in ba if player["player_position"] == "WR"]
@@ -1279,9 +1182,11 @@ def get_league():
 
         total_rosters = int(get_league_rosters_size(league_id))
 
+        team_spots = render_players(players, "power")
+
         owner_cursor.close()
         player_cursor.close()
-        ba_cursor.close()
+        ktc_ba_cursor.close()
         date_cursor.close()
         avatar_cursor.close()
 
@@ -1353,80 +1258,7 @@ def get_league_dp():
         if len(players) < 1:
             return redirect(url_for("leagues.index"))
 
-        starting_qbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_rbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_wrs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_tes = [
-            player
-            for player in players
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        flex = [player for player in players if player["fantasy_position"] == "FLEX"]
-        super_flex = [
-            player for player in players if player["fantasy_position"] == "SUPER_FLEX"
-        ]
-
-        rec_flex = [
-            player for player in players if player["fantasy_position"] == "REC_FLEX"
-        ]
-        bench_qbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_rbs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_wrs = [
-            player
-            for player in players
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_tes = [
-            player
-            for player in players
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-
-        picks = [
-            player for player in players if player["fantasy_designation"] == "PICKS"
-        ]
-
-        starters = {
-            "qb": starting_qbs,
-            "rb": starting_rbs,
-            "wr": starting_wrs,
-            "te": starting_tes,
-            "flex": flex,
-            "super_flex": super_flex,
-            "rec_flex": rec_flex,
-        }
-
-        bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        picks_ = {"picks": picks}
-        team_spots = {"starters": starters, "bench": bench, "picks": picks_}
+        team_spots = render_players(players, "power")
 
         owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -1468,35 +1300,18 @@ def get_league_dp():
             pct_values = []
 
         ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        ba_cursor.execute(
-            f"""SELECT 
-            ba_t1.player_id as sleeper_id
-            , ba_t1.full_name
-            , ba_t1.player_position
-            , ba_t1.player_value
-            from (SELECT
-            pl.player_id
-            ,pl.full_name
-            ,pl.player_position
-            , ktc.{league_type} as player_value
-            , ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY ktc.{league_type} desc) rn
-
-            FROM dynastr.players pl 
-            INNER JOIN dynastr.dp_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
-            where 1=1 
-            and pl.player_id NOT IN (SELECT
-                            lp.player_id
-                            from dynastr.league_players lp
-                            where lp.session_id = '{session_id}'
-                            and lp.league_id = '{league_id}'
-                        )
-            and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
-            and pl.team is not null
-            order by player_value desc) ba_t1
-            where ba_t1.rn <= 5
-            order by ba_t1.player_position, ba_t1.player_value desc"""
-        )
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "dp_ba.sql", "r"
+        ) as sql_file:
+            dp_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+            )
+        ba_cursor.execute(dp_sql)
         ba = ba_cursor.fetchall()
+
         ba_qb = [player for player in ba if player["player_position"] == "QB"]
         ba_rb = [player for player in ba if player["player_position"] == "RB"]
         ba_wr = [player for player in ba if player["player_position"] == "WR"]
@@ -1693,75 +1508,7 @@ def contender_rankings():
         if len(contenders) < 1:
             return redirect(url_for("leagues.index"))
 
-        starting_qbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_rbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_wrs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_tes = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        flex = [player for player in contenders if player["fantasy_position"] == "FLEX"]
-        super_flex = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "SUPER_FLEX"
-        ]
-        rec_flex = [
-            player for player in contenders if player["fantasy_position"] == "REC_FLEX"
-        ]
-        bench_qbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_rbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_wrs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_tes = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-
-        fp_starters = {
-            "qb": starting_qbs,
-            "rb": starting_rbs,
-            "wr": starting_wrs,
-            "te": starting_tes,
-            "flex": flex,
-            "super_flex": super_flex,
-            "rec_flex": rec_flex,
-        }
-        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        c_aps = {"starters": fp_starters, "bench": fp_bench}
+        c_aps = render_players(contenders, "contender")
 
         c_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -1800,35 +1547,17 @@ def contender_rankings():
             pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        con_ba_cursor.execute(
-            f"""SELECT 
-                ba_t1.player_id as sleeper_id
-                , ba_t1.full_name
-                , ba_t1.player_position
-                , ba_t1.player_value
-                from (SELECT
-                pl.player_id
-                ,pl.full_name
-                ,pl.player_position
-                ,ep.total_projection as player_value
-                ,RANK() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
-
-                FROM dynastr.players pl 
-                INNER JOIN dynastr.espn_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
-                WHERE 1=1 
-                and pl.player_id NOT IN (SELECT
-                                lp.player_id
-                                FROM dynastr.league_players lp
-                                WHERE lp.session_id = '{session_id}'
-                                and lp.league_id = '{league_id}'
-                            )
-                and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
-                and pl.team is not null
-                order by player_value desc) ba_t1
-                where ba_t1.rn <= 5
-                order by ba_t1.player_position, ba_t1.player_value desc"""
-        )
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "con_espn_ba.sql", "r"
+        ) as sql_file:
+            con_espn_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+            )
+        con_ba_cursor.execute(con_espn_sql)
         con_ba = con_ba_cursor.fetchall()
+
         con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
         con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
         con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
@@ -1930,75 +1659,7 @@ def nfl_contender_rankings():
         if len(contenders) < 1:
             return redirect(url_for("leagues.index"))
 
-        starting_qbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_rbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_wrs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_tes = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        flex = [player for player in contenders if player["fantasy_position"] == "FLEX"]
-        super_flex = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "SUPER_FLEX"
-        ]
-        rec_flex = [
-            player for player in contenders if player["fantasy_position"] == "REC_FLEX"
-        ]
-        bench_qbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_rbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_wrs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_tes = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-
-        fp_starters = {
-            "qb": starting_qbs,
-            "rb": starting_rbs,
-            "wr": starting_wrs,
-            "te": starting_tes,
-            "flex": flex,
-            "super_flex": super_flex,
-            "rec_flex": rec_flex,
-        }
-        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        nfl_aps = {"starters": fp_starters, "bench": fp_bench}
+        nfl_aps = render_players(contenders, "contender")
 
         nfl_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -2039,35 +1700,17 @@ def nfl_contender_rankings():
             pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        con_ba_cursor.execute(
-            f"""SELECT 
-                ba_t1.player_id as sleeper_id
-                , ba_t1.full_name
-                , ba_t1.player_position
-                , ba_t1.player_value
-                from (SELECT
-                pl.player_id
-                ,pl.full_name
-                ,pl.player_position
-                ,ep.total_projection as player_value
-                ,ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
-
-                FROM dynastr.players pl 
-                INNER JOIN dynastr.nfl_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
-                WHERE 1=1 
-                and pl.player_id NOT IN (SELECT
-                                lp.player_id
-                                FROM dynastr.league_players lp
-                                WHERE lp.session_id = '{session_id}'
-                                and lp.league_id = '{league_id}'
-                            )
-                and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
-                and pl.team is not null
-                order by player_value desc) ba_t1
-                where ba_t1.rn <= 5
-                order by ba_t1.player_position, ba_t1.player_value desc"""
-        )
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "con_nfl_ba.sql", "r"
+        ) as sql_file:
+            con_nfl_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+            )
+        con_ba_cursor.execute(con_nfl_sql)
         con_ba = con_ba_cursor.fetchall()
+
         con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
         con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
         con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
@@ -2170,75 +1813,7 @@ def fp_contender_rankings():
         if len(contenders) < 1:
             return redirect(url_for("leagues.index"))
 
-        starting_qbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_rbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_wrs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        starting_tes = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "STARTER"
-        ]
-        flex = [player for player in contenders if player["fantasy_position"] == "FLEX"]
-        super_flex = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "SUPER_FLEX"
-        ]
-        rec_flex = [
-            player for player in contenders if player["fantasy_position"] == "REC_FLEX"
-        ]
-        bench_qbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "QB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_rbs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "RB"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_wrs = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "WR"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-        bench_tes = [
-            player
-            for player in contenders
-            if player["fantasy_position"] == "TE"
-            if player["fantasy_designation"] == "BENCH"
-        ]
-
-        fp_starters = {
-            "qb": starting_qbs,
-            "rb": starting_rbs,
-            "wr": starting_wrs,
-            "te": starting_tes,
-            "flex": flex,
-            "super_flex": super_flex,
-            "rec_flex": rec_flex,
-        }
-        fp_bench = {"qb": bench_qbs, "rb": bench_rbs, "wr": bench_wrs, "te": bench_tes}
-        fp_aps = {"starters": fp_starters, "bench": fp_bench}
+        fp_aps = render_players(contenders, "contender")
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -2280,35 +1855,17 @@ def fp_contender_rankings():
             pct_values = []
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        con_ba_cursor.execute(
-            f"""SELECT 
-                ba_t1.player_id as sleeper_id
-                , ba_t1.full_name
-                , ba_t1.player_position
-                , ba_t1.player_value
-                from (SELECT
-                pl.player_id
-                ,pl.full_name
-                ,pl.player_position
-                ,ep.total_projection as player_value
-                ,ROW_NUMBER() OVER(PARTITION BY pl.player_position ORDER BY ep.total_projection desc) rn
-
-                FROM dynastr.players pl 
-                INNER JOIN dynastr.fp_player_projections ep on concat(pl.first_name, pl.last_name)  = concat(ep.player_first_name, ep.player_last_name)
-                WHERE 1=1 
-                and pl.player_id NOT IN (SELECT
-                                lp.player_id
-                                FROM dynastr.league_players lp
-                                WHERE lp.session_id = '{session_id}'
-                                and lp.league_id = '{league_id}'
-                            )
-                and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
-                and pl.team is not null
-                order by player_value desc) ba_t1
-                where ba_t1.rn <= 5
-                order by ba_t1.player_position, ba_t1.player_value desc"""
-        )
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "con_fp_ba.sql", "r"
+        ) as sql_file:
+            con_fp_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+            )
+        con_ba_cursor.execute(con_fp_sql)
         con_ba = con_ba_cursor.fetchall()
+
         con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
         con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
         con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
