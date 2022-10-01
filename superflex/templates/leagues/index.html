@@ -1,41 +1,66 @@
 {% extends 'base.html' %} {% block header %}
 <h1>{% block title %}{% endblock %}</h1>
 {% endblock %} {% block content %}
-<div class="card border-0">
+<section style="background-color: #577590;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-xl-10">
+                <div class="card" style="border-radius: 1rem;">
+                    <div class="row g-0">
+                        <div class="col-md-6 col-lg-5 d-none d-md-block">
+                            <img src="{{url_for('static', filename='landingpage_football.jpg')}}" alt="login form"
+                                class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
+                        </div>
+                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                            <div class="card-body p-4 p-lg-5 text-black">
 
-    <h5 class="text-center">Superflex takes data from sources across the web and combines them into one all up league
-        view to help you
-        rank and value your teams.</h5>
-    <br>
-    <div class="row flex-xl-nowrap">
-        <form method="post">
-            <div class="container">
-                <div class="col-sm" style="max-width: 540px;">
-                    <label for="" class="form-label">
-                        <h4>Sleeper Username</h4>
-                    </label>
-                    <input type="text" size="100" class="form-control input-lg" name="username" id="username"
-                        value="{{ user_name[1] if user_name else request.form['username'] }}" required
-                        placeholder="{{user_name[1] if user_name else 'User Name...'}}">
-                    <br>
-                    <button type="submit" class="btn btn-primary" data-toggle="submit" aria-pressed="false"
-                        autocomplete="off">Submit</button>
-                    <br><span>{{error_message}}</span>
-                    <br>
-                    <br>
+                                <form method="post">
+                                    <div class="d-flex align-items-center mb-3 pb-1">
+                                        <img src="{{url_for('static', filename='logo.png')}}" width="145" height="65"
+                                            alt="">
+                                    </div>
 
+                                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Enter Sleeper Username
+                                    </h5>
 
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="username" class="form-control form-control-lg"
+                                            name="username"
+                                            value="{{ user_name[1] if user_name else request.form['username'] }}"
+                                            required placeholder="{{user_name[1] if user_name else 'User Name...'}}" />
+                                    </div>
+                                    <div class="pt-1 mb-1">
+                                        <button type="submit" class="btn btn-primary" data-toggle="submit"
+                                            aria-pressed="false" autocomplete="off">Submit</button>
+                                    </div>
+
+                                    <br><span style="color: #de2121;">{{error_message}}</span><br>
+
+                                    <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account?<button
+                                            id="username" type="submit" class="btn btn-link"
+                                            style="background-color:transparent" name="username" value="gray_matter">Try
+                                            a demo account</button></p>
+                                    <a href="#!" class="small text-muted">Powered by data from</a><a
+                                        href="https://www.sleeper.app" class="small text-muted" target="_blank">
+                                        Sleeper, <a href="https://keeptradecut.com/" class="small text-muted"
+                                            target="_blank">KeepTradeCut,</a>
+                                        <a href="https://www.fantasypros.com/nfl/"
+                                            class="small text-muted">FantasyPros,</a> <a
+                                            href="https://fantasy.espn.com/football/players/projections"
+                                            class="small text-muted" target="_blank">ESPN, </a><a
+                                            href="https://fantasy.nfl.com/research/projections" class="small text-muted"
+                                            target="_blank">NFL
+                                            Projections, and </a><a href="https://calc.dynastyprocess.com/"
+                                            class="small text-muted" target="_blank">Dynasty
+                                            Process.</a>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <h5 class="text-center">Powered by data from Sleeper, KeepTradeCut, FantasyPros, ESPN, Dynasty Process
-                    and coffee.</h5>
-                <center><a class="text-center" href="https://www.buymeacoffee.com/superflex" target=”_blank”><img
-                            src="{{url_for('static', filename='bmc-button.png')}}" width="200" height="40" alt=""></a>
-                </center>
-
-        </form>
-
+            </div>
+        </div>
     </div>
-</div>
-
+</section>
 {% endblock %}

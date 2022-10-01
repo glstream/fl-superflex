@@ -16,6 +16,7 @@
 <br>
 <div class="row justify-content-center">
     {{ranks(owners, pct_values, 'Contender Rankings')}}
+
     <div class="col-auto" style="width: 65em;">
         {{buttons_large(session_id, user_id, league_id,fp_c_button='disabled')}}
         <br>
@@ -23,6 +24,7 @@
             {{contender_ranks(owners)}}
             <br>
             {{table_footer('Fantasy Pros Player Projections', update_diff_minutes)}}
+            Week: {{nfl_current_week}}
         </div>
     </div>
 
