@@ -33,7 +33,7 @@
                                         <input type="text" id="username" class="form-control form-control-lg"
                                             name="username"
                                             value="{{ user_name[1] if user_name else request.form['username'] }}"
-                                            required placeholder="{{user_name[1] if user_name else 'User Name...'}}" />
+                                            placeholder="{{user_name[1] if user_name else 'Username...'}}" />
                                     </div>
                                     <div class="pt-1 mb-1">
                                         <button type="submit" class="btn btn-primary" data-toggle="submit"
@@ -41,7 +41,8 @@
                                     </div>
 
                                     <br><span style="color: #de2121;">{{error_message}}</span><br>
-
+                                </form>
+                                <form method="post">
                                     <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account?<button
                                             id="username" type="submit" class="btn btn-link"
                                             style="background-color:transparent" name="username" value="gray_matter">Try
