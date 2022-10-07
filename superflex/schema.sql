@@ -211,6 +211,28 @@ insert_date  VARCHAR(150),
 PRIMARY KEY (player_full_name)
 );
 
+CREATE TABLE IF NOT EXISTS dynastr.fc_player_ranks (
+player_first_name  VARCHAR(150),
+player_last_name  VARCHAR(150),
+player_full_name  VARCHAR(150),
+fc_player_id  VARCHAR(150),
+mfl_player_id  VARCHAR(150),
+sleeper_player_id  VARCHAR(150),
+player_position  VARCHAR(150),
+rank_type VARCHAR(150),
+one_qb_overall_rank  VARCHAR(150),
+one_qb_position_rank  VARCHAR(150),
+one_qb_value integer,
+one_qb_trend_30_day integer,
+sf_overall_rank  VARCHAR(150),
+sf_position_rank  VARCHAR(150),
+sf_value integer,
+sf_trend_30_day integer,
+insert_date  VARCHAR(150),
+PRIMARY KEY (player_full_name, rank_type)
+);
+
+
 CREATE TABLE IF NOT EXISTS dynastr.draft_positions (
     season VARCHAR(75),
     rounds VARCHAR(75),
