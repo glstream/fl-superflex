@@ -81,6 +81,17 @@
                         <a class="text-left align-left"
                             href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
                             target="_blank">{{c.full_name}}</a>
+                        {% elif source == 'fc' %}
+                        <a href="https://fantasycalc.com/players/{{c.full_name}}-{{c.hyper_link}}" target="_blank">
+                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                                <img class="avatar-player"
+                                    href="https://fantasycalc.com/players/{{c.full_name}}-{{c.player_id}}"
+                                    src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+                            </object>
+                        </a>
+                        <a class="text-left align-left"
+                            href="https://fantasycalc.com/players/{{c.full_name}}-{{c.hyper_link}}"
+                            target="_blank">{{c.full_name}}</a>
                         {% elif source == 'espn' %}
                         <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
                             <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">

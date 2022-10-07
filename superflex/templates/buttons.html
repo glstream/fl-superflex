@@ -1,5 +1,5 @@
-{% macro buttons_large(session_id, user_id, league_id, ktc_button='', fp_button='', dp_button='', espn_button='',
-nfl_button='',fp_c_button='', tt_button='') %}
+{% macro buttons_large(session_id, user_id, league_id, ktc_button='', fp_button='', dp_button='', fc_button='',
+espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_tt_button='') %}
 <form method="post" class="form-inline">
     <div class="btn-group flex-wrap">
         <div class="dropdown">
@@ -14,6 +14,8 @@ nfl_button='',fp_c_button='', tt_button='') %}
                     value="{{session_id, user_id, league_id}}" {{fp_button}}>Fantasy Pros</button>
                 <button class="dropdown-item" type="submit" name="get_league_dp"
                     value="{{session_id, user_id, league_id}}" {{dp_button}}>Dynasty Process</button>
+                <button class="dropdown-item" type="submit" name="get_league_fc"
+                    value="{{session_id, user_id, league_id}}" {{fc_button}}>Fantasy Calc</button>
 
             </div>
         </div>
@@ -31,6 +33,8 @@ nfl_button='',fp_c_button='', tt_button='') %}
                 <button class="dropdown-item" type="submit" name="fp_contender_rankings"
                     value="{{session_id, user_id, league_id}}" {{fp_c_button}}>Fantasy Pros
                     Projections</button>
+                <button class="dropdown-item" type="submit" name="fc_contender_rankings"
+                    value="{{session_id, user_id, league_id}}" {{fc_c_button}}>Fantasy Calc</button>
             </div>
         </div>
         <div class="dropdown">
@@ -42,6 +46,8 @@ nfl_button='',fp_c_button='', tt_button='') %}
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <button class="dropdown-item" type="submit" name="trade_tracker"
                         value="{{session_id, user_id, league_id}}" {{tt_button}}>KTC Rankings</button>
+                    <button class="dropdown-item" type="submit" name="trade_tracker_fc"
+                        value="{{session_id, user_id, league_id}}" {{fc_tt_button}}>Fantasy Calc</button>
                 </div>
         </div>
     </div>
