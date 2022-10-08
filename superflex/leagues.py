@@ -3,7 +3,6 @@ import psycopg2
 from psycopg2.extras import execute_batch, execute_values
 from pathlib import Path
 
-
 from flask import (
     Blueprint,
     flash,
@@ -20,13 +19,11 @@ from superflex.db import get_db, pg_db
 bp = Blueprint("leagues", __name__, url_prefix="/")
 bp.secret_key = "hello"
 
-
 def n_user_id(user_name: str) -> str:
     user_url = f"https://api.sleeper.app/v1/user/{user_name}"
     un_res = requests.get(user_url)
     user_id = un_res.json()["user_id"]
     return user_id
-
 
 def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
     owner_id = n_user_id(user_name)
@@ -63,7 +60,6 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
         )
     return leagues
 
-
 def league_managers(league_id: str, user_id: str) -> list:
     managers = []
     for i in user_leagues(user_id):
@@ -76,12 +72,10 @@ def league_managers(league_id: str, user_id: str) -> list:
                 managers.append(a1)
     return managers
 
-
 def get_user_name(user_id: str):
     user_req = requests.get(f"https://api.sleeper.app/v1/user/{user_id}")
     user_meta = user_req.json()
     return (user_meta["username"], user_meta["display_name"])
-
 
 def get_user_id(user_name: str) -> str:
     user_id_req = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
@@ -92,21 +86,12 @@ def get_league_name(league_id: str) -> str:
     league_req = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
     return league_req.json()["name"]
 
-
-def get_league_names(user_id, year: str = "2022"):
-    leagues_res = requests.get(
-        f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{year}"
-    )
-    return [(i["name"], i["league_id"]) for i in leagues_res.json()]
-
-
 def get_users_data(league_id):
     users_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/users")
     return [
         (user_meta["display_name"], user_meta["user_id"], user_meta["avatar"])
         for user_meta in users_res.json()
     ]
-
 
 def get_league_type(league_id: str):
     league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
@@ -116,26 +101,13 @@ def get_league_type(league_id: str):
         else "one_qb_value"
     )
 
-
 def get_league_rosters_size(league_id: str) -> int:
     league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
     return league_res.json()["total_rosters"]
 
-
-def delete_players(session_id, league_id, user_id):
-    db = get_db()
-    query = f"""
-    DELETE from owned_players where session_id = '{str(session_id)}' and owner_user_id = '{str(user_id)}' and owner_league_id = '{str(league_id)}'
-    """
-    db.execute(query)
-    db.commit()
-    print(f"DELETE CALLED:{session_id,user_id,league_id}")
-
-
 def get_league_rosters(league_id: str) -> list:
     rosters = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
     return rosters.json()
-
 
 def get_traded_picks(league_id: str) -> list:
     total_res = requests.get(
@@ -143,11 +115,9 @@ def get_traded_picks(league_id: str) -> list:
     )
     return total_res.json()
 
-
 def get_full_league(league_id: str):
     l_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
     return l_res.json()
-
 
 def get_draft_id(league_id: str) -> str:
     draft = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/drafts")
@@ -166,9 +136,7 @@ def get_managers(league_id: str) -> list:
         ["sleeper", i["user_id"], league_id, i["avatar"], i["display_name"]]
         for i in res.json()
     ]
-
     return manager_data
-
 
 def clean_league_managers(db, league_id: str):
     delete_query = f"""DELETE FROM dynastr.managers where league_id = '{league_id}' """
@@ -178,7 +146,6 @@ def clean_league_managers(db, league_id: str):
     cursor.close()
     print("Managers deleted.")
     return
-
 
 def insert_managers(db, managers: list):
     with db.cursor() as cursor:
@@ -200,18 +167,15 @@ def insert_managers(db, managers: list):
         )
     return
 
-
 def is_user(user_name: str) -> bool:
     res = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
     return True if res.text != "null" else False
-
 
 def round_suffix(rank: int) -> str:
     ith = {1: "st", 2: "nd", 3: "rd"}.get(
         rank % 10 * (rank % 100 not in [11, 12, 13]), "th"
     )
     return f"{str(rank)}{ith}"
-
 
 def clean_league_rosters(db, session_id: str, user_id: str, league_id: str):
     delete_query = f"""DELETE FROM dynastr.league_players where session_id = '{session_id}' and league_id = '{league_id}' """
@@ -244,7 +208,6 @@ def clean_draft_trades(db, league_id: str) -> None:
     print("Draft Picks Trades deleted")
     return
 
-
 def clean_league_picks(db, league_id: str) -> None:
     delete_query = (
         f"""DELETE FROM dynastr.player_trades where league_id = '{league_id}'"""
@@ -255,10 +218,8 @@ def clean_league_picks(db, league_id: str) -> None:
     print("Draft pick trades deleted")
     return
 
-
 def get_sleeper_state():
     return requests.get("https://api.sleeper.app/v1/state/nfl").json()
-
 
 def get_trades(league_id: str, nfl_state: dict) -> list:
 
@@ -276,7 +237,6 @@ def get_trades(league_id: str, nfl_state: dict) -> list:
     trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
     return trades_payload
 
-
 def dedupe(lst):
     dup_free_set = set()
     for x in lst:
@@ -284,7 +244,6 @@ def dedupe(lst):
         if t not in dup_free_set:
             dup_free_set.add(t)
     return list(dup_free_set)
-
 
 def insert_trades(db, trades: dict, league_id: str) -> None:
     player_adds_db = []
@@ -533,7 +492,6 @@ def total_owned_picks(
 
     return
 
-
 def clean_draft_positions(db, league_id: str):
     delete_query = (
         f"""DELETE FROM dynastr.draft_positions where league_id = '{league_id}'"""
@@ -618,7 +576,6 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     cursor.close()
     return
 
-
 def insert_current_leagues(
     db, session_id: str, user_id: str, user_name: str, entry_time: str, leagues: list
 ) -> None:
@@ -679,7 +636,6 @@ def insert_current_leagues(
     cursor.close()
     return
 
-
 def player_manager_upates(
     db, button: str, session_id: str, user_id: str, league_id: str
 ):
@@ -726,7 +682,6 @@ def player_manager_upates(
                     error_message="Issue processing this league please contact @superlfex_app for support.",
                 )
             )
-
 
 def render_players(players: list, rank_type: str):
     starting_qbs = [
@@ -808,7 +763,6 @@ def render_players(players: list, rank_type: str):
 
     return team_spots
 
-
 league_ids = []
 league_metas = []
 players = []
@@ -817,7 +771,6 @@ current_year = datetime.now().strftime("%Y")
 @bp.route("/faqs", methods=["GET"])
 def faqs():
     return render_template("leagues/faqs.html")
-
 
 @bp.route("/", methods=("GET", "POST"))
 def index():
@@ -861,7 +814,6 @@ def index():
 
     return render_template("leagues/index.html")
 
-
 @bp.route("/select_league", methods=["GET", "POST"])
 def select_league():
     db = pg_db()
@@ -875,7 +827,6 @@ def select_league():
 
         if request.method == "POST":
             button = list(request.form)[0]
-            print(button)
             league_data = eval(request.form[button])
             session_id = league_data[0]
             user_id = league_data[1]
@@ -903,7 +854,6 @@ def select_league():
         return render_template("leagues/select_league.html", leagues=leagues)
     else:
         return redirect(url_for("leagues.index"))
-
 
 @bp.route("/get_league_fp", methods=("GET", "POST"))
 def get_league_fp():
@@ -1060,7 +1010,6 @@ def get_league_fp():
             avatar=avatar,
         )
 
-
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
@@ -1212,7 +1161,6 @@ def get_league():
         )
     else:
         return redirect(url_for("leagues.index"))
-
 
 @bp.route("/get_league_fc", methods=("GET", "POST"))
 def get_league_fc():
@@ -1367,7 +1315,6 @@ def get_league_fc():
     else:
         return redirect(url_for("leagues.index"))
 
-
 @bp.route("/get_league_dp", methods=("GET", "POST"))
 def get_league_dp():
     db = pg_db()
@@ -1521,7 +1468,6 @@ def get_league_dp():
     else:
         return redirect(url_for("leagues.index"))
 
-
 @bp.route("/trade_tracker", methods=["GET", "POST"])
 def trade_tracker():
     db = pg_db()
@@ -1621,7 +1567,6 @@ def trade_tracker():
             league_name=get_league_name(league_id),
         )
 
-
 @bp.route("/trade_tracker_fc", methods=["GET", "POST"])
 def trade_tracker_fc():
     db = pg_db()
@@ -1718,7 +1663,6 @@ def trade_tracker_fc():
             update_diff_minutes=update_diff_minutes,
             league_name=get_league_name(league_id),
         )
-
 
 @bp.route("/contender_rankings", methods=["GET", "POST"])
 def contender_rankings():
@@ -1869,7 +1813,6 @@ def contender_rankings():
         )
     else:
         return redirect(url_for("leagues.index"))
-
 
 @bp.route("/contender_rankings_fc", methods=["GET", "POST"])
 def fc_contender_rankings():
@@ -2025,7 +1968,6 @@ def fc_contender_rankings():
     else:
         return redirect(url_for("leagues.index"))
 
-
 @bp.route("/contender_rankings_nfl", methods=["GET", "POST"])
 def nfl_contender_rankings():
     db = pg_db()
@@ -2177,7 +2119,6 @@ def nfl_contender_rankings():
         )
     else:
         return redirect(url_for("leagues.index"))
-
 
 @bp.route("/contender_rankings_fp", methods=["GET", "POST"])
 def fp_contender_rankings():
