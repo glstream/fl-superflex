@@ -248,5 +248,5 @@ WITH base_players as (SELECT
                     LEFT JOIN dynastr.fc_player_ranks fc on tp.player_full_name = fc.player_full_name
                     inner join dynastr.managers m on tp.user_id = m.user_id 
                     where 1=1
-                    and fc.rank_type = 'dynasty'
+                    and fc.rank_type = 'redraft'
                     order by pick_year, m.display_name, player_value desc, tp.player_full_name	asc		
