@@ -1015,6 +1015,7 @@ def get_league_fp():
         users = get_users_data(league_id)
 
         total_rosters = get_league_rosters_size(league_id)
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
         fp_owners_cursor.close()
         fp_cursor.close()
@@ -1166,6 +1167,8 @@ def get_league():
         total_rosters = int(get_league_rosters_size(league_id))
 
         team_spots = render_players(players, "power")
+
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
         owner_cursor.close()
         player_cursor.close()
@@ -1321,6 +1324,8 @@ def get_league_fc():
 
         team_spots = render_players(players, "power")
 
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+
         owner_cursor.close()
         player_cursor.close()
         ktc_ba_cursor.close()
@@ -1474,6 +1479,8 @@ def get_league_dp():
         users = get_users_data(league_id)
 
         total_rosters = get_league_rosters_size(league_id)
+
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
         owner_cursor.close()
         player_cursor.close()
@@ -1825,6 +1832,8 @@ def contender_rankings():
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+
         contenders_cursor.close()
         c_owners_cursor.close()
         date_cursor.close()
@@ -1980,6 +1989,8 @@ def fc_contender_rankings():
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+
         fc_contenders_cursor.close()
         fc_owners_cursor.close()
         date_cursor.close()
@@ -2132,6 +2143,8 @@ def nfl_contender_rankings():
 
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
+
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
         nfl_contenders_cursor.close()
         nfl_owners_cursor.close()
@@ -2287,6 +2300,8 @@ def fp_contender_rankings():
 
         nfl_current_week = get_sleeper_state()["leg"]
         total_rosters = get_league_rosters_size(league_id)
+
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
         fp_contenders_cursor.close()
         fp_owners_cursor.close()

@@ -29,31 +29,32 @@
     <div class="col-auto" style="margin-top: 90px;">
         <canvas id="myChart" width="300" height="300"></canvas>
         <script>
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const myChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
-                    datasets: [{
-                        label: '{{page_user[0][0]}}',
-                        data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
-                        backgroundColor: 'rgb(39, 125, 161,.7)',
-                        borderColor: 'rgb(249, 199, 79, 0.7)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    plugins: {
-                        tooltip: {
-                            bodyColor: '#F9C74F'
-                        }
+            try {
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
+                        datasets: [{
+                            label: '{{page_user[0][0]}}',
+                            data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
+                            backgroundColor: 'rgb(39, 125, 161,.7)',
+                            borderColor: 'rgb(249, 199, 79, 0.7)',
+                            borderWidth: 2
+                        }]
                     },
+                    options: {
+                        plugins: {
+                            tooltip: {
+                                bodyColor: '#F9C74F'
+                            }
+                        },
 
-                    scales: {
+                        scales: {
 
-                        r: {
-                            reverse: true,
-                            max: {{ total_rosters }},
+                            r: {
+                                reverse: true,
+                                max: {{ total_rosters }},
             min: 1,
                 beginAtZero: false,
 
@@ -75,6 +76,9 @@
         
                         }
                     });
+            } catch (e) {
+
+            }
         </script>
     </div>
     {{ba(best_available)}}
