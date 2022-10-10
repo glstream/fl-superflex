@@ -95,11 +95,15 @@ def get_users_data(league_id):
 
 def get_league_type(league_id: str):
     league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
-    return (
+    try:
+        return (
         "sf_value"
         if "SUPER_FLEX" in league_res.json()["roster_positions"]
         else "one_qb_value"
     )
+    except:
+        return "sf_value"
+    
 
 def get_league_rosters_size(league_id: str) -> int:
     league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
@@ -814,7 +818,7 @@ def index():
 
     return render_template("leagues/index.html")
 
-@bp.route("/select_league", methods=["GET", "POST"])
+@bp.route("/select_league", methods=["GET", "POST"])``
 def select_league():
     db = pg_db()
 
