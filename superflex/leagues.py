@@ -1969,7 +1969,6 @@ def fc_contender_rankings():
             "WR": con_ba_wr,
             "TE": con_ba_te,
         }
-        print(con_ba)
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
