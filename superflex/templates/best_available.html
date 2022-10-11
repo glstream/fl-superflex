@@ -13,7 +13,7 @@
     {% for p in player %}
     <div style="display: flex; justify-content: space-between;">
         <span class="pb-2">{{p.full_name}}</span>
-        <span><b>{{"{:,}".format(p.player_value) }}</b></span>
+        <span><b>{{"{:,}".format(p.player_value) | default('', True)}}</b></span>
     </div>
     {%endfor%}
     {%endfor%}

@@ -2,7 +2,7 @@ SELECT
 ba_t1.player_id as sleeper_id
 , ba_t1.full_name
 , ba_t1.player_position
-, ba_t1.player_value
+, coalesce(ba_t1.player_value,0) as player_value
 from (SELECT
 pl.player_id
 ,pl.full_name
