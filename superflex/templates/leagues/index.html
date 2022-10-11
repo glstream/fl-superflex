@@ -26,7 +26,7 @@
                                         combines them into one
                                         all up league view to help you rank and value your teams.</p>
                                     <br>
-                                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Enter Sleeper Username
+                                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Enter Username
                                     </h5>
 
                                     <div class="form-outline mb-4">
@@ -35,11 +35,19 @@
                                             value="{{ user_name[1] if user_name else request.form['username'] }}"
                                             placeholder="{{user_name[1] if user_name else 'Username...'}}" />
                                     </div>
-                                    <div class="pt-1 mb-1">
-                                        <button type="submit" class="btn btn-primary" data-toggle="submit"
-                                            aria-pressed="false" autocomplete="off">Submit</button>
+                                    <div class="btn-group" role="group">
+                                        <button id="btnGroupDrop1" type="button"
+                                            class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                            Submit
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                            <button class="dropdown-item" type="submit" data-toggle="submit"
+                                                aria-pressed="false" autocomplete="off">Sleeper</button>
+                                            <button class="dropdown-item" href="" disabled="">MFL</button>
+                                            <button class="dropdown-item" href="" disabled>Fleaflicker</button>
+                                        </div>
                                     </div>
-
                                     <br><span style="color: #de2121;">{{error_message}}</span><br>
                                 </form>
                                 <form method="post">
