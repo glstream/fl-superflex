@@ -4,7 +4,7 @@
 {% from 'ranks.html' import contender_status_ranks %}
 {% from 'best_available.html' import ba %}
 {% from 'header_page.html' import league_header %}
-{% from 'player_cards.html' import player_cards %}
+{% from 'player_cards.html' import player_contender_cards %}
 {% from 'table_footer.html' import table_footer %}
 <script>
     $(document).ready(function () {
@@ -87,6 +87,6 @@
 
 <br>
 <div class="row justify-content-center">
-    {{ player_cards(owners, users, aps, 'espn') }}
+    {{ player_contender_cards(owners, users, aps, 'espn') }}
 </div>
 {% endblock %}
