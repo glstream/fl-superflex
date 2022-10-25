@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 {% from 'buttons.html' import buttons_large %}
 {% from 'tables.html' import contender_ranks %}
-{% from 'ranks.html' import ranks %}
+{% from 'ranks.html' import contender_status_ranks %}
 {% from 'best_available.html' import ba %}
 {% from 'header_page.html' import league_header %}
 {% from 'player_cards.html' import player_cards %}
@@ -15,7 +15,7 @@
 {{league_header(league_name, avatar)}}
 <br>
 <div class="row justify-content-center">
-    {{ranks(owners, pct_values, 'Contender Rankings')}}
+    {{contender_status_ranks(owners, pct_values, 'Contender Rankings')}}
     <div class="col-auto" style="width: 65em;">
         {{buttons_large(session_id, user_id, league_id,espn_button='disabled')}}
         <br>

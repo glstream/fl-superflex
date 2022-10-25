@@ -1,4 +1,4 @@
-{% macro power_ranks(owners) %}
+{% macro power_ranks(owners, user_id, league_id, session_id, view_source) %}
 <table class="table rounded table-hover" style="width:95%">
     <thead style="text-align:center">
         <tr>
@@ -15,7 +15,12 @@
     </thead>
     <tbody>
         {% for owner in owners %}
-        <td style="text-align:center">{{owner.display_name}}</td>
+
+        <td style="text-align:center"> <a
+                style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px"
+                href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
+        </td>
+
         <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" data-html="true"
             title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
             {{owner.total_rank | suffix}}

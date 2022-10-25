@@ -62,9 +62,7 @@
 
 
     <div class="container-fluid">
-        {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
-        {% endfor %} {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
     </div>
 </body>
 <div class="container-fluid">

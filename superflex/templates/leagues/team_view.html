@@ -1,0 +1,283 @@
+{% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+{% from 'player_cards.html' import player_cards %}
+{% from 'header_page.html' import league_header %}
+{% from 'buttons.html' import buttons_large %}
+<div class="row justify-content-center">
+    {{league_header(league_name, avatar)}}
+
+    {% for league in leagues %}
+    <h5>
+        {% if league.league_cat == 0 %}
+        <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>
+        {% endif %}
+        {% if league.league_cat == 1 %}
+        <span class="badge alert-light">{{league.league_cat | league_cat}}</span>
+        {% endif %}
+        {% if league.league_cat == 2 %}
+        <span class="badge alert-success">{{league.league_cat | league_cat}}</span>
+        {% endif %}
+        {% if league.total_rosters < 12 %} <span class="badge alert-success">{{league.total_rosters}}
+            Team
+            </span>
+            {% endif %}
+            {% if league.total_rosters == 12 %}
+            <span class="badge alert-danger">{{league.total_rosters}} Team</span>
+            {% endif %}
+            {% if league.total_rosters > 12 %}
+            <span class="badge alert-light">{{league.total_rosters}} Team</span>
+            {% endif %}
+            {% if league.qb_cnt + league.sf_cnt > 1 %}
+            <span class="badge alert-secondary">Superflex</span>
+            {% else %}
+            <span class="badge alert-primary">Single QB</span>
+            {% endif %}
+
+            <span class="badge bg-warning">{{league.starter_cnt}} Starters</span>
+    </h5>
+    {% endfor %}
+    <div style="display: inline-block;">
+        <h3>User &bull; {{user_name}} &bull; <small class="text-muted">{{rankings_source}}</small>
+        </h3>
+    </div>
+
+    {{buttons_large(session_id, user_id, league_id,ktc_button='')}}
+</div>
+<div class="row justify-content-center">
+    <canvas id="myChart" width="550" height="300"></canvas>
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        var qb_data = {{ qb_scatter | tojson }}
+        var rb_data = {{ rb_scatter | tojson }}
+        var wr_data = {{ wr_scatter | tojson }}
+        var te_data = {{ te_scatter | tojson }}
+        let data = {
+            datasets: [{
+                label: 'QBs',
+                data: qb_data,
+                backgroundColor: 'rgb(249, 65, 68, 0.7)'
+            }, {
+                label: 'RBs',
+                data: rb_data,
+                backgroundColor: 'rgb(77, 144, 142, 0.7)'
+            }, {
+                label: 'WRs',
+                data: wr_data,
+                backgroundColor: 'rgb(144, 190, 109, 0.7)'
+            },
+            {
+                label: 'TEs',
+                data: te_data,
+                backgroundColor: 'rgb(248, 150, 30, 0.7)'
+            }],
+        }
+        const myChart1 = new Chart(ctx, {
+            type: 'scatter',
+            data: data,
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Age Vs Value'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                return `${context.raw.player_name} Age: ${context.raw.x} Value: ${context.raw.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 12000
+                    },
+                    x: {
+                        min: 20,
+                        max: 45
+                    }
+                }
+            },
+
+        });
+    </script>
+
+</div>
+<div>
+    <div class="row justify-content-center">
+        <table class="table rounded table-hover" style="width:75%">
+            <thead style="text-align:center">
+                <tr>
+                    <th></th>
+                    <th>Qbs</th>
+                    <th>RBs</th>
+                    <th>WRs</th>
+                    <th>TEs</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for owner in owners %}
+                <td style="text-align:center;">{{owner.display_name}}</td>
+                <td style="text-align:center">{{owner.qb_count}}</td>
+                <td style="text-align:center">{{owner.rb_count}}</td>
+                <td style="text-align:center">{{owner.wr_count}}</td>
+                <td style="text-align:center">{{owner.te_count}}</td>
+                </tr>
+            </tbody>
+            {%endfor%}
+        </table>
+
+    </div>
+</div>
+<div>
+    {% for pos, pos_players in position_players.items() if pos != 'picks' %}
+    <div class="row justify-content-center">
+        {% if pos == 'qb' %}
+        <canvas id="bar-chart-qb" width="450" height="300"></canvas>
+        <script>
+            // Bar chart
+            new Chart(document.getElementById("bar-chart-qb"), {
+                type: 'bar',
+                data: {
+                    labels: {{ qb_graph['qb_names']| tojson }},
+                datasets: [
+                {
+                    label: "Qbs",
+                    backgroundColor: 'rgb(249, 65, 68, 0.7)',
+                    data: {{ qb_graph['qb_values']| tojson }}
+            }
+            ]
+            },
+                options: {
+                responsive: false,
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: ''
+                }
+            }
+        });
+
+        </script>
+        {% endif %}
+        {% if pos == 'rb' %}
+        <canvas id="bar-chart-rb" width="450" height="300"></canvas>
+        <script>
+            // Bar chart
+            new Chart(document.getElementById("bar-chart-rb"), {
+                type: 'bar',
+                data: {
+                    labels: {{ rb_graph['rb_names']| tojson }},
+                datasets: [
+                {
+                    label: "RBs",
+                    backgroundColor: 'rgb(77, 144, 142, 0.7)',
+                    data: {{ rb_graph['rb_values']| tojson }}
+            }
+            ]
+            },
+                options: {
+                responsive: false,
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Predicted world population (millions) in 2050'
+                }
+            }
+        });
+
+        </script>
+        {% endif %}
+        {% if pos == 'wr' %}
+        <canvas id="bar-chart-wr" width="450" height="300"></canvas>
+        <script>
+            // Bar chart
+            new Chart(document.getElementById("bar-chart-wr"), {
+                type: 'bar',
+                data: {
+                    labels: {{ wr_graph['wr_names']| tojson }},
+                datasets: [
+                {
+                    label: "WRs",
+                    backgroundColor: 'rgb(144, 190, 109, 0.7)',
+                    data: {{ wr_graph['wr_values']| tojson }}
+            }
+            ]
+            },
+                options: {
+                responsive: false,
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Predicted world population (millions) in 2050'
+                }
+            }
+        });
+
+        </script>
+        {% endif %}
+        {% if pos == 'te' %}
+        <canvas id="bar-chart-te" width="450" height="300"></canvas>
+        <script>
+            // Bar chart
+            new Chart(document.getElementById("bar-chart-te"), {
+                type: 'bar',
+                data: {
+                    labels: {{ te_graph['te_names']| tojson }},
+                datasets: [
+                {
+                    label: "TEs",
+                    backgroundColor: 'rgb(248, 150, 30, 0.7)',
+                    data: {{ te_graph['te_values']| tojson }}
+            }
+            ]
+            },
+                options: {
+                responsive: false,
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Predicted world population (millions) in 2050'
+                }
+            }
+        });
+
+        </script>
+        {% endif %}
+        <div class="row justify-content-center" style="width:65em;">
+            <table class="table rounded table-hover" style="width:95%">
+                <thead style="text-align:center">
+                    <tr>
+                        <th>Player</th>
+                        <th>Value</th>
+                        <th>Age</th>
+                        <th>Rank</th>
+                        <th>POS Rank</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in pos_players %}
+                    <td style="text-align:center">{{player.full_name}}</td>
+                    <td style="text-align:center" class="over-limit-{{player.val_tile}}">{{player.player_value}}</td>
+                    <td style="text-align:center" class="over-limit-{{player.age_tile | age_adjust }}">{{player.age}}
+                    </td>
+                    <td style="text-align:center">{{player.rank}}</td>
+                    <td style="text-align:center">{{player.positional_rank}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+
+
+        {% endfor %}
+    </div>
+</div>
+{%endblock%}
