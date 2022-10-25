@@ -3,7 +3,10 @@
 {% from 'header_page.html' import league_header %}
 {% from 'buttons.html' import buttons_large %}
 <div class="row justify-content-center">
-    {{league_header(league_name, avatar)}}
+
+    <h3><small class="text-muted">Team Views</small></h3> {{league_header(league_name, avatar)}}
+
+
 
     {% for league in leagues %}
     <h5>
@@ -95,7 +98,7 @@
                 scales: {
                     y: {
                         min: 0,
-                        max: 12000
+                        max: 10199
                     },
                     x: {
                         min: 20,
