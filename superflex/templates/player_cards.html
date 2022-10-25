@@ -1,16 +1,21 @@
-{% macro player_cards(owners, users, aps, source) %}
+{% macro player_cards(owners, users, aps, league_id, session_id, source, view_source) %}
 
 {% for owner in owners %}
 <div class="col-auto">
     {% for user in users %}
     {% if user[1] == owner.user_id %}
-    <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
-        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-    </object>
+    <a
+        href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">
+        <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
+            <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+        </object>
+    </a>
     <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
-        {{owner.display_name}}
+        <a
+            href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
         &bull;
-        {{"{:,}".format(owner.total_value)}}</h5>
+        {{"{:,}".format(owner.total_value)}}
+    </h5>
     {% endif %}
     {%endfor%}
     <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"

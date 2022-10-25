@@ -181,6 +181,21 @@ td {
     color: white !important;
     border: 2px solid white !important;
     background-clip: padding-box !important;
+    text-align: center !important;
+}
+
+td.tv {
+    border-radius: .5em !important;
+    background-color: rgb(39, 125, 161, .7) !important;
+    color: white !important;
+    border: 2px solid white !important;
+    background-clip: padding-box !important;
+}
+
+td.over-limit-0 {
+    background-color: rgb(68, 184, 73, .69) !important;
+    text-align: center !important;
+    color: white !important;
 }
 
 td.over-limit-1 {

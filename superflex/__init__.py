@@ -70,6 +70,10 @@ def create_app(test_config=None):
         except:
             return "Redraft"
 
+    @app.template_filter("age_adjust")
+    def age_adjust(age_tile: int) -> int:
+        return age_tile if age_tile < 11 else 10
+
     @app.route("/favicon.ico")
     def favicon():
         return send_from_directory(

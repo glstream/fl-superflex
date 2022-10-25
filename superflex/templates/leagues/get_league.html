@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 {% from 'buttons.html' import buttons_large %}
 {% from 'tables.html' import power_ranks %}
-{% from 'ranks.html' import ranks %}
+{% from 'ranks.html' import power_status_ranks %}
 {% from 'best_available.html' import ba %}
 {% from 'header_page.html' import league_header %}
 {% from 'player_cards.html' import player_cards %}
@@ -15,12 +15,12 @@
 {{league_header(league_name, avatar)}}
 <br>
 <div class="row justify-content-center">
-    {{ranks(owners, pct_values, 'Power Rankings')}}
+    {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id, session_id,'get_league_ktc')}}
     <div class="col-auto" style="width: 65em;">
-        {{buttons_large(session_id, user_id, league_id,ktc_button='disabled')}}
+        {{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
         <br>
         <div class="col-auto" style="width:65em; margin-right: 50px;">
-            {{power_ranks(owners)}}
+            {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
             <br>
             {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
         </div>
@@ -91,6 +91,6 @@
 
 <br>
 <div class="row justify-content-center">
-    {{ player_cards(owners, users, aps, 'ktc') }}
+    {{ player_cards(owners, users, aps, league_id, session_id, 'ktc', 'get_league_ktc') }}
 </div>
 {% endblock %}

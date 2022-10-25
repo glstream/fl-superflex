@@ -797,7 +797,192 @@ league_ids = []
 league_metas = []
 players = []
 current_year = datetime.now().strftime("%Y")
+
 # START ROUTES
+@bp.route(
+    "/team_view/<string:view_source>/<string:session_id>/<string:league_id>/<string:user_id>/",
+    methods=["GET", "POST"],
+)
+def team_view(user_id, league_id, session_id, view_source):
+    db = pg_db()
+    if request.method == "POST":
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+            )
+        )
+    source_mapping = {
+        "get_league_ktc": {"table":"get_league_ktc", "max":12000, "rankings":"KeepTradeCut"},
+        "get_league_fc": {"table":"get_league_fc", "max":12000, "rankings":"FantasyCalc"},
+        "get_league_dp": {"table":"get_league_dp", "max":12000, "rankings":"DynastyProcess"},
+    }
+    sql_view_table = source_mapping[view_source]["table"]
+    rankings_source = source_mapping[view_source]["rankings"]
+
+    league_type = get_league_type(league_id)
+
+    if sql_view_table == "get_league_ktc":
+        positional_type = (
+            "sf_positional_rank" if league_type == "sf_value" else "positional_rank"
+        )
+        total_rank_type = "sf_rank" if league_type == "sf_value" else "rank"
+        league_type = league_type
+
+    elif sql_view_table == "get_league_fc":
+        positional_type = (
+            "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
+        )
+        total_rank_type = (
+            "sf_overall_rank" if league_type == "sf_value" else "one_qb_overall_rank"
+        )
+        league_type = league_type
+
+    elif sql_view_table == "get_league_dp":
+        positional_type = ""
+        total_rank_type = (
+            "sf_rank_ecr" if league_type == "sf_value" else "one_qb_rank_ecr"
+        )
+        league_type = league_type
+
+    cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "team_views" / f"{sql_view_table}.sql", "r"
+    ) as sql_file:
+        sql = (
+            sql_file.read()
+            .replace("'session_id'", f"'{session_id}'")
+            .replace("'league_id'", f"'{league_id}'")
+            .replace("'user_id'", f"'{user_id}'")
+            .replace("sf_value", f"{league_type}")
+            .replace("sf_positional_rank", f"{positional_type}")
+            .replace("sf_rank ", f"{total_rank_type}")
+            .replace("sf_position_rank", f"{positional_type}")
+            .replace("sf_rank_ecr", f"{total_rank_type}")
+        )
+    cursor.execute(sql)
+    players = cursor.fetchall()
+
+    position_players = {
+        "qb": [i for i in players if i["player_position"] == "QB"],
+        "rb": [i for i in players if i["player_position"] == "RB"],
+        "wr": [i for i in players if i["player_position"] == "WR"],
+        "te": [i for i in players if i["player_position"] == "TE"],
+        "picks": [i for i in players if i["player_position"] == "PICKS"],
+    }
+
+    qb_graph = {
+        "qb_names": [qb["full_name"] for qb in position_players["qb"]],
+        "qb_values": [qb["player_value"] for qb in position_players["qb"]],
+    }
+    rb_graph = {
+        "rb_names": [rb["full_name"] for rb in position_players["rb"]],
+        "rb_values": [rb["player_value"] for rb in position_players["rb"]],
+    }
+    wr_graph = {
+        "wr_names": [wr["full_name"] for wr in position_players["wr"]],
+        "wr_values": [wr["player_value"] for wr in position_players["wr"]],
+    }
+    te_graph = {
+        "te_names": [te["full_name"] for te in position_players["te"]],
+        "te_values": [te["player_value"] for te in position_players["te"]],
+    }
+
+    ap_players = render_players(players, "power")
+
+    owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "team_views" / "get_league_ktc_summary.sql",
+        "r",
+    ) as sql_file:
+        sql = (
+            sql_file.read()
+            .replace("'session_id'", f"'{session_id}'")
+            .replace("'league_id'", f"'{league_id}'")
+            .replace("'user_id'", f"'{user_id}'")
+            .replace("league_type", f"{league_type}")
+        )
+    owner_cursor.execute(sql)
+    owner = owner_cursor.fetchall()
+
+    qbs = [player for player in players if player["player_position"] == "QB"]
+    rbs = [player for player in players if player["player_position"] == "RB"]
+    wrs = [player for player in players if player["player_position"] == "WR"]
+    tes = [player for player in players if player["player_position"] == "TE"]
+
+    qb_scatter = []
+    rb_scatter = []
+    wr_scatter = []
+    te_scatter = []
+
+    for i in qbs:
+        qb_scatter.append(
+            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+        )
+    for i in rbs:
+        rb_scatter.append(
+            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+        )
+    for i in wrs:
+        wr_scatter.append(
+            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+        )
+    for i in tes:
+        te_scatter.append(
+            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+        )
+
+    league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    league_cursor.execute(
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+    )
+    leagues = league_cursor.fetchall()
+
+    avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    avatar_cursor.execute(
+        f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+    )
+    avatar = avatar_cursor.fetchall()
+    print(avatar)
+
+    league_cursor.close()
+    cursor.close()
+    avatar_cursor.close()
+
+    return render_template(
+        "leagues/team_view.html",
+        user_id=user_id,
+        league_id=league_id,
+        session_id=session_id,
+        view_source=view_source,
+        owners=owner,
+        leagues=leagues,
+        league_name=get_league_name(league_id),
+        user_name=get_user_name(user_id)[1],
+        rankings_source=rankings_source,
+        position_players=position_players,
+        players=players,
+        avatar=avatar,
+        qb_graph=qb_graph,
+        rb_graph=rb_graph,
+        wr_graph=wr_graph,
+        te_graph=te_graph,
+        ap_players=ap_players,
+        qb_scatter=qb_scatter,
+        rb_scatter=rb_scatter,
+        wr_scatter=wr_scatter,
+        te_scatter=te_scatter,
+    )
+
+
 @bp.route("/faqs", methods=["GET"])
 def faqs():
     return render_template("leagues/faqs.html")
@@ -1008,7 +1193,7 @@ def get_league_fp():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1158,7 +1343,7 @@ def get_league():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1314,7 +1499,7 @@ def get_league_fc():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1472,7 +1657,7 @@ def get_league_dp():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1825,7 +2010,7 @@ def contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1982,7 +2167,7 @@ def fc_contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -2137,7 +2322,7 @@ def nfl_contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -2292,7 +2477,7 @@ def fp_contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
         )
         avatar = avatar_cursor.fetchall()
 
