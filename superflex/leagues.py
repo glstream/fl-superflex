@@ -27,9 +27,11 @@ def n_user_id(user_name: str) -> str:
     return user_id
 
 
-def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
+def user_leagues(user_name: str, league_year: str) -> list:
     owner_id = n_user_id(user_name)
-    leagues_url = f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{year}"
+    leagues_url = (
+        f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{league_year}"
+    )
     leagues_res = requests.get(leagues_url)
     leagues = []
     for league in leagues_res.json():
@@ -58,8 +60,10 @@ def user_leagues(user_name: str, year=datetime.now().strftime("%Y")) -> list:
                 league["sport"],
                 rec_flexes,
                 league["settings"]["type"],
+                league_year,
             )
         )
+        print(leagues)
     return leagues
 
 
@@ -609,8 +613,8 @@ def insert_current_leagues(
     cursor = db.cursor()
     execute_batch(
         cursor,
-        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
    ON CONFLICT (session_id, league_id) DO UPDATE 
   SET user_id = excluded.user_id,
   		user_name = excluded.user_name,
@@ -629,7 +633,8 @@ def insert_current_leagues(
 		sport = excluded.sport,
       	insert_date = excluded.insert_date,
         rf_cnt = excluded.rf_cnt,
-        league_cat = excluded.league_cat;
+        league_cat = excluded.league_cat,
+        league_year = excluded.league_year;
     """,
         tuple(
             [
@@ -653,6 +658,7 @@ def insert_current_leagues(
                     entry_time,
                     league[13],
                     league[14],
+                    league[15],
                 )
                 for league in iter(leagues)
             ]
@@ -821,9 +827,21 @@ def team_view(user_id, league_id, session_id, view_source):
             )
         )
     source_mapping = {
-        "get_league_ktc": {"table":"get_league_ktc", "max":12000, "rankings":"KeepTradeCut"},
-        "get_league_fc": {"table":"get_league_fc", "max":12000, "rankings":"FantasyCalc"},
-        "get_league_dp": {"table":"get_league_dp", "max":12000, "rankings":"DynastyProcess"},
+        "get_league_ktc": {
+            "table": "get_league_ktc",
+            "max": 12000,
+            "rankings": "KeepTradeCut",
+        },
+        "get_league_fc": {
+            "table": "get_league_fc",
+            "max": 12000,
+            "rankings": "FantasyCalc",
+        },
+        "get_league_dp": {
+            "table": "get_league_dp",
+            "max": 12000,
+            "rankings": "DynastyProcess",
+        },
     }
     sql_view_table = source_mapping[view_source]["table"]
     rankings_source = source_mapping[view_source]["rankings"]
@@ -1013,8 +1031,10 @@ def index():
         if is_user(request.form["username"]):
             session_id = session.get("session_id", str(uuid.uuid4()))
             user_name = request.form["username"]
+            year_ = request.form.get("league_year", "2022")
+            session["league_year"] = year_
             user_id = session["user_id"] = get_user_id(user_name)
-            leagues = user_leagues(str(user_id))
+            leagues = user_leagues(str(user_id), str(year_))
             entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
             insert_current_leagues(
@@ -1026,21 +1046,22 @@ def index():
                 error_message="Username not found. Please enter a valid sleeper username.",
             )
 
-        return redirect(url_for("leagues.select_league"))
+        return redirect(url_for("leagues.select_league", year="2022"))
 
     return render_template("leagues/index.html")
 
 
-@bp.route("/select_league", methods=["GET", "POST"])
+@bp.route("/select_league/", methods=["GET", "POST"])
 def select_league():
     db = pg_db()
 
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
     try:
-
+        print(session)
         session_id = session.get("session_id", str(uuid.uuid4()))
         user_id = session["user_id"]
+        session_year = session["league_year"]
 
         if request.method == "POST":
             button = list(request.form)[0]
@@ -1061,8 +1082,12 @@ def select_league():
         return redirect(url_for("leagues.index"))
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    print(
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
+    )
+
     cursor.execute(
-        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}'"
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
     )
     leagues = cursor.fetchall()
     cursor.close()
