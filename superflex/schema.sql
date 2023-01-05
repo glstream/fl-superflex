@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS dynastr.current_leagues (
   insert_date VARCHAR(75),
   rf_cnt integer,
   league_cat integer,
+  league_year VARCHAR(75),
   PRIMARY KEY (session_id, league_id)
 );
 
