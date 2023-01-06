@@ -1,4 +1,20 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+<div class="col-sm-3">
+    <div class="card-body">
+        {% for ls in league_summary %}
+        {% if ls.league_cat == 0 %}
+        <span class="badge alert-dark">{{ls.league_cat | league_cat}} &bull; {{ls.num_leagues}}</span>
+        {% endif %}
+        {% if ls.league_cat == 1 %}
+        <span class="badge alert-light">{{ls.league_cat | league_cat}} &bull; {{ls.num_leagues}}</span>
+        {% endif %}
+        {% if ls.league_cat == 2 %}
+        <span class="badge alert-success">{{ls.league_cat | league_cat}} &bull; {{ls.num_leagues}}</span>
+        {% endif %}
+
+        {%endfor%}
+    </div>
+</div>
 <div class="row">
     {% for league in leagues[:leagues|length] %}
 
