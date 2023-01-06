@@ -1051,7 +1051,7 @@ def index():
     return render_template("leagues/index.html")
 
 
-@bp.route("/select_league/", methods=["GET", "POST"])
+@bp.route("/select_league", methods=["GET", "POST"])
 def select_league():
     db = pg_db()
 
@@ -1082,18 +1082,35 @@ def select_league():
         return redirect(url_for("leagues.index"))
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    print(
-        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
-    )
 
     cursor.execute(
         f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
     )
+
     leagues = cursor.fetchall()
     cursor.close()
 
+    ls_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    ls_cursor.execute(
+        f"""select 
+                    league_year
+                    ,league_cat
+                    , count(*) as num_leagues
+                    from dynastr.current_leagues 
+                    where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
+                    group by 
+                    league_year
+                    ,league_cat
+                    """
+    )
+    league_summary = ls_cursor.fetchall()
+    ls_cursor.close()
+
     if len(leagues) > 0:
-        return render_template("leagues/select_league.html", leagues=leagues)
+        return render_template(
+            "leagues/select_league.html", leagues=leagues, league_summary=league_summary
+        )
     else:
         return redirect(url_for("leagues.index"))
 
