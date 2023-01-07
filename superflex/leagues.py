@@ -63,7 +63,6 @@ def user_leagues(user_name: str, league_year: str) -> list:
                 league_year,
             )
         )
-        print(leagues)
     return leagues
 
 
@@ -545,7 +544,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
         empty_team_cnt = 0
         for k, v in draft_slot.items():
             if int(k) not in list(draft["draft_order"].values()):
-                print("DRAFT_POSITION", k, "ROSTER_ID", v)
+                # print("DRAFT_POSITION", k, "ROSTER_ID", v)
                 if league[v - 1]["owner_id"] is not None:
                     draft_dict[league[v - 1]["owner_id"]] = int(k)
                 else:
@@ -969,7 +968,6 @@ def team_view(user_id, league_id, session_id, view_source):
         f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
     )
     avatar = avatar_cursor.fetchall()
-    print(avatar)
 
     league_cursor.close()
     cursor.close()
@@ -1058,7 +1056,6 @@ def select_league():
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
     try:
-        print(session)
         session_id = session.get("session_id", str(uuid.uuid4()))
         user_id = session["user_id"]
         session_year = session["league_year"]
@@ -1094,18 +1091,25 @@ def select_league():
 
     ls_cursor.execute(
         f"""select 
-                    league_year
-                    ,league_cat
-                    , count(*) as num_leagues
-                    from dynastr.current_leagues 
-                    where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
-                    group by 
-                    league_year
-                    ,league_cat
-                    """
+            league_year
+            , count(*) FILTER (WHERE league_cat = 0) as keeper
+            , count(*) FILTER (WHERE league_cat = 1) as redraft
+            , count(*) FILTER (WHERE league_cat = 2) as dynasty
+            , count(*) FILTER (WHERE total_rosters = 8) as eight_team
+            , count(*) FILTER (WHERE total_rosters = 10) as ten_team
+            , count(*) FILTER (WHERE total_rosters = 12) as twelve_team
+            , count(*) FILTER (WHERE total_rosters = 16) as sixteen_team
+            , count(*) FILTER (WHERE total_rosters = 32) as thirtytwo_team
+            , sum(sf_cnt) as superflex
+            , (select count(*) from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}') - sum(sf_cnt) as single_qb 
+            from dynastr.current_leagues 
+            where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
+            group by
+            league_year"""
     )
-    league_summary = ls_cursor.fetchall()
+    league_summary = ls_cursor.fetchall()[0]
     ls_cursor.close()
+
 
     if len(leagues) > 0:
         return render_template(
