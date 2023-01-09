@@ -15,6 +15,11 @@
 {{league_header(league_name, avatar)}}
 
 
+<form method="post" class="form-inline">
+    <button class="btn btn-outline-secondary" type="submit" name="get_league"
+        value="{{session_id,user_id,leagues[0].previous_league_id}}" {{bt}}>Load Previous
+        Year</button>
+</form>
 <br>
 {% for league in leagues %}
 <h5>
