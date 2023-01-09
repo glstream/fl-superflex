@@ -1283,7 +1283,7 @@ def get_league_fp():
             best_available=fp_best_available,
             avatar=avatar,
             leagues=leagues,
-            session_year=session["league_year"]
+            session_year=session["league_year"],
         )
 
 
@@ -1445,6 +1445,7 @@ def get_league():
             best_available=best_available,
             avatar=avatar,
             leagues=leagues,
+            session_year=session["league_year"],
         )
     else:
         return redirect(url_for("leagues.index"))
