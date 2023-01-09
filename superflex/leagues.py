@@ -1418,11 +1418,11 @@ def get_league():
 
         page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
-        print(users)
-        print(cur_league)
-        print(total_rosters)
-        print(team_spots)
-        print(page_user)
+        print("users", users)
+        print("cur_league", cur_league)
+        print("total_rosters", total_rosters)
+        print("team_spots", team_spots)
+        print("page_user", page_user)
 
         owner_cursor.close()
         player_cursor.close()
