@@ -27,46 +27,6 @@ def n_user_id(user_name: str) -> str:
     return user_id
 
 
-def user_leagues(user_name: str, league_year: str) -> list:
-    owner_id = n_user_id(user_name)
-    leagues_url = (
-        f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{league_year}"
-    )
-    leagues_res = requests.get(leagues_url)
-    leagues = []
-    for league in leagues_res.json():
-        qbs = len([i for i in league["roster_positions"] if i == "QB"])
-        rbs = len([i for i in league["roster_positions"] if i == "RB"])
-        wrs = len([i for i in league["roster_positions"] if i == "WR"])
-        tes = len([i for i in league["roster_positions"] if i == "TE"])
-        flexes = len([i for i in league["roster_positions"] if i == "FLEX"])
-        super_flexes = len([i for i in league["roster_positions"] if i == "SUPER_FLEX"])
-        rec_flexes = len([i for i in league["roster_positions"] if i == "REC_FLEX"])
-        starters = sum([qbs, rbs, wrs, tes, flexes, super_flexes, rec_flexes])
-        leagues.append(
-            (
-                league["name"],
-                league["league_id"],
-                league["avatar"],
-                league["total_rosters"],
-                qbs,
-                rbs,
-                wrs,
-                tes,
-                flexes,
-                super_flexes,
-                starters,
-                len(league["roster_positions"]),
-                league["sport"],
-                rec_flexes,
-                league["settings"]["type"],
-                league_year,
-                league["previous_league_id"],
-            )
-        )
-    return leagues
-
-
 def league_managers(league_id: str, user_id: str) -> list:
     managers = []
     for i in user_leagues(user_id):
@@ -607,6 +567,123 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     return
 
 
+def user_leagues(user_name: str, league_year: str) -> list:
+    owner_id = n_user_id(user_name)
+    leagues_url = (
+        f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{league_year}"
+    )
+    leagues_res = requests.get(leagues_url)
+    leagues = []
+    for league in leagues_res.json():
+        qbs = len([i for i in league["roster_positions"] if i == "QB"])
+        rbs = len([i for i in league["roster_positions"] if i == "RB"])
+        wrs = len([i for i in league["roster_positions"] if i == "WR"])
+        tes = len([i for i in league["roster_positions"] if i == "TE"])
+        flexes = len([i for i in league["roster_positions"] if i == "FLEX"])
+        super_flexes = len([i for i in league["roster_positions"] if i == "SUPER_FLEX"])
+        rec_flexes = len([i for i in league["roster_positions"] if i == "REC_FLEX"])
+        starters = sum([qbs, rbs, wrs, tes, flexes, super_flexes, rec_flexes])
+        leagues.append(
+            (
+                league["name"],
+                league["league_id"],
+                league["avatar"],
+                league["total_rosters"],
+                qbs,
+                rbs,
+                wrs,
+                tes,
+                flexes,
+                super_flexes,
+                starters,
+                len(league["roster_positions"]),
+                league["sport"],
+                rec_flexes,
+                league["settings"]["type"],
+                league_year,
+                league["previous_league_id"],
+            )
+        )
+    return leagues
+
+
+def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id: str):
+    league_single = requests.get(
+        f"https://api.sleeper.app/v1/league/{league_id}"
+    ).json()
+    qbs = len([i for i in league_single["roster_positions"] if i == "QB"])
+    rbs = len([i for i in league_single["roster_positions"] if i == "RB"])
+    wrs = len([i for i in league_single["roster_positions"] if i == "WR"])
+    tes = len([i for i in league_single["roster_positions"] if i == "TE"])
+    flexes = len([i for i in league_single["roster_positions"] if i == "FLEX"])
+    super_flexes = len(
+        [i for i in league_single["roster_positions"] if i == "SUPER_FLEX"]
+    )
+    rec_flexes = len([i for i in league_single["roster_positions"] if i == "REC_FLEX"])
+    starters = sum([qbs, rbs, wrs, tes, flexes, super_flexes, rec_flexes])
+    user_name = get_user_name(user_id)[1]
+    cursor = db.cursor()
+    # Execute an INSERT statement
+    cursor.execute(
+        """
+    INSERT INTO dynastr.current_leagues 
+    (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (session_id, league_id) DO UPDATE 
+    SET user_id = excluded.user_id,
+  		user_name = excluded.user_name,
+		league_id = excluded.league_id,
+		league_name = excluded.league_name,
+		avatar = excluded.avatar,
+		total_rosters = excluded.total_rosters,
+		qb_cnt = excluded.qb_cnt,
+		rb_cnt = excluded.rb_cnt,
+		wr_cnt = excluded.wr_cnt,
+		te_cnt = excluded.te_cnt,
+		flex_cnt = excluded.flex_cnt,
+		sf_cnt = excluded.sf_cnt,
+		starter_cnt = excluded.starter_cnt,
+		total_roster_cnt = excluded.total_roster_cnt,
+		sport = excluded.sport,
+      	insert_date = excluded.insert_date,
+        rf_cnt = excluded.rf_cnt,
+        league_cat = excluded.league_cat,
+        league_year = excluded.league_year,
+        previous_league_id = excluded.previous_league_id;""",
+        (
+            session_id,
+            user_id,
+            user_name,
+            league_id,
+            league_single["name"],
+            league_single["avatar"],
+            league_single["total_rosters"],
+            qbs,
+            rbs,
+            wrs,
+            tes,
+            flexes,
+            super_flexes,
+            starters,
+            len(league_single["roster_positions"]),
+            league_single["sport"],
+            entry_time,
+            rec_flexes,
+            league_single["settings"]["type"],
+            league_single["season"],
+            league_single["previous_league_id"],
+        ),
+    )
+
+    # Commit the transaction
+    db.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+
+    return None
+
+
 def insert_current_leagues(
     db, session_id: str, user_id: str, user_name: str, entry_time: str, leagues: list
 ) -> None:
@@ -964,7 +1041,7 @@ def team_view(user_id, league_id, session_id, view_source):
     league_cursor.execute(
         f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
     )
-    leagues = league_cursor.fetchall()
+    cur_league = league_cursor.fetchone()
 
     avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     avatar_cursor.execute(
@@ -1069,6 +1146,7 @@ def select_league():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
+
             player_manager_upates(db, button, session_id, user_id, league_id)
             return redirect(
                 url_for(
@@ -1249,7 +1327,7 @@ def get_league_fp():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
 
@@ -1282,8 +1360,7 @@ def get_league_fp():
             pct_values=pct_values,
             best_available=fp_best_available,
             avatar=avatar,
-            leagues=leagues,
-            session_year=session["league_year"],
+            cur_league=cur_league,
         )
 
 
@@ -1298,6 +1375,9 @@ def get_league():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -1418,14 +1498,6 @@ def get_league():
 
         page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
-        print("users", users)
-        print(
-            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' limit 1"
-        )
-        print("cur_league", cur_league)
-        print("total_rosters", total_rosters)
-        print("page_user", page_user)
-
         owner_cursor.close()
         player_cursor.close()
         ktc_ba_cursor.close()
@@ -1453,7 +1525,6 @@ def get_league():
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
-            session_year=session["league_year"],
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1470,6 +1541,9 @@ def get_league_fc():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -1581,7 +1655,7 @@ def get_league_fc():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
 
@@ -1617,7 +1691,7 @@ def get_league_fc():
             pct_values=pct_values,
             best_available=best_available,
             avatar=avatar,
-            leagues=leagues,
+            cur_league=cur_league,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1633,6 +1707,9 @@ def get_league_dp():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -1747,7 +1824,7 @@ def get_league_dp():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
 
@@ -1781,7 +1858,7 @@ def get_league_dp():
             pct_values=pct_values,
             best_available=best_available,
             avatar=avatar,
-            leagues=leagues,
+            cur_league=cur_league,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1798,6 +1875,9 @@ def trade_tracker():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -1899,6 +1979,9 @@ def trade_tracker_fc():
         user_id = league_data[1]
         league_id = league_data[2]
 
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
+
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
             url_for(
@@ -1995,6 +2078,9 @@ def contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -2108,7 +2194,7 @@ def contender_rankings():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
@@ -2140,7 +2226,7 @@ def contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
-            leagues=leagues,
+            cur_league=cur_league,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2156,6 +2242,9 @@ def fc_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -2273,7 +2362,7 @@ def fc_contender_rankings():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
@@ -2305,7 +2394,7 @@ def fc_contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
-            leagues=leagues,
+            cur_league=cur_league,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2321,6 +2410,9 @@ def nfl_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -2436,7 +2528,7 @@ def nfl_contender_rankings():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
@@ -2468,7 +2560,7 @@ def nfl_contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
-            leagues=leagues,
+            cur_league=cur_league,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2484,6 +2576,9 @@ def fp_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
 
         player_manager_upates(db, button, session_id, user_id, league_id)
         return redirect(
@@ -2599,7 +2694,7 @@ def fp_contender_rankings():
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
 
         users = get_users_data(league_id)
 
@@ -2634,7 +2729,7 @@ def fp_contender_rankings():
             best_available=con_best_available,
             avatar=avatar,
             nfl_current_week=nfl_current_week,
-            leagues=leagues,
+            cur_league=cur_league,
         )
     else:
         return redirect(url_for("leagues.index"))
