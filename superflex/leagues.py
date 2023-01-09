@@ -1409,7 +1409,6 @@ def get_league():
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' limit 1"
         )
         cur_league = league_cursor.fetchone()
-        print(cur_league)
 
         users = get_users_data(league_id)
 
@@ -1418,6 +1417,12 @@ def get_league():
         team_spots = render_players(players, "power")
 
         page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+
+        print(users)
+        print(cur_league)
+        print(total_rosters)
+        print(team_spots)
+        print(page_user)
 
         owner_cursor.close()
         player_cursor.close()
