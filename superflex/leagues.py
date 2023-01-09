@@ -1406,9 +1406,10 @@ def get_league():
 
         league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
-            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' limit 1"
         )
-        leagues = league_cursor.fetchall()
+        cur_league = league_cursor.fetchone()
+        print(cur_league)
 
         users = get_users_data(league_id)
 
@@ -1444,7 +1445,7 @@ def get_league():
             pct_values=pct_values,
             best_available=best_available,
             avatar=avatar,
-            leagues=leagues,
+            cur_league=cur_league,
             session_year=session["league_year"],
         )
     else:
