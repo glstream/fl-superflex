@@ -1283,6 +1283,7 @@ def get_league_fp():
             best_available=fp_best_available,
             avatar=avatar,
             leagues=leagues,
+            session_year=session["league_year"]
         )
 
 

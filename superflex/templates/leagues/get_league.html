@@ -14,16 +14,15 @@
 </script>
 {{league_header(league_name, avatar)}}
 
-{% if leagues[0].previous_league_id is not none %}
-{% set bt = 'disabled'%}
+{% if session_year != leagues[0].league_year %}
 <form method="post" class="form-inline">
-    <button class="btn btn-outline-secondary" type="submit" name="get_league"
-        value="{{session_id,user_id,leagues[0].previous_league_id}}">Load Previous
+    <button class="btn btn-outline-secondary" type="submit" name="get_league" value="" disabled>Load Previous
         Year</button>
 </form>
 {% else %}
 <form method="post" class="form-inline">
-    <button class="btn btn-outline-secondary" type="submit" name="get_league" value="" disabled>Load Previous
+    <button class="btn btn-outline-secondary" type="submit" name="get_league"
+        value="{{session_id,user_id,leagues[0].previous_league_id}}">Load Previous
         Year</button>
 </form>
 {%endif%}
