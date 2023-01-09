@@ -106,7 +106,7 @@ SELECT
                     from dynastr.league_players lp
                     inner join dynastr.players pl on lp.player_id = pl.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on concat(pl.first_name, pl.last_name)  = concat(ktc.player_first_name, ktc.player_last_name)
-                    inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'session_id'
+                    inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'session_id' 
                     where lp.session_id = 'session_id'
                     and lp.league_id = 'league_id'
                     and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))

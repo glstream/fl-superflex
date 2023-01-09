@@ -13,6 +13,47 @@
 
 </script>
 {{league_header(league_name, avatar)}}
+{% if leagues[0].previous_league_id is none %}
+{% set bt = 'disabled'%}
+{%endif%}
+<form method="post" class="form-inline">
+    <button class="btn btn-outline-secondary" type="submit" name="get_league_fc"
+        value="{{session_id,user_id,leagues[0].previous_league_id}}" {{bt}}>Load Previous
+        Year</button>
+</form>
+<br>
+{% for league in leagues %}
+<h5>
+    <span class="badge bg-dark-1">{{league.league_year}}</span>
+    {% if league.league_cat == 0 %}
+    <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>
+    {% endif %}
+    {% if league.league_cat == 1 %}
+    <span class="badge alert-light">{{league.league_cat | league_cat}}</span>
+    {% endif %}
+    {% if league.league_cat == 2 %}
+    <span class="badge alert-success">{{league.league_cat | league_cat}}</span>
+    {% endif %}
+    {% if league.total_rosters < 12 %} <span class="badge alert-success">{{league.total_rosters}}
+        Team
+        </span>
+        {% endif %}
+        {% if league.total_rosters == 12 %}
+        <span class="badge alert-danger">{{league.total_rosters}} Team</span>
+        {% endif %}
+        {% if league.total_rosters > 12 %}
+        <span class="badge alert-light">{{league.total_rosters}} Team</span>
+        {% endif %}
+        {% if league.qb_cnt + league.sf_cnt > 1 %}
+        <span class="badge alert-secondary">Superflex</span>
+        {% else %}
+        <span class="badge alert-primary">Single QB</span>
+        {% endif %}
+
+        <span class="badge bg-warning">{{league.starter_cnt}} Starters</span>
+
+</h5>
+{% endfor %}
 <br>
 <div class="row justify-content-center">
     {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id, session_id, 'get_league_fc')}}

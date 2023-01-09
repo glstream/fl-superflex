@@ -61,6 +61,7 @@ def user_leagues(user_name: str, league_year: str) -> list:
                 rec_flexes,
                 league["settings"]["type"],
                 league_year,
+                league["previous_league_id"],
             )
         )
     return leagues
@@ -612,8 +613,8 @@ def insert_current_leagues(
     cursor = db.cursor()
     execute_batch(
         cursor,
-        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+        """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
    ON CONFLICT (session_id, league_id) DO UPDATE 
   SET user_id = excluded.user_id,
   		user_name = excluded.user_name,
@@ -633,7 +634,8 @@ def insert_current_leagues(
       	insert_date = excluded.insert_date,
         rf_cnt = excluded.rf_cnt,
         league_cat = excluded.league_cat,
-        league_year = excluded.league_year;
+        league_year = excluded.league_year,
+        previous_league_id = excluded.previous_league_id;
     """,
         tuple(
             [
@@ -658,6 +660,7 @@ def insert_current_leagues(
                     league[13],
                     league[14],
                     league[15],
+                    league[16],
                 )
                 for league in iter(leagues)
             ]
@@ -1081,7 +1084,7 @@ def select_league():
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     cursor.execute(
-        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
+        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
     )
 
     leagues = cursor.fetchall()
@@ -1109,7 +1112,6 @@ def select_league():
     )
     league_summary = ls_cursor.fetchall()[0]
     ls_cursor.close()
-
 
     if len(leagues) > 0:
         return render_template(
@@ -1243,6 +1245,12 @@ def get_league_fp():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
 
         total_rosters = get_league_rosters_size(league_id)
@@ -1253,6 +1261,7 @@ def get_league_fp():
         date_cursor.close()
         fp_ba_cursor.close()
         avatar_cursor.close()
+        leagues.close()
 
         return render_template(
             "leagues/get_league_fp.html",
@@ -1273,6 +1282,7 @@ def get_league_fp():
             pct_values=pct_values,
             best_available=fp_best_available,
             avatar=avatar,
+            leagues=leagues,
         )
 
 
@@ -1393,6 +1403,12 @@ def get_league():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
 
         total_rosters = int(get_league_rosters_size(league_id))
@@ -1406,6 +1422,7 @@ def get_league():
         ktc_ba_cursor.close()
         date_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/get_league.html",
@@ -1426,6 +1443,7 @@ def get_league():
             pct_values=pct_values,
             best_available=best_available,
             avatar=avatar,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1549,6 +1567,12 @@ def get_league_fc():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
 
         total_rosters = int(get_league_rosters_size(league_id))
@@ -1562,6 +1586,7 @@ def get_league_fc():
         ktc_ba_cursor.close()
         date_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/get_league_fc.html",
@@ -1582,6 +1607,7 @@ def get_league_fc():
             pct_values=pct_values,
             best_available=best_available,
             avatar=avatar,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1707,6 +1733,12 @@ def get_league_dp():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
 
         total_rosters = get_league_rosters_size(league_id)
@@ -1718,6 +1750,7 @@ def get_league_dp():
         ba_cursor.close()
         date_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/get_league_dp.html",
@@ -1738,6 +1771,7 @@ def get_league_dp():
             pct_values=pct_values,
             best_available=best_available,
             avatar=avatar,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2060,6 +2094,12 @@ def contender_rankings():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
@@ -2070,6 +2110,7 @@ def contender_rankings():
         date_cursor.close()
         con_ba_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/contender_rankings.html",
@@ -2089,6 +2130,7 @@ def contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2217,6 +2259,12 @@ def fc_contender_rankings():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
@@ -2227,6 +2275,7 @@ def fc_contender_rankings():
         date_cursor.close()
         con_ba_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/contender_rankings_fc.html",
@@ -2246,6 +2295,7 @@ def fc_contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2372,6 +2422,12 @@ def nfl_contender_rankings():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
@@ -2382,6 +2438,7 @@ def nfl_contender_rankings():
         date_cursor.close()
         con_ba_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/contender_rankings_nfl.html",
@@ -2401,6 +2458,7 @@ def nfl_contender_rankings():
             pct_values=pct_values,
             best_available=con_best_available,
             avatar=avatar,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2527,6 +2585,12 @@ def fp_contender_rankings():
         )
         avatar = avatar_cursor.fetchall()
 
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        leagues = league_cursor.fetchall()
+
         users = get_users_data(league_id)
 
         nfl_current_week = get_sleeper_state()["leg"]
@@ -2539,6 +2603,7 @@ def fp_contender_rankings():
         date_cursor.close()
         con_ba_cursor.close()
         avatar_cursor.close()
+        league_cursor.close()
 
         return render_template(
             "leagues/contender_rankings_fp.html",
@@ -2559,6 +2624,7 @@ def fp_contender_rankings():
             best_available=con_best_available,
             avatar=avatar,
             nfl_current_week=nfl_current_week,
+            leagues=leagues,
         )
     else:
         return redirect(url_for("leagues.index"))

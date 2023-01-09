@@ -95,6 +95,13 @@ table {
     background-color: rgb(249, 199, 79) !important;
 }
 
+.badge.bg-dark-1 {
+    outline-color: rgb(3, 3, 3) !important;
+    color: rgb(252, loc 252, 252) !important;
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgba(22, 22, 22, 0.75) !important;
+}
+
 .badge.bg-light {
     outline-color: rgb(39, 125, 161) !important;
     border-color: rgb(39, 125, 161) !important;
