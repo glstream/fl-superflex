@@ -968,7 +968,7 @@ def team_view(user_id, league_id, session_id, view_source):
 
     avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     avatar_cursor.execute(
-        f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+        f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
     )
     avatar = avatar_cursor.fetchall()
 
@@ -1241,7 +1241,7 @@ def get_league_fp():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1399,7 +1399,7 @@ def get_league():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1563,7 +1563,7 @@ def get_league_fc():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -1729,7 +1729,7 @@ def get_league_dp():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -2090,7 +2090,7 @@ def contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -2255,7 +2255,7 @@ def fc_contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -2418,7 +2418,7 @@ def nfl_contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
@@ -2581,7 +2581,7 @@ def fp_contender_rankings():
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id='{str(league_id)}'"
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
