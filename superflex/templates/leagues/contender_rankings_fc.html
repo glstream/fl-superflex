@@ -16,11 +16,18 @@
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
-<form method="post" class="form-inline">
-    <button class="btn btn-outline-secondary" type="submit" name="contender_rankings_fc"
-        value="{{session_id,user_id,cur_league.previous_league_id}}" {{bt}}>Load Previous
-        Year</button>
-</form>
+<div style="display: flex; gap:10px">
+    <form method="post" class="form-inline">
+        <button class="btn btn-outline-secondary" type="submit" name="contender_rankings_fc"
+            value="{{session_id,user_id,cur_league.previous_league_id}" {{bt}}>Load Previous
+            Year</button>
+    </form>
+    <form method="post" class="form-inline">
+        <button class="btn btn-outline-secondary" type="submit" name="contender_rankings_fc"
+            value="{{session_id,user_id,session_league_id}}">Load Current
+            Year</button>
+    </form>
+</div>
 <br>
 <h5>
     <span class="badge bg-dark-1">{{cur_league.league_year}}</span>

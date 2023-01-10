@@ -1146,6 +1146,7 @@ def select_league():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
+            session_league_id = session["session_league_id"] = league_id
 
             player_manager_upates(db, button, session_id, user_id, league_id)
             return redirect(
@@ -1154,6 +1155,7 @@ def select_league():
                     session_id=session_id,
                     league_id=league_id,
                     user_id=user_id,
+                    session_league_id=session_league_id,
                 )
             )
     except:
@@ -1199,174 +1201,10 @@ def select_league():
         return redirect(url_for("leagues.index"))
 
 
-@bp.route("/get_league_fp", methods=("GET", "POST"))
-def get_league_fp():
-    db = pg_db()
-
-    if request.method == "POST":
-        button = list(request.form)[0]
-        league_data = eval(request.form[button])
-        session_id = league_data[0]
-        user_id = league_data[1]
-        league_id = league_data[2]
-        player_manager_upates(db, button, session_id, user_id, league_id)
-        return redirect(
-            url_for(
-                f"leagues.{button}",
-                session_id=session_id,
-                league_id=league_id,
-                user_id=user_id,
-            )
-        )
-
-    if request.method == "GET":
-        session_id = request.args.get("session_id")
-        league_id = request.args.get("league_id")
-        user_id = request.args.get("user_id")
-        league_type = get_league_type(league_id)
-        lt = "sf" if league_type == "sf_value" else "one_qb"
-
-        fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "get_league_fp.sql", "r"
-        ) as sql_file:
-            sql = (
-                sql_file.read()
-                .replace("'session_id'", f"'{session_id}'")
-                .replace("'league_id'", f"'{league_id}'")
-                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
-            )
-        fp_cursor.execute(sql)
-        fp_players = fp_cursor.fetchall()
-
-        if len(fp_players) < 1:
-            return redirect(url_for("leagues.index"))
-
-        fp_team_spots = render_players(fp_players, "contender")
-
-        fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "get_league_fp.sql", "r"
-        ) as sql_file:
-            summary_sql = (
-                sql_file.read()
-                .replace("'session_id'", f"'{session_id}'")
-                .replace("'league_id'", f"'{league_id}'")
-                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
-            )
-        fp_owners_cursor.execute(summary_sql)
-        fp_owners = fp_owners_cursor.fetchall()
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_avg_rank"],
-                i["rb_avg_rank"],
-                i["wr_avg_rank"],
-                i["te_avg_rank"],
-                i["starters_avg_rank"],
-                i["bench_avg_rank"],
-            )
-            for i in fp_owners
-            if i["user_id"] == user_id
-        ]
-
-        try:
-            labels = [row["display_name"] for row in fp_owners]
-            values = [row["total_avg"] for row in fp_owners]
-            total_value = [int(row["total_avg"]) for row in fp_owners][0] * 0.95
-
-            pct_values = [
-                100 - abs((total_value / int(row["total_avg"])) - 1) * 100
-                for row in fp_owners
-            ]
-        except:
-            pct_values = []
-
-        fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "fp_ba.sql", "r"
-        ) as sql_file:
-            ba_sql = (
-                sql_file.read()
-                .replace("'session_id'", f"'{session_id}'")
-                .replace("'league_id'", f"'{league_id}'")
-                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
-            )
-        fp_ba_cursor.execute(ba_sql)
-        fp_ba = fp_ba_cursor.fetchall()
-        fp_ba_qb = [player for player in fp_ba if player["player_position"] == "QB"]
-        fp_ba_rb = [player for player in fp_ba if player["player_position"] == "RB"]
-        fp_ba_wr = [player for player in fp_ba if player["player_position"] == "WR"]
-        fp_ba_te = [player for player in fp_ba if player["player_position"] == "TE"]
-        fp_best_available = {
-            "QB": fp_ba_qb,
-            "RB": fp_ba_rb,
-            "WR": fp_ba_wr,
-            "TE": fp_ba_te,
-        }
-
-        # Find difference in laod time and max update time in the ktc player ranks
-        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute(
-            "select max(insert_date) from dynastr.espn_player_projections"
-        )
-        _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
-        current_time = datetime.utcnow()
-        update_diff_minutes = round(
-            (current_time - ktc_max_time).total_seconds() / 60.0
-        )
-
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        avatar_cursor.execute(
-            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
-        )
-        avatar = avatar_cursor.fetchall()
-
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        league_cursor.execute(
-            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
-        )
-        cur_league = league_cursor.fetchone()
-
-        users = get_users_data(league_id)
-
-        total_rosters = get_league_rosters_size(league_id)
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
-        fp_owners_cursor.close()
-        fp_cursor.close()
-        date_cursor.close()
-        fp_ba_cursor.close()
-        avatar_cursor.close()
-        leagues.close()
-
-        return render_template(
-            "leagues/get_league_fp.html",
-            owners=fp_owners,
-            page_user=page_user,
-            total_rosters=total_rosters,
-            users=users,
-            league_name=get_league_name(league_id),
-            user_name=get_user_name(user_id)[1],
-            league_type=league_type,
-            aps=fp_team_spots,
-            league_id=league_id,
-            session_id=session_id,
-            user_id=user_id,
-            update_diff_minutes=update_diff_minutes,
-            labels=labels,
-            values=values,
-            pct_values=pct_values,
-            best_available=fp_best_available,
-            avatar=avatar,
-            cur_league=cur_league,
-        )
-
-
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
+    session_league_id = session["session_league_id"]
 
     if request.method == "POST":
 
@@ -1525,6 +1363,7 @@ def get_league():
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1533,6 +1372,7 @@ def get_league():
 @bp.route("/get_league_fc", methods=("GET", "POST"))
 def get_league_fc():
     db = pg_db()
+    session_league_id = session["session_league_id"]
 
     if request.method == "POST":
 
@@ -1692,6 +1532,7 @@ def get_league_fc():
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1700,6 +1541,8 @@ def get_league_fc():
 @bp.route("/get_league_dp", methods=("GET", "POST"))
 def get_league_dp():
     db = pg_db()
+    session_league_id = session["session_league_id"]
+
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -1859,9 +1702,177 @@ def get_league_dp():
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
+
+
+@bp.route("/get_league_fp", methods=("GET", "POST"))
+def get_league_fp():
+    db = pg_db()
+    session_league_id = session["session_league_id"]
+
+    if request.method == "POST":
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        player_manager_upates(db, button, session_id, user_id, league_id)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+            )
+        )
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        league_type = get_league_type(league_id)
+        lt = "sf" if league_type == "sf_value" else "one_qb"
+
+        fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd() / "superflex" / "sql" / "details" / "get_league_fp.sql", "r"
+        ) as sql_file:
+            sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
+            )
+        fp_cursor.execute(sql)
+        fp_players = fp_cursor.fetchall()
+
+        if len(fp_players) < 1:
+            return redirect(url_for("leagues.index"))
+
+        fp_team_spots = render_players(fp_players, "contender")
+
+        fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd() / "superflex" / "sql" / "summary" / "get_league_fp.sql", "r"
+        ) as sql_file:
+            summary_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
+            )
+        fp_owners_cursor.execute(summary_sql)
+        fp_owners = fp_owners_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_avg_rank"],
+                i["rb_avg_rank"],
+                i["wr_avg_rank"],
+                i["te_avg_rank"],
+                i["starters_avg_rank"],
+                i["bench_avg_rank"],
+            )
+            for i in fp_owners
+            if i["user_id"] == user_id
+        ]
+
+        try:
+            labels = [row["display_name"] for row in fp_owners]
+            values = [row["total_avg"] for row in fp_owners]
+            total_value = [int(row["total_avg"]) for row in fp_owners][0] * 0.95
+
+            pct_values = [
+                100 - abs((total_value / int(row["total_avg"])) - 1) * 100
+                for row in fp_owners
+            ]
+        except:
+            pct_values = []
+
+        fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "fp_ba.sql", "r"
+        ) as sql_file:
+            ba_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("lt_rank_ecr", f"{lt}_rank_ecr")
+            )
+        fp_ba_cursor.execute(ba_sql)
+        fp_ba = fp_ba_cursor.fetchall()
+        fp_ba_qb = [player for player in fp_ba if player["player_position"] == "QB"]
+        fp_ba_rb = [player for player in fp_ba if player["player_position"] == "RB"]
+        fp_ba_wr = [player for player in fp_ba if player["player_position"] == "WR"]
+        fp_ba_te = [player for player in fp_ba if player["player_position"] == "TE"]
+        fp_best_available = {
+            "QB": fp_ba_qb,
+            "RB": fp_ba_rb,
+            "WR": fp_ba_wr,
+            "TE": fp_ba_te,
+        }
+
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.espn_player_projections"
+        )
+        _date = date_cursor.fetchall()
+        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round(
+            (current_time - ktc_max_time).total_seconds() / 60.0
+        )
+
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        cur_league = league_cursor.fetchone()
+
+        users = get_users_data(league_id)
+
+        total_rosters = get_league_rosters_size(league_id)
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+
+        fp_owners_cursor.close()
+        fp_cursor.close()
+        date_cursor.close()
+        fp_ba_cursor.close()
+        avatar_cursor.close()
+        league_cursor.close()
+
+        return render_template(
+            "leagues/get_league_fp.html",
+            owners=fp_owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
+            users=users,
+            league_name=get_league_name(league_id),
+            user_name=get_user_name(user_id)[1],
+            league_type=league_type,
+            aps=fp_team_spots,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+            update_diff_minutes=update_diff_minutes,
+            labels=labels,
+            values=values,
+            pct_values=pct_values,
+            best_available=fp_best_available,
+            avatar=avatar,
+            cur_league=cur_league,
+            session_league_id=session_league_id,
+        )
 
 
 @bp.route("/trade_tracker", methods=["GET", "POST"])
@@ -2071,6 +2082,7 @@ def trade_tracker_fc():
 @bp.route("/contender_rankings", methods=["GET", "POST"])
 def contender_rankings():
     db = pg_db()
+    session_league_id = session["session_league_id"]
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -2227,6 +2239,7 @@ def contender_rankings():
             best_available=con_best_available,
             avatar=avatar,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2235,6 +2248,7 @@ def contender_rankings():
 @bp.route("/contender_rankings_fc", methods=["GET", "POST"])
 def fc_contender_rankings():
     db = pg_db()
+    session_league_id = session["session_league_id"]
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -2395,6 +2409,7 @@ def fc_contender_rankings():
             best_available=con_best_available,
             avatar=avatar,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2403,6 +2418,8 @@ def fc_contender_rankings():
 @bp.route("/contender_rankings_nfl", methods=["GET", "POST"])
 def nfl_contender_rankings():
     db = pg_db()
+    session_league_id = session["session_league_id"]
+
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -2561,6 +2578,7 @@ def nfl_contender_rankings():
             best_available=con_best_available,
             avatar=avatar,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2569,6 +2587,8 @@ def nfl_contender_rankings():
 @bp.route("/contender_rankings_fp", methods=["GET", "POST"])
 def fp_contender_rankings():
     db = pg_db()
+    session_league_id = session["session_league_id"]
+
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -2730,6 +2750,7 @@ def fp_contender_rankings():
             avatar=avatar,
             nfl_current_week=nfl_current_week,
             cur_league=cur_league,
+            session_league_id=session_league_id,
         )
     else:
         return redirect(url_for("leagues.index"))
