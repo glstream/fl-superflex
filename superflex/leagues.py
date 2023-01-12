@@ -195,7 +195,7 @@ def clean_draft_trades(db, league_id: str) -> None:
 
 def clean_league_picks(db, league_id: str) -> None:
     delete_query = (
-        f"""DELETE FROM dynastr.player_trades where league_id = '{league_id}'"""
+        f"""DELETE FROM dynastr.draft_picks where league_id = '{league_id}'"""
     )
     cursor = db.cursor()
     cursor.execute(delete_query)
@@ -400,85 +400,92 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
 
 
 def total_owned_picks(
-    db, league_id: str, session_id, base_picks: dict = {}, traded_picks_all: dict = {}
+    db,
+    league_id: str,
+    session_id,
+    startup,
+    base_picks: dict = {},
+    traded_picks_all: dict = {},
 ) -> None:
-    base_picks = {}
-    traded_picks_all = {}
-    league_size = get_league_rosters_size(league_id)
-    total_picks = get_traded_picks(league_id)
-    draft_id = get_draft_id(league_id)
+    if startup is not None:
+        base_picks = {}
+        traded_picks_all = {}
+        league_size = get_league_rosters_size(league_id)
+        total_picks = get_traded_picks(league_id)
+        draft_id = get_draft_id(league_id)
 
-    years = (
-        [str(int(draft_id["season"]) + i) for i in range(1, 4)]
-        if draft_id["status"] == "complete"
-        else [str(int(draft_id["season"]) + i) for i in range(0, 3)]
-    )
-    rounds = [r for r in range(1, draft_id["settings"]["rounds"] + 1)]
+        years = (
+            [str(int(draft_id["season"]) + i) for i in range(1, 4)]
+            if draft_id["status"] == "complete"
+            else [str(int(draft_id["season"]) + i) for i in range(0, 3)]
+        )
+        rounds = [r for r in range(1, draft_id["settings"]["rounds"] + 1)]
 
-    traded_picks = [
-        [pick["season"], pick["round"], pick["roster_id"], pick["owner_id"]]
-        for pick in total_picks
-        if pick["roster_id"] != pick["owner_id"] and pick["season"] in years
-    ]
-    for year in years:
-        base_picks[year] = {
-            round: [[i, i] for i in range(1, league_size + 1)] for round in rounds
-        }
-        for pick in traded_picks:
-            traded_picks_all[year] = {
-                round: [
-                    [i[2], i[3]]
-                    for i in [i for i in traded_picks if i[0] == year and i[1] == round]
-                ]
-                for round in rounds
+        traded_picks = [
+            [pick["season"], pick["round"], pick["roster_id"], pick["owner_id"]]
+            for pick in total_picks
+            if pick["roster_id"] != pick["owner_id"] and pick["season"] in years
+        ]
+        for year in years:
+            base_picks[year] = {
+                round: [[i, i] for i in range(1, league_size + 1)] for round in rounds
             }
-    for year, traded_rounds in traded_picks_all.items():
-        for round, picks in traded_rounds.items():
-            for pick in picks:
-                if [pick[0], pick[0]] in base_picks[year][round]:
-                    base_picks[year][round].remove([pick[0], pick[0]])
-                    base_picks[year][round].append(pick)
+            for pick in traded_picks:
+                traded_picks_all[year] = {
+                    round: [
+                        [i[2], i[3]]
+                        for i in [
+                            i for i in traded_picks if i[0] == year and i[1] == round
+                        ]
+                    ]
+                    for round in rounds
+                }
+        for year, traded_rounds in traded_picks_all.items():
+            for round, picks in traded_rounds.items():
+                for pick in picks:
+                    if [pick[0], pick[0]] in base_picks[year][round]:
+                        base_picks[year][round].remove([pick[0], pick[0]])
+                        base_picks[year][round].append(pick)
 
-    for year, round in base_picks.items():
-        for round, picks in round.items():
-            draft_picks = [
-                [
-                    year,
-                    round,
-                    round_suffix(round),
-                    pick[0],
-                    pick[1],
-                    league_id,
-                    draft_id["draft_id"],
-                    session_id,
-                ]
-                for pick in picks
-            ]
-            with db.cursor() as cursor:
-                execute_values(
-                    cursor,
-                    """
-                    INSERT INTO dynastr.draft_picks VALUES %s
-                    ON CONFLICT (year, round, roster_id, owner_id, league_id, session_id)
-                    DO UPDATE SET round_name = EXCLUDED.round_name
-	                              , draft_id = EXCLUDED.draft_id;
-                    """,
+        for year, round in base_picks.items():
+            for round, picks in round.items():
+                draft_picks = [
                     [
-                        (
-                            draft_pick[0],
-                            draft_pick[1],
-                            draft_pick[2],
-                            draft_pick[3],
-                            draft_pick[4],
-                            draft_pick[5],
-                            draft_pick[6],
-                            draft_pick[7],
-                        )
-                        for draft_pick in iter(draft_picks)
-                    ],
-                    page_size=1000,
-                )
-
+                        year,
+                        round,
+                        round_suffix(round),
+                        pick[0],
+                        pick[1],
+                        league_id,
+                        draft_id["draft_id"],
+                        session_id,
+                    ]
+                    for pick in picks
+                ]
+                with db.cursor() as cursor:
+                    execute_values(
+                        cursor,
+                        """
+                        INSERT INTO dynastr.draft_picks VALUES %s
+                        ON CONFLICT (year, round, roster_id, owner_id, league_id, session_id)
+                        DO UPDATE SET round_name = EXCLUDED.round_name
+                                    , draft_id = EXCLUDED.draft_id;
+                        """,
+                        [
+                            (
+                                draft_pick[0],
+                                draft_pick[1],
+                                draft_pick[2],
+                                draft_pick[3],
+                                draft_pick[4],
+                                draft_pick[5],
+                                draft_pick[6],
+                                draft_pick[7],
+                            )
+                            for draft_pick in iter(draft_picks)
+                        ],
+                        page_size=1000,
+                    )
     return
 
 
@@ -750,7 +757,7 @@ def insert_current_leagues(
 
 
 def player_manager_upates(
-    db, button: str, session_id: str, user_id: str, league_id: str
+    db, button: str, session_id: str, user_id: str, league_id: str, startup
 ):
     print("Button", button)
     if button in ["trade_tracker", "trade_tracker_fc"]:
@@ -786,7 +793,7 @@ def player_manager_upates(
             insert_managers(db, managers)
 
             insert_league_rosters(db, session_id, user_id, league_id)
-            total_owned_picks(db, league_id, session_id)
+            total_owned_picks(db, league_id, session_id, startup)
             draft_positions(db, league_id, user_id)
         except:
             return redirect(
@@ -1148,7 +1155,14 @@ def select_league():
             league_id = league_data[2]
             session_league_id = session["session_league_id"] = league_id
 
-            player_manager_upates(db, button, session_id, user_id, league_id)
+            startup_cursor = db.cursor()
+            startup_cursor.execute(
+                f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            )
+            startup = startup_cursor.fetchone()[0]
+            startup_cursor.close()
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
             return redirect(
                 url_for(
                     f"leagues.{button}",
@@ -1217,7 +1231,14 @@ def get_league():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -1385,7 +1406,14 @@ def get_league_fc():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -1554,7 +1582,14 @@ def get_league_dp():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -1719,7 +1754,14 @@ def get_league_fp():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -1890,7 +1932,14 @@ def trade_tracker():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -1993,7 +2042,14 @@ def trade_tracker_fc():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -2094,7 +2150,14 @@ def contender_rankings():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -2260,7 +2323,14 @@ def fc_contender_rankings():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -2431,7 +2501,14 @@ def nfl_contender_rankings():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -2600,7 +2677,14 @@ def fp_contender_rankings():
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
-        player_manager_upates(db, button, session_id, user_id, league_id)
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
