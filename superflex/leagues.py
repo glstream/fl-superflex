@@ -1067,7 +1067,7 @@ def team_view(user_id, league_id, session_id, view_source):
         session_id=session_id,
         view_source=view_source,
         owners=owner,
-        leagues=leagues,
+        cur_league=cur_league,
         league_name=get_league_name(league_id),
         user_name=get_user_name(user_id)[1],
         rankings_source=rankings_source,

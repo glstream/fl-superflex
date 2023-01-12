@@ -5,39 +5,37 @@
 <div class="row justify-content-center">
 
     <h3><small class="text-muted">Team Views</small></h3> {{league_header(league_name, avatar)}}
-
-
-
-    {% for league in leagues %}
+    <br>
     <h5>
-        {% if league.league_cat == 0 %}
-        <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>
+        <span class="badge bg-dark-1">{{cur_league.league_year}}</span>
+        {% if cur_league.league_cat == 0 %}
+        <span class="badge alert-dark">{{cur_league.league_cat | league_cat}}</span>
         {% endif %}
-        {% if league.league_cat == 1 %}
-        <span class="badge alert-light">{{league.league_cat | league_cat}}</span>
+        {% if cur_league.league_cat == 1 %}
+        <span class="badge alert-light">{{cur_league.league_cat | league_cat}}</span>
         {% endif %}
-        {% if league.league_cat == 2 %}
-        <span class="badge alert-success">{{league.league_cat | league_cat}}</span>
+        {% if cur_league.league_cat == 2 %}
+        <span class="badge alert-success">{{cur_league.league_cat | league_cat}}</span>
         {% endif %}
-        {% if league.total_rosters < 12 %} <span class="badge alert-success">{{league.total_rosters}}
+        {% if cur_league.total_rosters < 12 %} <span class="badge alert-success">{{cur_league.total_rosters}}
             Team
             </span>
             {% endif %}
-            {% if league.total_rosters == 12 %}
-            <span class="badge alert-danger">{{league.total_rosters}} Team</span>
+            {% if cur_league.total_rosters == 12 %}
+            <span class="badge alert-danger">{{cur_league.total_rosters}} Team</span>
             {% endif %}
-            {% if league.total_rosters > 12 %}
-            <span class="badge alert-light">{{league.total_rosters}} Team</span>
+            {% if cur_league.total_rosters > 12 %}
+            <span class="badge alert-light">{{cur_league.total_rosters}} Team</span>
             {% endif %}
-            {% if league.qb_cnt + league.sf_cnt > 1 %}
+            {% if cur_league.qb_cnt + cur_league.sf_cnt > 1 %}
             <span class="badge alert-secondary">Superflex</span>
             {% else %}
             <span class="badge alert-primary">Single QB</span>
             {% endif %}
 
-            <span class="badge bg-warning">{{league.starter_cnt}} Starters</span>
+            <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
+
     </h5>
-    {% endfor %}
     <div style="display: inline-block;">
         <h3>User &bull; {{user_name}} &bull; <small class="text-muted">{{rankings_source}}</small>
         </h3>
