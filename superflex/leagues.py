@@ -903,7 +903,15 @@ def team_view(user_id, league_id, session_id, view_source):
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
-        player_manager_upates(db, button, session_id, user_id, league_id)
+
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
