@@ -2326,6 +2326,7 @@ def fc_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        print(league_data)
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -2705,6 +2706,7 @@ def fp_contender_rankings():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+
         fp_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd() / "superflex" / "sql" / "details" / "contender_rankings_fp.sql",
