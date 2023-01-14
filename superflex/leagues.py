@@ -1154,7 +1154,7 @@ def select_league():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
-            session_league_id = session.get("session_league_id", None) = league_id
+            session_league_id = session["session_league_id"] = league_id
 
             startup_cursor = db.cursor()
             startup_cursor.execute(
