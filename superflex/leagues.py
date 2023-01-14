@@ -1154,7 +1154,7 @@ def select_league():
             session_id = league_data[0]
             user_id = league_data[1]
             league_id = league_data[2]
-            session_league_id = session["session_league_id"] = league_id
+            session_league_id = session.get("session_league_id", None) = league_id
 
             startup_cursor = db.cursor()
             startup_cursor.execute(
@@ -1225,7 +1225,7 @@ def select_league():
 @bp.route("/get_league", methods=("GET", "POST"))
 def get_league():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
 
     if request.method == "POST":
 
@@ -1400,7 +1400,7 @@ def get_league():
 @bp.route("/get_league_fc", methods=("GET", "POST"))
 def get_league_fc():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
 
     if request.method == "POST":
 
@@ -1576,7 +1576,7 @@ def get_league_fc():
 @bp.route("/get_league_dp", methods=("GET", "POST"))
 def get_league_dp():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
 
     if request.method == "POST":
 
@@ -1753,7 +1753,7 @@ def get_league_dp():
 @bp.route("/get_league_fp", methods=("GET", "POST"))
 def get_league_fp():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
 
     if request.method == "POST":
         button = list(request.form)[0]
@@ -2145,7 +2145,7 @@ def trade_tracker_fc():
 @bp.route("/contender_rankings", methods=["GET", "POST"])
 def contender_rankings():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -2318,7 +2318,7 @@ def contender_rankings():
 @bp.route("/contender_rankings_fc", methods=["GET", "POST"])
 def fc_contender_rankings():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
     if request.method == "POST":
 
         button = list(request.form)[0]
@@ -2495,7 +2495,7 @@ def fc_contender_rankings():
 @bp.route("/contender_rankings_nfl", methods=["GET", "POST"])
 def nfl_contender_rankings():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
 
     if request.method == "POST":
 
@@ -2671,7 +2671,7 @@ def nfl_contender_rankings():
 @bp.route("/contender_rankings_fp", methods=["GET", "POST"])
 def fp_contender_rankings():
     db = pg_db()
-    session_league_id = session["session_league_id"]
+    session_league_id = session.get("session_league_id", None)
 
     if request.method == "POST":
 
