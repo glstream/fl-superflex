@@ -1139,7 +1139,7 @@ def index():
                 error_message="Username not found. Please enter a valid sleeper username.",
             )
 
-        return redirect(url_for("leagues.select_league", year="2022"))
+        return redirect(url_for("leagues.select_league", year=year_))
 
     return render_template("leagues/index.html")
 
@@ -1212,8 +1212,14 @@ def select_league():
             group by
             league_year"""
     )
-    league_summary = ls_cursor.fetchall()[0]
-    ls_cursor.close()
+    try:
+        league_summary = ls_cursor.fetchall()[0]
+        ls_cursor.close()
+    except:
+        return render_template(
+            "leagues/index.html",
+            error_message=f"No {session_year} leagues found for {get_user_name(user_id)[1]}, try picking a another year.",
+        )
 
     if len(leagues) > 0:
         return render_template(
