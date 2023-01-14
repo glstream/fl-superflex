@@ -1,7 +1,7 @@
 {% macro buttons_large(session_id, user_id, league_id, ktc_button='', fp_button='', dp_button='', fc_button='',
 espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_tt_button='') %}
 <form method="post" class="form-inline">
-    <div class="btn-group flex-wrap">
+    <div class="btn-group flex-wrap" style="gap:10px">
         <div class="dropdown">
             <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -19,7 +19,6 @@ espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_t
 
             </div>
         </div>
-        <br>
         <div class="dropdown">
             <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
