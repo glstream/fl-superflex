@@ -904,7 +904,7 @@ def team_view(user_id, league_id, session_id, view_source):
         user_id = league_data[1]
         league_id = league_data[2]
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        player_manager_upates(db, button, session_id, user_id, league_id, startup=False)
         return redirect(
             url_for(
                 f"leagues.{button}",
