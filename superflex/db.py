@@ -9,6 +9,7 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
+
 def get_db():
     """Connect to the application's configured database. The connection
     is unique for each request and will be reused if this is called
@@ -16,23 +17,27 @@ def get_db():
     """
     if "db" not in g:
         g.db = sqlite3.connect(
-            current_app.config["DATABASE"], detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False
+            current_app.config["DATABASE"],
+            detect_types=sqlite3.PARSE_DECLTYPES,
+            check_same_thread=False,
         )
         g.db.row_factory = sqlite3.Row
-        
 
     return g.db
+
 
 def pg_db():
     """Get connection to cloud postgres database"""
     # Update connection string information
 
-    host = os.getenv('host')
-    dbname = os.getenv('dbname')
-    user = os.getenv('user')
-    password = os.getenv('password')
-    sslmode = os.getenv('sslmode')
-    conn_string = "host={0} user={1} dbname={2} password=superflex1! sslmode={4}".format(host, user, dbname, password, sslmode)
+    host = os.getenv("host")
+    dbname = os.getenv("dbname")
+    user = os.getenv("user")
+    password = os.getenv("password")
+    sslmode = os.getenv("sslmode")
+    conn_string = "host={0} user={1} dbname={2} password={3} sslmode={4}".format(
+        host, user, dbname, str(password), sslmode
+    )
     g.db = psycopg2.connect(conn_string)
     # g.db = conn.cursor()
     g.db.autocommit = True
