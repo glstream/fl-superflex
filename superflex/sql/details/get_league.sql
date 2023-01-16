@@ -187,6 +187,7 @@ WITH base_players as (SELECT
                     SELECT tp.user_id
                     ,m.display_name
                     ,coalesce(ktc.player_full_name, tp.picks_player_name, p.full_name) as full_name
+                    , tp.draft_year
                     ,ktc.slug as hyper_link
                     ,p.team
                     ,tp.player_id as sleeper_id
@@ -199,6 +200,7 @@ WITH base_players as (SELECT
                             ,ap.player_id
                             ,ap.ktc_player_id
                             ,NULL as picks_player_name
+                            ,NULL as draft_year
                             ,ap.player_position 
                             ,ap.fantasy_position
                             ,'STARTER' as fantasy_designation
@@ -210,6 +212,7 @@ WITH base_players as (SELECT
                             ,bp.player_id
                             ,bp.ktc_player_id
                             ,NULL as picks_player_name
+                            ,NULL as draft_year
                             ,bp.player_position 
                             ,bp.player_position as fantasy_position
                             ,'BENCH' as fantasy_designation
@@ -221,6 +224,7 @@ WITH base_players as (SELECT
                             ,null as player_id
                             ,picks.ktc_player_id
                             ,picks.player_name as picks_player_name
+                            ,picks.year as draft_year
                             ,'PICKS' as player_position 
                             ,'PICKS' as fantasy_position
                             ,'PICKS' as fantasy_designation
@@ -231,4 +235,4 @@ WITH base_players as (SELECT
                     left join dynastr.players p on tp.player_id = p.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
                     inner join dynastr.managers m on tp.user_id = m.user_id 
-                    order by m.display_name, picks_player_name asc, player_value desc
+                    order by draft_year asc, player_value desc
