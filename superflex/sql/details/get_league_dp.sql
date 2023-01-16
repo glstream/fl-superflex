@@ -169,6 +169,7 @@ WITH base_players as (SELECT
                     SELECT tp.user_id
                     ,m.display_name
                     ,coalesce(p.full_name, tp.player_full_name) as full_name
+                    , tp.draft_year
                     ,lower(p.first_name) as first_name
 					,lower(p.last_name) as last_name
                     ,p.team
@@ -182,6 +183,7 @@ WITH base_players as (SELECT
                             ,ap.player_id
                             ,ap.fp_player_id
                             ,ap.player_full_name
+                            , NULL as draft_year
                             ,ap.player_position 
                             ,ap.fantasy_position
                             ,'STARTER' as fantasy_designation
@@ -193,6 +195,7 @@ WITH base_players as (SELECT
                             ,bp.player_id
                             ,bp.fp_player_id
                             ,bp.player_full_name
+                            , NULL as draft_year
                             ,bp.player_position 
                             ,bp.player_position as fantasy_position
                             ,'BENCH' as fantasy_designation
@@ -204,6 +207,7 @@ WITH base_players as (SELECT
                             ,null as player_id
                             ,picks.fp_player_id
                             ,picks.player_full_name as player_full_name
+                            ,picks.year as draft_year
                             ,'PICKS' as player_position 
                             ,'PICKS' as fantasy_position
                             ,'PICKS' as fantasy_designation
@@ -244,4 +248,4 @@ WITH base_players as (SELECT
                     left join dynastr.players p on tp.player_id = p.player_id
                     LEFT JOIN dynastr.dp_player_ranks dp on tp.player_full_name = dp.player_full_name
                     inner join dynastr.managers m on tp.user_id = m.user_id 
-                    order by m.display_name, player_value desc, tp.player_full_name	asc	
+                    order by draft_year asc, player_value desc
