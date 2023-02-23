@@ -429,7 +429,6 @@ def total_owned_picks(
         league_size = get_league_rosters_size(league_id)
         total_picks = get_traded_picks(league_id)
         draft_id = get_draft_id(league_id)
-        # work here
         years = (
             [str(int(draft_id["season"]) + i) for i in range(1, 4)]
             if draft_id["status"] == "complete"
