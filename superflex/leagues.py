@@ -40,6 +40,16 @@ def league_managers(league_id: str, user_id: str) -> list:
     return managers
 
 
+def get_league_managers(league_id: str) -> list:
+    league_managers_url = f"https://api.sleeper.app/v1/league/{league_id}/users"
+    leg_managers_res = requests.get(league_managers_url)
+    leg_managers = [
+        (i["user_id"], i["display_name"], i["league_id"])
+        for i in leg_managers_res.json()
+    ]
+    return leg_managers
+
+
 def get_user_name(user_id: str):
     user_req = requests.get(f"https://api.sleeper.app/v1/user/{user_id}")
     user_meta = user_req.json()
@@ -116,6 +126,12 @@ def get_managers(league_id: str) -> list:
         for i in res.json()
     ]
     return manager_data
+
+
+def get_roster_ids(league_id: str) -> list:
+    roster_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+    roster_meta = roster_res.json()
+    return [(r["owner_id"], str(r["roster_id"])) for r in roster_meta]
 
 
 def clean_league_managers(db, league_id: str):
@@ -413,12 +429,13 @@ def total_owned_picks(
         league_size = get_league_rosters_size(league_id)
         total_picks = get_traded_picks(league_id)
         draft_id = get_draft_id(league_id)
-
+        # work here
         years = (
             [str(int(draft_id["season"]) + i) for i in range(1, 4)]
             if draft_id["status"] == "complete"
             else [str(int(draft_id["season"]) + i) for i in range(0, 3)]
         )
+
         rounds = [r for r in range(1, draft_id["settings"]["rounds"] + 1)]
 
         traded_picks = [
@@ -426,6 +443,7 @@ def total_owned_picks(
             for pick in total_picks
             if pick["roster_id"] != pick["owner_id"] and pick["season"] in years
         ]
+
         for year in years:
             base_picks[year] = {
                 round: [[i, i] for i in range(1, league_size + 1)] for round in rounds
@@ -462,6 +480,7 @@ def total_owned_picks(
                     ]
                     for pick in picks
                 ]
+
                 with db.cursor() as cursor:
                     execute_values(
                         cursor,
@@ -503,59 +522,74 @@ def clean_draft_positions(db, league_id: str):
 def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) -> None:
     draft_id = get_draft_id(league_id)
     draft = get_draft(draft_id["draft_id"])
-    league = get_full_league(league_id)
+
     draft_order = []
     draft_dict = draft["draft_order"]
     draft_slot = {k: v for k, v in draft["slot_to_roster_id"].items() if v is not None}
-
-    if len(draft["draft_order"]) < len(draft["slot_to_roster_id"]):
-        empty_team_cnt = 0
-        for k, v in draft_slot.items():
-            if int(k) not in list(draft["draft_order"].values()):
-                # print("DRAFT_POSITION", k, "ROSTER_ID", v)
-                if league[v - 1]["owner_id"] is not None:
-                    draft_dict[league[v - 1]["owner_id"]] = int(k)
-                else:
-                    empty_alias = f"Empty_Team{empty_team_cnt}"
-                    draft_dict[empty_alias] = v
-                    empty_team_cnt += 1
-
     season = draft["season"]
     rounds = draft_id["settings"]["rounds"]
     roster_slot = {int(k): v for k, v in draft_slot.items() if v is not None}
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
-
-    try:
-        draft_order_dict = dict(sorted(draft_dict.items(), key=lambda item: item[1]))
-    except:
+    if draft_dict is None:
         # if no draft is present then create all managers at mid level for picks
-        draft_order_dict = {i[0]: 5 for i in league_managers(league_id, user_id)}
+        participents = get_roster_ids(league_id)
 
-    draft_order_ = dict([(value, key) for key, value in draft_order_dict.items()])
-
-    for draft_position, roster_id in rs_dict.items():
-        if draft_position <= 4:
-            position_name = "Early"
-        elif draft_position <= 8:
+        for pos in range(len(rs_dict.items())):
             position_name = "Mid"
-        else:
-            position_name = "Late"
-        if int(draft_position) in [
-            int(draft_position) for user_id, draft_position in draft_order_dict.items()
-        ]:
             draft_order.append(
                 [
                     season,
                     rounds,
-                    draft_position,
+                    pos,
                     position_name,
-                    roster_id,
-                    draft_order_[int(draft_position)],
-                    # draft_order_.get(int(draft_position), "Empty"),
+                    participents[pos][1],  # roster_id
+                    participents[pos][0],  # user_id
                     league_id,
                     draft_id["draft_id"],
                 ]
             )
+    else:
+        if len(draft.get("draft_order", 0)) < len(draft["slot_to_roster_id"]):
+            league = get_full_league(league_id)
+            empty_team_cnt = 0
+            for k, v in draft_slot.items():
+                if int(k) not in list(draft.get("draft_order", {}).values()):
+                    # print("DRAFT_POSITION", k, "ROSTER_ID", v)
+                    if league[v - 1]["owner_id"] is not None:
+                        draft_dict[league[v - 1]["owner_id"]] = int(k)
+                    else:
+                        empty_alias = f"Empty_Team{empty_team_cnt}"
+                        draft_dict[empty_alias] = v
+                        empty_team_cnt += 1
+
+        draft_order_dict = dict(sorted(draft_dict.items(), key=lambda item: item[1]))
+        draft_order_ = dict([(value, key) for key, value in draft_order_dict.items()])
+
+        for draft_position, roster_id in rs_dict.items():
+            if draft_position <= 4:
+                position_name = "Early"
+            elif draft_position <= 8:
+                position_name = "Mid"
+            else:
+                position_name = "Late"
+            if int(draft_position) in [
+                int(draft_position)
+                for user_id, draft_position in draft_order_dict.items()
+            ]:
+                draft_order.append(
+                    [
+                        season,
+                        rounds,
+                        draft_position,
+                        position_name,
+                        roster_id,
+                        draft_order_[int(draft_position)],
+                        # draft_order_.get(int(draft_position), "Empty"),
+                        league_id,
+                        draft_id["draft_id"],
+                    ]
+                )
+
     cursor = db.cursor()
     execute_batch(
         cursor,
