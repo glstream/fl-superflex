@@ -1,13 +1,13 @@
 {% macro ba(best_available) %}
 
-<div class="card-fr" style="width: 18em;">
+<div class="card border-0" style="width: 25em;">
     <div class="header">
-        <h4 style="padding:10px" class="title">Best Available</h4>
+        <h4 class="title">Best Available</h4>
     </div>
 
     {% for pos, player in best_available.items() %}
     <div class="d-flex justify-content-between">
-        <h5 class="text-left margin-left: 20px;"><span class="badge bg-light">{{pos}}</span></h5>
+        <h5 class="text-left margin-left: 10px;"><span class="badge bg-light">{{pos}}</span></h5>
         <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
     </div>
     {% for p in player %}

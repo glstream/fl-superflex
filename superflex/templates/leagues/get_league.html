@@ -16,6 +16,10 @@
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
+<div class="desk">Large Screen</div>
+<div class="div-only-mobile">Only Mobile</div>
+<p>Demo Text.</p>
+
 <div style="display: flex; gap:10px">
     <form method="post" class="form-inline">
         <button class="btn btn-outline-secondary bt-sm" type="submit" name="get_league"
@@ -60,18 +64,22 @@
 
 </h5>
 <br>
-<div class="row justify-content-center">
-    {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id, session_id,'get_league_ktc')}}
-    <div class="col-auto" style="width: 65em;">
-        {{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
-        <br>
-        <div class="col-auto" style="width:65em; margin-right: 50px;">
+<div class="col-auto">
+    {{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
+</div>
+<br>
+<div class="row justify-content-between">
+    <div class="col-lg">
+        {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id, session_id,'get_league_ktc')}}
+    </div>
+    <div class="col-lg">
+        <div style="margin-top: 20px">
             {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
-            <br>
             {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
         </div>
     </div>
-    <div class="col-auto" style="margin-top: 90px;">
+
+    <div class="col-lg" style="margin-top: 20px;">
         <canvas id="myChart" width="300" height="300"></canvas>
         <script>
             try {
@@ -126,7 +134,9 @@
             }
         </script>
     </div>
-    {{ba(best_available)}}
+    <div class="col-lg">
+        {{ba(best_available)}}
+    </div>
 </div>
 <br>
 
