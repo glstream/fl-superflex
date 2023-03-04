@@ -64,77 +64,72 @@
 
 </h5>
 <br>
-<div class="col-auto">
-    {{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
-</div>
+{{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
 <br>
-<div class="row justify-content-between">
-    <div class="col-lg">
+<div class="row justify-content-left">
+    <div class="col-auto">
         {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id, session_id,'get_league_ktc')}}
     </div>
-    <div class="col-lg">
-        <div style="margin-top: 20px">
+    <div class="col-auto">
+        <div style="margin-top: 30px">
             {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
             {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
         </div>
     </div>
-
-    <div class="col-lg" style="margin-top: 20px;">
-        <canvas id="myChart" width="300" height="300"></canvas>
-        <script>
-            try {
-                const ctx = document.getElementById('myChart').getContext('2d');
-                const myChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
-                        datasets: [{
-                            label: '{{page_user[0][0]}}',
-                            data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
-                            backgroundColor: 'rgb(39, 125, 161,.7)',
-                            borderColor: 'rgb(249, 199, 79, 0.7)',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            tooltip: {
-                                bodyColor: '#F9C74F'
-                            }
+    <div class="col-auto">
+        <div class="card border-0">
+            <canvas id="myChart" width="340" height="340"></canvas>
+            <script>
+                try {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    const myChart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
+                            datasets: [{
+                                label: '{{page_user[0][0]}}',
+                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
+                                backgroundColor: 'rgb(39, 125, 161, .95)',
+                                borderColor: 'rgb(67, 170, 139, 1.0)',
+                                borderWidth: 3
+                            }]
                         },
+                        options: {
+                            font: {
+                                size: 16,
+                                weight: "bolder"
+                            },
+                            plugins: {
+                                tooltip: {
+                                    bodyColor: '#F9C74F'
+                                }
+                            },
 
-                        scales: {
+                            scales: {
 
-                            r: {
-                                reverse: true,
-                                max: {{ total_rosters }},
-            min: 1,
-                beginAtZero: false,
+                                r: {
+                                    reverse: true,
+                                    max: {{ total_rosters }},
+                min: 1,
+                    beginAtZero: false,
 
-                    ticks: {
-                stepSize: 3,
-                    display: true,
+                        ticks: {
+                    stepSize: 4,
                         font: {
-                    size: 12
+                        size: 16,
+                            weight: "bold"
+                    }
                 }
-            },
-            pointLabels: {
-                display: true
-            },
-        
-        
                                 },
                             },
-            responsive: false,
         
                         }
                     });
             } catch (e) {
 
-            }
-        </script>
-    </div>
-    <div class="col-lg">
+                }
+            </script>
+        </div>
         {{ba(best_available)}}
     </div>
 </div>
@@ -145,7 +140,7 @@
 </div>
 
 <br>
-<div class="row justify-content-center">
+<div class="row justify-content-left">
     {{ player_cards(owners, users, aps, league_id, session_id, 'ktc', 'get_league_ktc') }}
 </div>
 {% endblock %}

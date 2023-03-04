@@ -15,7 +15,7 @@ table {
 
 .table-all {
     border: 1px solid black;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .progress-bar {
@@ -61,7 +61,21 @@ table {
     background-color: rgb(39, 125, 161) !important;
 }
 
+.badge.bg-QB {
+    outline-color: rgb(39, 125, 161) !important;
+
+    border-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161) !important;
+}
+
 .badge.bg-success {
+    outline-color: rgb(144, 190, 109) !important;
+
+    border-color: rgb(144, 190, 109) !important;
+    background-color: rgb(144, 190, 109) !important;
+}
+
+.badge.bg-RB {
     outline-color: rgb(144, 190, 109) !important;
 
     border-color: rgb(144, 190, 109) !important;
@@ -75,7 +89,21 @@ table {
     background-color: rgb(67, 170, 139) !important;
 }
 
+.badge.bg-WR {
+    outline-color: rgb(67, 170, 139) !important;
+
+    border-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139) !important;
+}
+
 .badge.bg-danger {
+    outline-color: rgb(249, 132, 74) !important;
+
+    border-color: rgb(249, 132, 74) !important;
+    background-color: rgb(249, 132, 74) !important;
+}
+
+.badge.bg-TE {
     outline-color: rgb(249, 132, 74) !important;
 
     border-color: rgb(249, 132, 74) !important;
@@ -180,6 +208,7 @@ table {
 
 th {
     height: 100%;
+    font-weight: normal;
 }
 
 td {
@@ -481,5 +510,5 @@ h5>.badge {
 
 .gfg {
     border-collapse: separate;
-    border-spacing: 0 15px;
+    border-spacing: 0 18px;
 }

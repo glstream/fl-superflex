@@ -1,8 +1,7 @@
 {% macro table_footer(source, update_diff_minutes)%}
 <div>
-    <p style="float:right;">Source: {{source}}</p>
-    <span class="align-bottom">{{source}} Updated
+    <span class="align-bottom"><b>{{source}}</b></span><span style="float:right;"> Updated
         {{update_diff_minutes}} minutes
-        ago.</span>
+        ago</span>
 </div>
 {% endmacro %}

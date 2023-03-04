@@ -22,42 +22,44 @@
         aria-controls="collapseExample">
         Show Team
     </a>
-    <div class="card-fr" style="width: 25rem;">
+    <div class="card-fr" style="width: 31rem;">
         {% for k, v in aps.items()%}
         {% set designation = k %}
         <div class="card-header bg-transparent">
-            <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
-                suffix}}
-            </h5>
+            <h4>{{designation[0] | upper }}{{ designation[1:] | lower}}
+                <span class="badge bg-primary" style="float:right;">{{owner[designation+"_rank"] |
+                    suffix}}
+                </span>
+            </h4>
         </div>
-        <br> {% for p,j in v.items() %}
+        <br>
+        {% for p,j in v.items() %}
         <div class="card d-flex border-0">
             {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
             <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
                 <div class="d-flex justify-content-between">
                     {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                    <h4 class="float:left;"><span class="badge bg-primary">{{c.fantasy_position}}</span></h4>
                     {% elif c.fantasy_position =="RB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                    <h4 class="text-left margin-left: 20px;"><span
+                            class="badge bg-success">{{c.fantasy_position}}</span></h4>
                     {% elif c.fantasy_position =="WR" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                    <h4 class="text-left margin-left: 20px;"><span
+                            class="badge bg-warning">{{c.fantasy_position}}</span></h4>
                     {% elif c.fantasy_position =="TE" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
+                    </h4>
                     {% elif c.fantasy_position =="FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
+                    </h4>
                     {% elif c.fantasy_position =="SUPER_FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
+                    </h4>
                     {% elif c.fantasy_position == "PICKS" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
+                    </h4>
                     {%endif%}
-                    <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+                    <h4 class="float:right;"><span class="badge bg-secondary">Value</span></h4>
                     {%endif%}
                 </div>
 
@@ -120,9 +122,14 @@
                             href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
                             target="_blank">{{c.full_name}}</a>
                         {% endif %}
-                        <b><span class="text-lg-right">
+
+                        <h5><span class="badge bg-{{c.player_position}}">{{c.player_position}}
+                                {{"{:,}".format(c.player_rank)|
+                                replace(-1,"Unranked") }}
+                            </span></h5>
+                        <h5><span class="text-lg-right" style="font-size: 14px;">
                                 {{"{:,}".format(c.player_value)|
-                                replace(-1,"Unranked") }}</b></span>
+                                replace(-1,"Unranked") }}</span></h5>
                     </li>
                 </ul>
                 {% else %}
