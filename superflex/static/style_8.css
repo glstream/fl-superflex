@@ -43,9 +43,18 @@ table {
 
 .btn-secondary {
     outline-color: rgb(67, 170, 139) !important;
-
     border-color: rgb(67, 170, 139) !important;
     background-color: rgb(67, 170, 139) !important;
+}
+
+
+.btn-info {
+    outline-color: rgb(249, 199, 79) !important;
+    color: white !important;
+
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79) !important;
+
 }
 
 .badge.alert-secondary {
@@ -70,7 +79,6 @@ table {
 
 .badge.bg-success {
     outline-color: rgb(144, 190, 109) !important;
-
     border-color: rgb(144, 190, 109) !important;
     background-color: rgb(144, 190, 109) !important;
 }

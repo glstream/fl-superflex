@@ -10,33 +10,50 @@
             <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
         </object>
     </a>
-    <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
+    <h4 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
         <a
             href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
         &bull;
         {{"{:,}".format(owner.total_value)}}
-    </h5>
+    </h4>
     {% endif %}
     {%endfor%}
-    <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
-        aria-controls="collapseExample">
-        Show Team
+    <a class="btn btn-light" data-toggle="collapse" data-target=".multi-collapse-{{owner.user_id}}"
+        aria-expanded="false" aria-controls="collapseExample-all">
+        <i class="fa fa-expand" aria-hidden="true"></i>
+    </a>
+    <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}-starters" aria-expanded="true"
+        aria-controls="collapseExample-starters">
+        <i class="fa fa-chevron-down" aria-hidden="true"></i> Starters
+    </a>
+    <a class="btn btn-secondary" data-toggle="collapse" href="#collapse-{{owner.user_id}}-bench" aria-expanded="true"
+        aria-controls="collapseExample-bench">
+        <i class="fa fa-chevron-down" aria-hidden="true"></i> Bench
+    </a>
+    <a class="btn btn-info" data-toggle="collapse" href="#collapse-{{owner.user_id}}-picks" aria-expanded="true"
+        aria-controls="collapseExample-picks">
+        <i class="fa fa-chevron-down" aria-hidden="true"></i> Picks
     </a>
     <div class="card-fr" style="width: 31rem;">
         {% for k, v in aps.items()%}
         {% set designation = k %}
         <div class="card-header bg-transparent">
-            <h4>{{designation[0] | upper }}{{ designation[1:] | lower}}
-                <span class="badge bg-primary" style="float:right;">{{owner[designation+"_rank"] |
+            <h4 data-toggle="collapse" href="#collapse-{{owner.user_id}}-{{designation}}" aria-expanded="false"
+                aria-controls="collapseExample">{{designation[0] |
+                upper }}{{ designation[1:] | lower}}
+                <span class="badge bg-primary" style="float:right;margin-right: 10px;">{{owner[designation+"_rank"] |
                     suffix}}
                 </span>
+
             </h4>
         </div>
         <br>
         {% for p,j in v.items() %}
-        <div class="card d-flex border-0">
+        <div class="card d-flex border-0" id="{{designation}}">
             {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
-            <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
+
+            <div class="collapse multi-collapse multi-collapse-{{owner.user_id}}"
+                id="collapse-{{owner.user_id}}-{{designation}}">
                 <div class="d-flex justify-content-between">
                     {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
                     <h4 class="float:left;"><span class="badge bg-primary">{{c.fantasy_position}}</span></h4>
@@ -145,12 +162,14 @@
                 {% endif %}
 
             </div>
+
             {% endif %}
             {% endfor %}
 
         </div>
         {% endfor %}
         {% endfor %}
+
     </div>
 </div>
 {% endfor %}
