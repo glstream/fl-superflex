@@ -18,20 +18,35 @@ table {
     font-size: 12px;
 }
 
-.progress-bar {
-    background-color: rgb(39, 125, 161) !important;
+.progress-bar.bg-primary {
+    outline-color: rgb(39, 125, 161) !important;
+    border-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161, .7) !important;
 }
 
-.progress-bar-qb {
-    background-color: rgb(21, 170, 70) !important;
+.progress-bar.bg-success {
+    outline-color: rgb(144, 190, 109) !important;
+    border-color: rgb(144, 190, 109) !important;
+    background-color: rgb(144, 190, 109, .7) !important;
 }
 
-.progress-bar-rb {
-    background-color: rgb(216, 219, 9) !important;
+.progress-bar.bg-warning {
+    outline-color: rgb(67, 170, 139) !important;
+    border-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139, .7) !important;
 }
 
-.progress-bar-wr {
-    background-color: rgb(112, 9, 14) !important;
+.progress-bar.bg-danger {
+    outline-color: rgb(249, 132, 74) !important;
+    border-color: rgb(249, 132, 74) !important;
+    background-color: rgb(249, 132, 74, .7) !important;
+}
+
+.progress-bar.bg-dark {
+    outline-color: rgb(249, 199, 79) !important;
+    color: rgb(252, loc 252, 252) !important;
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79, .7) !important;
 }
 
 .btn-outline-primary {
@@ -48,7 +63,6 @@ table {
 
 .btn-primary {
     outline-color: rgb(87, 117, 144) !important;
-
     border-color: rgb(87, 117, 144) !important;
     background-color: rgb(87, 117, 144) !important;
 }
@@ -77,7 +91,6 @@ table {
 
 .badge.bg-primary {
     outline-color: rgb(39, 125, 161) !important;
-
     border-color: rgb(39, 125, 161) !important;
     background-color: rgb(39, 125, 161) !important;
 }
@@ -104,7 +117,6 @@ table {
 
 .badge.bg-warning {
     outline-color: rgb(67, 170, 139) !important;
-
     border-color: rgb(67, 170, 139) !important;
     background-color: rgb(67, 170, 139) !important;
 }
@@ -118,7 +130,6 @@ table {
 
 .badge.bg-danger {
     outline-color: rgb(249, 132, 74) !important;
-
     border-color: rgb(249, 132, 74) !important;
     background-color: rgb(249, 132, 74) !important;
 }
@@ -477,7 +488,7 @@ h5>.badge {
 
 .tooltip>.tooltip-inner {
     background-color: #ffffff !important;
-    color: rgb(184, 8, 8) !important;
+    color: rgb(0, 0, 0) !important;
     border: 1px solid rgb(98, 97, 97) !important;
     font-size: 12px !important;
     border-radius: .5em !important;

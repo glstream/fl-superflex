@@ -1,11 +1,9 @@
 {% macro power_ranks(owners, user_id, league_id, session_id, view_source) %}
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
 <!-- DataTables JS -->
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-<script type="text/javascript">
+<script>
     $(document).ready(function () {
         $('#myTable').DataTable({ order: [[1, 'asc']], searching: false, paging: false, info: false });
     });
@@ -16,13 +14,13 @@
             <tr>
                 <th scope="col" data-sortable="false"></th>
                 <th scope="col" style="font-weight: normal;">Overall</th>
-                <th class="sorting" scope="col">Starters</th>
-                <th class="sorting" scope="col">QB</th>
-                <th class="sorting" scope="col">RB</th>
-                <th class="sorting" scope="col">WR</th>
-                <th class="sorting" scope="col">TE</th>
-                <th class="sorting" scope="col">Picks</th>
-                <th class="sorting" scope="col">Bench</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">Starters</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">QB</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">RB</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">WR</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">TE</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">Picks</th>
+                <th class="sorting" style="font-weight: normal;" scope="col">Bench</th>
             </tr>
         </thead>
         <tbody>
