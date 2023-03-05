@@ -68,7 +68,8 @@
 <br>
 <div class="row justify-content-left">
     <div class="col-auto">
-        {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id, session_id,'get_league_ktc')}}
+        {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id,
+        session_id,pct_values_dict,'get_league_ktc')}}
     </div>
     <div class="col-auto">
         <div style="margin-top: 30px">
@@ -135,7 +136,7 @@
 </div>
 <br>
 
-<div> <a class="btn btn-secondary" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
+<div> <a class="btn btn-light" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
         aria-controls="collapseExample"><i class="fa fa-expand" aria-hidden="true"></i> | all teams</a>
 </div>
 

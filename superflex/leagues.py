@@ -1341,13 +1341,42 @@ def get_league():
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
-            total_value = [row["total_value"] for row in owners][0] * 1.05
+            calc_value = [row["total_value"] for row in owners][0]
+            total_value = calc_value * 1.05
+
             pct_values = [
                 (((row["total_value"] - total_value) / total_value) + 1) * 100
                 for row in owners
             ]
+            pct_values_dict = {
+                "total": [
+                    (((row["total_value"] - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "qb_total": [
+                    (((int(row["qb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "rb_total": [
+                    (((int(row["rb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "wr_total": [
+                    (((int(row["wr_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "te_total": [
+                    (((int(row["te_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "picks_total": [
+                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+            }
         except:
             pct_values = []
+            pct_values_dict = {}
 
         ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -1422,6 +1451,7 @@ def get_league():
             labels=labels,
             values=values,
             pct_values=pct_values,
+            pct_values_dict=pct_values_dict,
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
