@@ -5,7 +5,7 @@ html {
 
 body {
     margin: 0 auto;
-    /* background: white; */
+    background-color: #E3E2DF;
 }
 
 table {
@@ -49,6 +49,10 @@ table {
     background-color: rgb(249, 199, 79, .7) !important;
 }
 
+.progress.border.border-dark {
+    border-color: rgba(189, 195, 199, 0.6) !important;
+}
+
 .btn-outline-primary {
     outline-color: rgb(87, 117, 144) !important;
     color: rgb(87, 117, 144) !important;
@@ -56,9 +60,51 @@ table {
 }
 
 .btn-outline-primary:hover {
-    color: rgba(87, 117, 144) !important;
-    background-color: rgb(133, 134, 135, 0.45) !important;
+    outline-color: rgb(87, 117, 144) !important;
+    background-color: white !important;
+    color: gray !important;
 }
+
+.btn-outline-danger {
+    outline-color: rgb(87, 117, 144) !important;
+    border-color: rgb(87, 117, 144) !important;
+    color: white !important;
+    background-color: rgb(87, 117, 144) !important;
+}
+
+.btn-outline-danger:hover {
+    outline-color: rgb(87, 117, 144) !important;
+    background-color: white !important;
+    color: gray !important;
+}
+
+.btn-outline-warning {
+    outline-color: rgb(67, 170, 139) !important;
+    border-color: rgb(67, 170, 139) !important;
+    color: white !important;
+    background-color: rgb(67, 170, 139) !important;
+}
+
+.btn-outline-warning:hover {
+    outline-color: rgb(67, 170, 139) !important;
+    background-color: white !important;
+    color: gray !important;
+}
+
+.btn-outline-info {
+    outline-color: rgb(249, 199, 79) !important;
+    color: white !important;
+    border-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79) !important;
+}
+
+.btn-outline-info:hover {
+    outline-color: rgb(249, 199, 79) !important;
+    background-color: white !important;
+    color: gray !important;
+}
+
+
 
 
 .btn-primary {
@@ -77,7 +123,6 @@ table {
 .btn-info {
     outline-color: rgb(249, 199, 79) !important;
     color: white !important;
-
     border-color: rgb(249, 199, 79) !important;
     background-color: rgb(249, 199, 79) !important;
 
@@ -211,9 +256,9 @@ table {
     margin-bottom: 25px;
     margin-top: 25px;
     padding: 1.5em .5em .5em;
-    border-radius: 1em;
+    border-radius: .5em;
     box-shadow: 0 5px 7px rgba(39, 125, 161, 0.2);
-    border: 2em;
+    border: 1em;
     border-style: solid;
     border-width: 1px 1px 1px 1px;
     border-color: rgb(77, 144, 142);
@@ -413,11 +458,6 @@ input[type=submit] {
     flex: 1
 }
 
-/* .card-header {
-  border: none;
-  background-color: rgba(0, 0, 0, .8);
-} */
-
 .text-right {
     text-align: right;
 }
@@ -425,25 +465,6 @@ input[type=submit] {
 .text-left {
     text-align: left;
 }
-
-
-/* .card-header {display:inline-block;}
-.card-row {display:inline-block;} */
-
-
-/* .card,
-.card-header,
-.card-body,
-.card-footer {
-  border-radius: 0px !important;
-  border: 1px solid;
-  border-bottom: 1px;
-} */
-
-/* .row {
-    margin-bottom: 2px;
-    margin-top: 2px;
-} */
 
 a.right {
     display: inline-block;
@@ -457,6 +478,18 @@ a.right {
     flex: 0 0 38px;
     /* float: left; */
     /* background: center center / cover rgb(239, 239, 239); */
+    /* border-radius: 50%; */
+    background-color: transparent;
+}
+
+.avatar-manager {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    border-radius: 1px;
+    border: 1px solid #6c757d;
     border-radius: 50%;
 }
 
@@ -468,11 +501,6 @@ html {
     display: inline-block;
 }
 
-/* ul {
-  column-count: 2;
-  column-rule: dotted 1px #333;
-  list-style-type: none;
-} */
 
 a:link {
     text-decoration: none;
@@ -499,17 +527,6 @@ h5>.badge {
     opacity: 1.0 !important;
 }
 
-.desk {
-    width: 400px;
-    height: 200px;
-    background: white;
-}
-
-.div-only-mobile {
-    width: 400px;
-    height: 200px;
-    background: orange;
-}
 
 @media screen and (max-width : 1920px) {
     .div-only-mobile {

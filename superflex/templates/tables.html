@@ -9,7 +9,7 @@
     });
 </script>
 <div class="table-responsive">
-    <table class="table table-striped" style="width:85%;font-size: 13px;" id="myTable">
+    <table class="table table-striped table-hover" style="width:85%;font-size: 13px;;" id="myTable">
         <thead style="text-align:center;">
             <tr>
                 <th scope="col" data-sortable="false"></th>
@@ -26,8 +26,8 @@
         <tbody>
             {% for owner in owners %}
 
-            <td style="text-align:center"> <a
-                    style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px"
+            <td style="text-align:center;"> <a
+                    style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px;"
                     href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
             </td>
 

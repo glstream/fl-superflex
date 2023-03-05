@@ -78,7 +78,7 @@
         </div>
     </div>
     <div class="col-auto">
-        <div class="card border-0" style="margin-top: 30px;">
+        <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
             <canvas id="myChart" width="340" height="340"></canvas>
             <script>
                 try {
@@ -138,10 +138,9 @@
 </div>
 <br>
 
-<div> <a class="btn btn-light" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
+<div> <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
         aria-controls="collapseExample"><i class="fa fa-expand" aria-hidden="true"></i> | all teams</a>
 </div>
-
 <br>
 <div class="row justify-content-center">
     {{ player_cards(owners, users, aps, league_id, session_id, 'ktc', 'get_league_ktc') }}

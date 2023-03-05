@@ -4,23 +4,23 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
-<div class="card border-0" style="width:31rem;">
+<div class="card border-0" style="width:31rem; background-color: transparent;">
     <div class="header">
         <h1 class="title">{{rank_name}}</h1>
     </div>
     <ul class="list-group list-group-flush">
         {% for owner in owners %}
-        <li class="list-group-item">
+        <li class="list-group-item" style="background-color: transparent;">
             <a style="font-family: sans-serif;color: rgb(15, 88, 167);text-decoration: none;font-size: 13px"
                 href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.total_rank
                 | suffix}} {{owner.display_name}}</a>
             <span style="float:right;font-size: 13px; font-weight: bold;">{{"{:,}".format(owner.total_value)}}</span>
         </li>
-        <div class="progress" style="height: 20px;">
+        <div class="progress border border-dark" style="height: 20px;background-color: white;font-size: 1rem;">
             <div class="progress-bar bg-primary" role="progressbar"
                 style="width:{{pct_values_dict.qb_total[loop.index-1]}}%;"
                 aria-valuenow="{{pct_values_dict.qb_total[loop.index-1]}}" aria-valuemin="0" aria-valuemax="100"
-                data-toggle="tooltip" data-html="true"
+                data-toggle="tooltip" data-placement="right" data-html="true"
                 title="QBs: <b>{{'{:,}'.format(owner.qb_sum) | default('', True)}}  &bull; {{owner.qb_rank | default('', True) | suffix}} </b>">
                 QB
             </div>
