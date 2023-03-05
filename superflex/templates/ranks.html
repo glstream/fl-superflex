@@ -1,4 +1,9 @@
 {% macro power_status_ranks(owners, pct_values, rank_name, league_id, session_id, pct_values_dict, view_source) %}
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
 <div class="card border-0" style="width:31rem;">
     <div class="header">
         <h1 class="title">{{rank_name}}</h1>
@@ -6,12 +11,12 @@
     <ul class="list-group list-group-flush">
         {% for owner in owners %}
         <li class="list-group-item">
-            <a style="font-family: sans-serif;color: rgb(15, 88, 167);text-decoration: none;font-size: 12px"
+            <a style="font-family: sans-serif;color: rgb(15, 88, 167);text-decoration: none;font-size: 13px"
                 href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.total_rank
                 | suffix}} {{owner.display_name}}</a>
             <span style="float:right">{{"{:,}".format(owner.total_value)}}</span>
         </li>
-        <div class="progress" style="height: 15px;">
+        <div class="progress" style="height: 20px;">
             <!-- <div class="progress-bar" role="progressbar" style="width: {{pct_values[loop.index-1]}}%;font-size: medium;"
                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div> -->
             <div class="progress-bar bg-warning" role="progressbar"

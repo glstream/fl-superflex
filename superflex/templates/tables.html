@@ -1,19 +1,28 @@
 {% macro power_ranks(owners, user_id, league_id, session_id, view_source) %}
-
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#myTable').DataTable({ order: [[1, 'asc']], searching: false, paging: false, info: false });
+    });
+</script>
 <div class="table-responsive">
-
-    <table class="table" style="height: 50rem;font-size: 13px;">
+    <table class="table table-striped" style="width:85%;font-size: 13px;" id="myTable">
         <thead style="text-align:center;">
             <tr>
-                <th scope="col"></th>
+                <th scope="col" data-sortable="false"></th>
                 <th scope="col" style="font-weight: normal;">Overall</th>
-                <th scope="col">Starters</th>
-                <th scope="col">QB</th>
-                <th scope="col">RB</th>
-                <th scope="col">WR</th>
-                <th scope="col">TE</th>
-                <th scope="col">Picks</th>
-                <th scope="col">Bench</th>
+                <th class="sorting" scope="col">Starters</th>
+                <th class="sorting" scope="col">QB</th>
+                <th class="sorting" scope="col">RB</th>
+                <th class="sorting" scope="col">WR</th>
+                <th class="sorting" scope="col">TE</th>
+                <th class="sorting" scope="col">Picks</th>
+                <th class="sorting" scope="col">Bench</th>
             </tr>
         </thead>
         <tbody>
@@ -24,36 +33,43 @@
                     href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
             </td>
 
-            <td style="text-align:center" class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" data-html="true"
-                title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>">
+            <td style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px"
+                class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" data-html="true"
+                title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>" data-sort="{{owner.total_rank}}">
                 {{owner.total_rank | suffix}}
             </td>
-            <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-toggle="tooltip"
-                data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.starters_tile}}" data-sort="{{owner.starters_rank}}"
+                data-sort="{{owner.starters_rank}}" data-toggle="tooltip" data-html="true"
                 title="Starters Value: <b>{{'{:,}'.format(owner.starters_sum) | default('', True)}}</b><br>Starters Avg. <b>{{'{:,}'.format(owner.starters_average)}} </b>">
                 {{owner.starters_rank | suffix}}</td>
-            <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-toggle="tooltip" data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.qb_tile}}" data-sort="{{owner.qb_rank}}"
+                data-toggle="tooltip" data-html="true"
                 title="QB Value: <b>{{'{:,}'.format(owner.qb_sum)}}</b><br>QB Avg. <b>{{'{:,}'.format(owner.qb_average) | default('', True)}} </b>">
                 {{owner.qb_rank | suffix}}
             </td>
-            <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-toggle="tooltip" data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.rb_tile}}" data-sort="{{owner.rb_rank}}"
+                data-toggle="tooltip" data-html="true"
                 title="RB Value: <b>{{'{:,}'.format(owner.rb_sum)}}</b><br>RB Avg. <b>{{'{:,}'.format(owner.rb_average) | default('', True)}} </b>">
                 {{owner.rb_rank | suffix}}
             </td>
-            <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-toggle="tooltip" data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.wr_tile}}" data-sort="{{owner.wr_rank}}"
+                data-toggle="tooltip" data-html="true"
                 title="WR Value: <b>{{'{:,}'.format(owner.wr_sum)}}</b><br>WR Avg. <b>{{'{:,}'.format(owner.wr_average) | default('', True)}} </b>">
                 {{owner.wr_rank | suffix}}
             </td>
-            <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-toggle="tooltip" data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.te_tile}}" data-sort="{{owner.te_rank}}"
+                data-toggle="tooltip" data-html="true"
                 title="TE Value: <b>{{'{:,}'.format(owner.te_sum) | default('', True) }}</b><br>TE Avg. <b>{{'{:,}'.format(owner.te_average) | default('', True)}} </b>">
                 {{owner.te_rank | suffix}}
             </td>
-            <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-toggle="tooltip" data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.picks_tile}}" data-sort="{{owner.picks_rank}}"
+                data-toggle="tooltip" data-html="true"
                 title="Picks Value: <b>{{'{:,}'.format(owner.picks_sum) | default('', True)}}</b>">
                 {{owner.picks_rank |
                 suffix}}
             </td>
-            <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-toggle="tooltip" data-html="true"
+            <td style="text-align:center" class="over-limit-{{owner.bench_tile}}" data-sort="{{owner.bench_rank}}"
+                data-toggle="tooltip" data-html="true"
                 title="Bench Value: <b>{{'{:,}'.format(owner.bench_sum)}}</b><br>Bench Avg. <b>{{'{:,}'.format(owner.bench_average) | default('', True)}} </b>">
                 {{owner.bench_rank | suffix}}</td>
             </tr>

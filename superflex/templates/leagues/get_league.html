@@ -6,11 +6,11 @@
 {% from 'header_page.html' import league_header %}
 {% from 'player_cards.html' import player_cards %}
 {% from 'table_footer.html' import table_footer %}
+
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-
 </script>
 {{league_header(league_name, avatar)}}
 {% if cur_league.previous_league_id is none %}
@@ -72,13 +72,13 @@
         session_id,pct_values_dict,'get_league_ktc')}}
     </div>
     <div class="col">
-        <div style="margin-top: 30px">
+        <div style="margin-top: 30px;">
             {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
-            <!-- {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}} -->
+            {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
         </div>
     </div>
     <div class="col-auto">
-        <div class="card border-0">
+        <div class="card border-0" style="margin-top: 30px;">
             <canvas id="myChart" width="340" height="340"></canvas>
             <script>
                 try {

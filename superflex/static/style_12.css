@@ -477,11 +477,12 @@ h5>.badge {
 
 .tooltip>.tooltip-inner {
     background-color: #ffffff !important;
-    color: rgb(0, 0, 0) !important;
+    color: rgb(184, 8, 8) !important;
     border: 1px solid rgb(98, 97, 97) !important;
     font-size: 12px !important;
     border-radius: .5em !important;
 }
+
 
 .tooltip.show {
     opacity: 1.0 !important;
@@ -528,7 +529,27 @@ h5>.badge {
     background-color: #ccc;
 }
 
-.gfg {
-    border-collapse: separate;
-    border-spacing: 0 18px;
+table.dataTable thead th {
+    border-bottom: 0 !important;
+}
+
+table.dataTable.no-footer {
+    border-bottom: 0 !important;
+}
+
+table.dataTable {
+    border-collapse: collapse !important;
+}
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+    bottom: .5em;
 }
