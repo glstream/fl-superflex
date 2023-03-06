@@ -175,68 +175,85 @@
 </div>
 {% endfor %}
 {% endmacro %}
-{% macro player_contender_cards(owners, users, aps, source) %}
 
+{% macro player_contender_cards(owners, users, aps, league_id, session_id, source, view_source) %}
 {% for owner in owners %}
 <div class="col-auto">
     {% for user in users %}
     {% if user[1] == owner.user_id %}
-    <object class="avatar-player" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
-        <img class="avatar-player" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-    </object>
-    <h5 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
-        {{owner.display_name}}
+    <a
+        href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">
+        <object class="avatar-manager" data="https://sleepercdn.com/avatars/thumbs/{{user[2]}}" type="image/png">
+            <img class="avatar-manager" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
+        </object>
+    </a>
+    <h4 class="text-left" style="vertical-align: middle;">{{owner.total_rank | suffix}} &bull;
+        <a
+            href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
         &bull;
         {{"{:,}".format(owner.total_value)}}
-    </h5>
+    </h4>
     {% endif %}
     {%endfor%}
-    <a class="btn btn-primary" data-toggle="collapse" href="#collapse-{{owner.user_id}}" aria-expanded="false"
-        aria-controls="collapseExample">
-        Show Team
+    <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse-{{owner.user_id}}"
+        aria-expanded="false" aria-controls="collapseExample-all">
+        <i class="fa fa-expand" aria-hidden="true"></i>
     </a>
-    <div class="card-fr" style="width: 25rem;">
+    <a class="btn btn-outline-danger" data-toggle="collapse" href="#collapse-{{owner.user_id}}-starters"
+        aria-expanded="true" aria-controls="collapseExample-starters">
+        <i class="fa fa-chevron-down" aria-hidden="true"></i> Starters
+    </a>
+    <a class="btn btn-outline-warning" data-toggle="collapse" href="#collapse-{{owner.user_id}}-bench"
+        aria-expanded="true" aria-controls="collapseExample-bench">
+        <i class="fa fa-chevron-down" aria-hidden="true"></i> Bench
+    </a>
+    <div class="card-fr" style="width: 31rem;">
         {% for k, v in aps.items()%}
         {% set designation = k %}
         <div class="card-header bg-transparent">
-            <h5>{{designation[0] | upper }}{{ designation[1:] | lower}} Rank: {{owner[designation+"_rank"] |
-                suffix}}
-            </h5>
+            <h4 data-toggle="collapse" href="#collapse-{{owner.user_id}}-{{designation}}" aria-expanded="false"
+                aria-controls="collapseExample">{{designation[0] |
+                upper }}{{ designation[1:] | lower}}
+                <span class="badge bg-primary" style="float:right;margin-right: 10px;">{{owner[designation+"_rank"] |
+                    suffix}}
+                </span>
+
+            </h4>
         </div>
-        <br> {% for p,j in v.items() %}
-        <div class="card d-flex border-0">
+        <br>
+        {% for p,j in v.items() %}
+        <div class="card d-flex border-0" id="{{designation}}" style="background-color: transparent;">
             {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
-            <div class="collapse multi-collapse" id="collapse-{{owner.user_id}}">
-                <div class="d-flex justify-content-between">
+
+            <div class="collapse multi-collapse multi-collapse-{{owner.user_id}}"
+                id="collapse-{{owner.user_id}}-{{designation}}">
+                <div class="d-flex justify-content-between" style="background-color: transparent;">
                     {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-primary">{{c.fantasy_position}}</span></h5>
+                    <h4 class="float:left;"><span class="badge bg-primary">{{c.fantasy_position}}</span></h4>
                     {% elif c.fantasy_position =="RB" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-success">{{c.fantasy_position}}</span></h5>
+                    <h4 class="text-left margin-left: 20px;"><span
+                            class="badge bg-success">{{c.fantasy_position}}</span></h4>
                     {% elif c.fantasy_position =="WR" %}
-                    <h5 class="text-left margin-left: 20px;"><span
-                            class="badge bg-warning">{{c.fantasy_position}}</span></h5>
+                    <h4 class="text-left margin-left: 20px;"><span
+                            class="badge bg-warning">{{c.fantasy_position}}</span></h4>
                     {% elif c.fantasy_position =="TE" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
+                    </h4>
                     {% elif c.fantasy_position =="FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
+                    </h4>
                     {% elif c.fantasy_position =="SUPER_FLEX" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
-                    </h5>
-                    {% elif c.fantasy_position == "PICKS" %}
-                    <h5 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
-                    </h5>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
+                    </h4>
                     {%endif%}
-                    <h5 class="text-right"><span class="badge bg-secondary">Value</span></h5>
+                    <h4 class="float:right;"><span class="badge bg-secondary">Value</span></h4>
                     {%endif%}
                 </div>
 
                 <ul class="list-group">
                     {% if c.fantasy_position != 'PICKS' %}
-                    <li class="list-group-item d-flex justify-content-between align-items-left border-0">
+                    <li class="list-group-item d-flex justify-content-between align-items-left border-0"
+                        style="background-color: transparent;">
                         {% if source in ['dp', 'nfl'] %}
                         <a href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/" target="_blank">
                             <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
@@ -293,9 +310,9 @@
                             href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
                             target="_blank">{{c.full_name}}</a>
                         {% endif %}
-                        <b><span class="text-lg-right">
+                        <h5><span class="text-lg-right" style="font-size: 14px;">
                                 {{"{:,}".format(c.player_value)|
-                                replace(-1,"Unranked") }}</b></span>
+                                replace(-1,"Unranked") }}</span></h5>
                     </li>
                 </ul>
                 {% else %}
@@ -311,12 +328,14 @@
                 {% endif %}
 
             </div>
+
             {% endif %}
             {% endfor %}
 
         </div>
         {% endfor %}
         {% endfor %}
+
     </div>
 </div>
 {% endfor %}

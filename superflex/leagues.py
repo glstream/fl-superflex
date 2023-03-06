@@ -1294,6 +1294,9 @@ def get_league():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         league_type = get_league_type(league_id)
+        league_pos_col = (
+            "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
+        )
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
@@ -1304,6 +1307,7 @@ def get_league():
                 .replace("'session_id'", f"'{session_id}'")
                 .replace("'league_id'", f"'{league_id}'")
                 .replace("league_type", f"{league_type}")
+                .replace("league_pos_col", f"{league_pos_col}")
             )
         player_cursor.execute(get_league_detail_sql)
         players = player_cursor.fetchall()
@@ -1499,6 +1503,9 @@ def get_league_fc():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         league_type = get_league_type(league_id)
+        league_pos_col = (
+            "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
+        )
 
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -1510,6 +1517,7 @@ def get_league_fc():
                 .replace("'session_id'", f"'{session_id}'")
                 .replace("'league_id'", f"'{league_id}'")
                 .replace("league_type", f"{league_type}")
+                .replace("league_pos_col", f"{league_pos_col}")
             )
         player_cursor.execute(get_league_detail_sql)
         players = player_cursor.fetchall()
@@ -1547,11 +1555,39 @@ def get_league_fc():
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
-            total_value = [row["total_value"] for row in owners][0] * 1.05
+            calc_value = [row["total_value"] for row in owners][0]
+            total_value = calc_value * 1.05
+
             pct_values = [
                 (((row["total_value"] - total_value) / total_value) + 1) * 100
                 for row in owners
             ]
+            pct_values_dict = {
+                "total": [
+                    (((row["total_value"] - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "qb_total": [
+                    (((int(row["qb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "rb_total": [
+                    (((int(row["rb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "wr_total": [
+                    (((int(row["wr_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "te_total": [
+                    (((int(row["te_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "picks_total": [
+                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+            }
         except:
             pct_values = []
 
@@ -1628,6 +1664,7 @@ def get_league_fc():
             labels=labels,
             values=values,
             pct_values=pct_values,
+            pct_values_dict=pct_values_dict,
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
@@ -1726,11 +1763,39 @@ def get_league_dp():
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
-            total_value = [row["total_value"] for row in owners][0] * 1.05
+            calc_value = [row["total_value"] for row in owners][0]
+            total_value = calc_value * 1.05
+
             pct_values = [
                 (((row["total_value"] - total_value) / total_value) + 1) * 100
                 for row in owners
             ]
+            pct_values_dict = {
+                "total": [
+                    (((row["total_value"] - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "qb_total": [
+                    (((int(row["qb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "rb_total": [
+                    (((int(row["rb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "wr_total": [
+                    (((int(row["wr_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "te_total": [
+                    (((int(row["te_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "picks_total": [
+                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+            }
         except:
             pct_values = []
 
@@ -1805,6 +1870,7 @@ def get_league_dp():
             labels=labels,
             values=values,
             pct_values=pct_values,
+            pct_values_dict=pct_values_dict,
             best_available=best_available,
             avatar=avatar,
             cur_league=cur_league,
@@ -2287,13 +2353,39 @@ def contender_rankings():
         try:
             labels = [row["display_name"] for row in c_owners]
             values = [row["total_value"] for row in c_owners]
-            total_value = [row["total_value"] for row in c_owners][0] * 1.05
+            calc_value = [row["total_value"] for row in c_owners][0]
+            total_value = calc_value * 1.05
+
             pct_values = [
                 (((row["total_value"] - total_value) / total_value) + 1) * 100
                 for row in c_owners
             ]
+            pct_values_dict = {
+                "total": [
+                    (((row["total_value"] - total_value) / total_value) + 1) * 100
+                    for row in c_owners
+                ],
+                "qb_total": [
+                    (((int(row["qb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in c_owners
+                ],
+                "rb_total": [
+                    (((int(row["rb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in c_owners
+                ],
+                "wr_total": [
+                    (((int(row["wr_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in c_owners
+                ],
+                "te_total": [
+                    (((int(row["te_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in c_owners
+                ],
+            }
         except:
             pct_values = []
+            pct_values_dict = {}
+        print("contender_rankings_PCT VALUES", pct_values_dict)
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -2370,6 +2462,7 @@ def contender_rankings():
             labels=labels,
             values=values,
             pct_values=pct_values,
+            pct_values_dict=pct_values_dict,
             best_available=con_best_available,
             avatar=avatar,
             cur_league=cur_league,
