@@ -225,18 +225,28 @@ def get_sleeper_state():
 
 
 def get_trades(league_id: str, nfl_state: dict) -> list:
-
     leg = nfl_state["leg"] if nfl_state["leg"] > 0 else 1
     all_trades = []
-    week = 1
-    for i in range(1, leg + 1):
+    if nfl_state["season_type"] != "off":
+        leg = nfl_state["leg"] if nfl_state["leg"] > 0 else 1
+        week = 1
+        for i in range(1, leg + 1):
 
-        trans_call = requests.get(
-            f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
-        ).json()
-        all_trades.extend(trans_call)
-        week += 1
-    trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
+            trans_call = requests.get(
+                f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
+            ).json()
+            all_trades.extend(trans_call)
+            week += 1
+        trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
+    else:
+        for week in range(1, 18):
+            trans_call = requests.get(
+                f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
+            ).json()
+            all_trades.extend(trans_call)
+            week += 1
+        trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
+
     return trades_payload
 
 
@@ -428,7 +438,6 @@ def total_owned_picks(
         league_size = get_league_rosters_size(league_id)
         total_picks = get_traded_picks(league_id)
         draft_id = get_draft_id(league_id)
-        # work here
         years = (
             [str(int(draft_id["season"]) + i) for i in range(1, 4)]
             if draft_id["status"] == "complete"
