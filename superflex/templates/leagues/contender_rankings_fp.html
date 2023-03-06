@@ -18,12 +18,12 @@
 {%endif%}
 <div style="display: flex; gap:10px">
     <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary" type="submit" name="fp_contender_rankings"
+        <button class="btn btn-outline-secondary" type="submit" name="contender_rankings"
             value="{{session_id,user_id,cur_league.previous_league_id}}" {{bt}}>Load Previous
             Year</button>
     </form>
     <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary" type="submit" name="fp_contender_rankings"
+        <button class="btn btn-outline-secondary" type="submit" name="contender_rankings"
             value="{{session_id,user_id,session_league_id}}">Load Current
             Year</button>
     </form>
@@ -55,86 +55,88 @@
         {% else %}
         <span class="badge alert-primary">Single QB</span>
         {% endif %}
-
         <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
-
 </h5>
 <br>
-<div class="row justify-content-center">
-    {{contender_status_ranks(owners, pct_values, 'Contender Rankings')}}
-
-    <div class="col-auto" style="width: 65em;">
-        {{buttons_large(session_id, user_id, league_id,fp_c_button='disabled')}}
-        <br>
-        <div class="col-auto" style="width:65em; margin-right: 50px;">
-            {{contender_ranks(owners)}}
-            <br>
-            {{table_footer('Fantasy Pros Player Projections', update_diff_minutes)}}
-            Week: {{nfl_current_week}}
+{{buttons_large(session_id, user_id, league_id, fp_button='disabled')}}
+<br>
+<div class="row justify-content-between">
+    <div class="col-auto">
+        {{contender_status_ranks(owners, pct_values, 'Contender Rankings', league_id,
+        session_id,pct_values_dict,'contender_rankings_fp')}}
+    </div>
+    <div class="col">
+        <div style="margin-top: 30px;">
+            {{contender_ranks(owners, user_id, league_id, session_id,'contender_ranks_fp')}}
+            {{table_footer('FantasyPros Player Projections', update_diff_minutes)}}
         </div>
     </div>
+    <div class="col-auto">
+        <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
+            <canvas id="myChart" width="340" height="340"></canvas>
+            <script>
+                try {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    const myChart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
+                            datasets: [{
+                                label: '{{page_user[0][0]}}',
+                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
+                                backgroundColor: 'rgb(39, 125, 161, .95)',
+                                borderColor: 'rgb(67, 170, 139, 1.0)',
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            font: {
+                                size: 16,
+                                weight: "bolder"
+                            },
+                            plugins: {
+                                tooltip: {
+                                    bodyColor: '#F9C74F'
+                                }
+                            },
 
-    <div class="col-auto" style="margin-top: 90px;">
-        <canvas id="myChart" width="300" height="300"></canvas>
-        <script>
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const myChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['QB', 'RB', 'WR', 'TE', 'Starters', 'Bench'],
-                    datasets: [{
-                        label: '{{page_user[0][0]}}',
-                        data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}'],
-                        backgroundColor: 'rgb(39, 125, 161,.7)',
-                        borderColor: 'rgb(249, 199, 79, 0.7)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    plugins: {
-                        tooltip: {
-                            bodyColor: '#F9C74F'
-                        }
-                    },
+                            scales: {
 
-                    scales: {
+                                r: {
+                                    reverse: true,
+                                    max: {{ total_rosters }},
+                min: 1,
+                    beginAtZero: false,
 
-                        r: {
-                            reverse: true,
-                            max: {{ total_rosters }},
-            min: 1,
-                beginAtZero: false,
-
-                    ticks: {
-                stepSize: 3,
-                    display: true,
+                        ticks: {
+                    stepSize: 4,
                         font: {
-                    size: 12
+                        size: 16,
+                            weight: "bold"
+                    }
                 }
-            },
-            pointLabels: {
-                display: true
-            },
-        
-        
                                 },
                             },
-            responsive: false,
         
                         }
                     });
-        </script>
+            } catch (e) {
+
+                }
+            </script>
+        </div>
+        <div style="margin-top: 30px;">
+            {{ba(best_available)}}
+        </div>
     </div>
-    {{ba(best_available)}}
 </div>
 <br>
 
-<div> <a class="btn btn-secondary" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
-        aria-controls="collapseExample">Expand all teams</a>
+<div> <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
+        aria-controls="collapseExample"><i class="fa fa-expand" aria-hidden="true"></i> | all teams</a>
 </div>
-
 <br>
 <div class="row justify-content-center">
-    {{ player_contender_cards(owners, users, aps, 'fp_c') }}
+    {{ player_contender_cards(owners, users, aps, league_id, session_id, 'fp', 'contender_rankings_fp') }}
 </div>
 {% endblock %}

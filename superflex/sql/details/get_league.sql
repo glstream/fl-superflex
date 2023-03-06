@@ -195,6 +195,7 @@ WITH base_players as (SELECT
                     ,tp.fantasy_position
                     ,tp.fantasy_designation
                     ,coalesce(ktc.league_type, -1) as player_value
+                    ,coalesce(ktc.positional_rank, -1) as player_rank
                     from (select 
                             user_id
                             ,ap.player_id

@@ -178,6 +178,7 @@ WITH base_players as (SELECT
                     ,tp.fantasy_position
                     ,tp.fantasy_designation
                     ,coalesce(dp.league_type, -1) as player_value
+                    ,coalesce(cast(cast(replace(dp.ecr_pos, 'NA', '0.00') AS DECIMAL(10,2)) AS INTEGER), -1) as player_rank
                     from (select 
                             user_id
                             ,ap.player_id
