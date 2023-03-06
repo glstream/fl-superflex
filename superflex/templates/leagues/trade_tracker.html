@@ -10,7 +10,8 @@
             </div>
             <ul class="list-group list-group-flush">
                 {% for summary in summary_table %}
-                <li class="list-group-item">{{summary.display_name}} - {{summary.trades_cnt}}
+                <li class="list-group-item" style="background-color: transparent;">{{summary.display_name}} -
+                    {{summary.trades_cnt}}
                 </li>
                 {% endfor %}
             </ul>
@@ -58,7 +59,7 @@
         </div>
         {% for transaction_id in transaction_ids %}
 
-        <div class="card border-0">
+        <div class="card border-0" style="background-color: transparent;">
             <div class="row justify-content-center">
                 <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
                 </h4>
@@ -72,7 +73,8 @@
 
                     {% endif %}
                     <ul class="list-group">
-                        <li class="list-group-item d-flex align-items-center border-0">
+                        <li class="list-group-item d-flex align-items-center border-0"
+                            style="background-color: transparent;">
                             <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
                                 <img class="avatar-player"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />

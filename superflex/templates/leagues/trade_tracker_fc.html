@@ -10,7 +10,8 @@
             </div>
             <ul class="list-group list-group-flush">
                 {% for summary in summary_table %}
-                <li class="list-group-item">{{summary.display_name}} - {{summary.trades_cnt}}
+                <li class="list-group-item" style="background-color: transparent;">{{summary.display_name}} -
+                    {{summary.trades_cnt}}
                 </li>
                 {% endfor %}
             </ul>
@@ -53,17 +54,18 @@
     <p style="text-align: right">FantasyCalc {{update_diff_minutes}} minutes ago.</p>
 
     <div class="row">
-        <div class="header text-center">
+        <div class="header text-center" style="background-color: transparent;">
             <h4 style="padding:10px" class="title">Trade History</h4>
         </div>
         {% for transaction_id in transaction_ids %}
 
-        <div class="card border-0">
-            <div class="row justify-content-center">
+        <div class="card border-0" style="background-color: transparent;">
+            <div class="row justify-content-center" style="background-color: transparent;">
                 <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
                 </h4>
                 {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
-                <div class="card-fr" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
+                <div class="card-fr"
+                    style="width: 24rem; margin-right: 10px;margin-left: 10px;background-color: transparent;">
                     <h5 class="text-left">{{o}}</h5>
                     {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {%
                     set
@@ -72,7 +74,8 @@
 
                     {% endif %}
                     <ul class="list-group">
-                        <li class="list-group-item d-flex align-items-center border-0">
+                        <li class="list-group-item d-flex align-items-center border-0"
+                            style="background-color: transparent;">
                             <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
                                 <img class="avatar-player"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
