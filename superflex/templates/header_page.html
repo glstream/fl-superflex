@@ -1,16 +1,13 @@
-{% macro league_header(league_name, avatar=['3ac2e6d64cbd73b5829e7e13e215aa73']) %}
-
+{% macro league_header(league_name, avatar=[''], source='') %}
 <div class="">
     <div style="display: flex;margin-right: 50px;">
-        <object class="avatar-manager" data="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
-            type="image/png">
-            <img class="avatar-manager" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-        </object>
+        <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
+            onError="this.onerror=null;this.src='static/XQH8I4-a_400x400.jpg';" />
+
         <span><b>
-                <h1>{{league_name}}</h1>
+                <h1 style="margin-left:10px;">{{league_name}} &bull; {{source}}</h1>
             </b></span>
 
     </div>
 </div>
-
 {% endmacro %}

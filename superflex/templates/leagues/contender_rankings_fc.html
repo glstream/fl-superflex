@@ -12,7 +12,7 @@
     });
 
 </script>
-{{league_header(league_name, avatar)}}
+{{league_header(league_name, avatar, source='FantasyCalc Player Rankings')}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
@@ -58,7 +58,7 @@
         <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
 </h5>
 <br>
-{{buttons_large(session_id, user_id, league_id, fc_button='disabled')}}
+{{buttons_large(session_id, user_id, league_id, fc_c_button='disabled')}}
 <br>
 <div class="row justify-content-between">
     <div class="col-auto">
@@ -67,7 +67,7 @@
     </div>
     <div class="col">
         <div style="margin-top: 30px;">
-            {{contender_ranks(owners, user_id, league_id, session_id,'contender_ranks_espn')}}
+            {{contender_ranks(owners, user_id, league_id, session_id,'contender_ranks_fc')}}
             {{table_footer('FantasyCalc Player Rankings', update_diff_minutes)}}
         </div>
     </div>
@@ -107,10 +107,10 @@
                                     max: {{ total_rosters }},
                 min: 1,
                     beginAtZero: false,
-
                         ticks: {
                     stepSize: 4,
-                        font: {
+                        display: false,
+                            font: {
                         size: 16,
                             weight: "bold"
                     }
