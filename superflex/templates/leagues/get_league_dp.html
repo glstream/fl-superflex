@@ -12,7 +12,7 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
-{{league_header(league_name, avatar)}}
+{{league_header(league_name, avatar, source='DynastyProcess Player Values')}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
@@ -116,7 +116,8 @@
 
                         ticks: {
                     stepSize: 4,
-                        font: {
+                        display: false,
+                            font: {
                         size: 16,
                             weight: "bold"
                     }

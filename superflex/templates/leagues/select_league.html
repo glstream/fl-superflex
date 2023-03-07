@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
+
 <div class="col-md-6" style="padding-top: 20px;">
     <div class="card-body">
         <div class="row">
@@ -40,12 +41,10 @@
     {% for league in leagues[:leagues|length] %}
 
     <div class="col-sm-3">
-        <div class="card-top-sl">
+        <div class="card-fr">
             <div class="card-body">
-                <object class="avatar-manager" data="https://sleepercdn.com/avatars/thumbs/{{league.avatar}}"
-                    type="image/png">
-                    <img class="avatar-manager" src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
-                </object>
+                <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{league.avatar}}"
+                    onError="this.onerror=null;this.src='static/XQH8I4-a_400x400.jpg';" />
                 <h5 class="card-title">{{league.league_name}} &bull; {{league.league_year}} </h5>
 
                 <h5>
@@ -91,9 +90,6 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <button class="dropdown-item" type="submit" name="get_league"
                                     value="{{league.session_id,league.user_id,league.league_id}}">KeepTradeCut</button>
-                                <!-- <button class="dropdown-item" type="submit" name="get_league_fp"
-                                    value="{{league.session_id,league.user_id,league.league_id}}">Fantasy
-                                    Pros</button> -->
                                 <button class="dropdown-item" type="submit" name="get_league_dp"
                                     value="{{league.session_id,league.user_id,league.league_id}}">Dynasty
                                     Process</button>

@@ -1,5 +1,14 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 {% from 'buttons.html' import buttons_large %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#trade_tracker_fc').DataTable({ order: [[1, 'asc']], searching: false, paging: false, info: false });
+    });
+</script>
 <h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
 <br>
 <div class="container">
@@ -10,16 +19,17 @@
             </div>
             <ul class="list-group list-group-flush">
                 {% for summary in summary_table %}
-                <li class="list-group-item">{{summary.display_name}} - {{summary.trades_cnt}}
+                <li class="list-group-item" style="background-color: transparent;">{{summary.display_name}} -
+                    {{summary.trades_cnt}}
                 </li>
                 {% endfor %}
             </ul>
         </div>
         <div class="col-auto">
-            <table class="table rounded table-hover">
+            <table class="table rounded table-hover" id="trade_tracker_fc">
                 <thead class="" style="text-align:center">
                     <tr>
-                        <th scope="col">Manager</th>
+                        <th scope="col" data-sortable="false">Manager</th>
                         <th>Value Added</th>
                         <th>Value Droped</th>
                         <th>Total Value</th>
@@ -53,17 +63,18 @@
     <p style="text-align: right">FantasyCalc {{update_diff_minutes}} minutes ago.</p>
 
     <div class="row">
-        <div class="header text-center">
+        <div class="header text-center" style="background-color: transparent;">
             <h4 style="padding:10px" class="title">Trade History</h4>
         </div>
         {% for transaction_id in transaction_ids %}
 
-        <div class="card border-0">
-            <div class="row justify-content-center">
+        <div class="card border-0" style="background-color: transparent;">
+            <div class="row justify-content-center" style="background-color: transparent;">
                 <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
                 </h4>
                 {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for o,items in v.items() %}
-                <div class="card-fr" style="width: 24rem; margin-right: 10px;margin-left: 10px;">
+                <div class="card-fr"
+                    style="width: 24rem; margin-right: 10px;margin-left: 10px;background-color: transparent;">
                     <h5 class="text-left">{{o}}</h5>
                     {% for asset in items if asset.transaction_id == transaction_id[0] %} {% if loop.index == 1 %} {%
                     set
@@ -72,7 +83,8 @@
 
                     {% endif %}
                     <ul class="list-group">
-                        <li class="list-group-item d-flex align-items-center border-0">
+                        <li class="list-group-item d-flex align-items-center border-0"
+                            style="background-color: transparent;">
                             <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
                                 <img class="avatar-player"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />

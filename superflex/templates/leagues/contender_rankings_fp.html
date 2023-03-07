@@ -12,7 +12,7 @@
     });
 
 </script>
-{{league_header(league_name, avatar)}}
+{{league_header(league_name, avatar, source='FantasyPros Player Projections')}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
@@ -58,16 +58,16 @@
         <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
 </h5>
 <br>
-{{buttons_large(session_id, user_id, league_id, fp_button='disabled')}}
+{{buttons_large(session_id, user_id, league_id, fp_c_button='disabled')}}
 <br>
 <div class="row justify-content-between">
     <div class="col-auto">
         {{contender_status_ranks(owners, pct_values, 'Contender Rankings', league_id,
-        session_id,pct_values_dict,'contender_rankings_fp')}}
+        session_id, pct_values_dict, 'contender_rankings_fp')}}
     </div>
     <div class="col">
         <div style="margin-top: 30px;">
-            {{contender_ranks(owners, user_id, league_id, session_id,'contender_ranks_fp')}}
+            {{contender_ranks(owners, user_id, league_id, session_id, 'contender_ranks_fp')}}
             {{table_footer('FantasyPros Player Projections', update_diff_minutes)}}
         </div>
     </div>
@@ -110,7 +110,8 @@
 
                         ticks: {
                     stepSize: 4,
-                        font: {
+                        display: false,
+                            font: {
                         size: 16,
                             weight: "bold"
                     }

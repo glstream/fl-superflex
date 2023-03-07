@@ -1,5 +1,14 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 {% from 'buttons.html' import buttons_large %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#trade_tracker').DataTable({ order: [[1, 'asc']], searching: false, paging: false, info: false });
+    });
+</script>
 <h1 class="text-center">{% block title %}{{league_name}}{% endblock %}</h1>
 <br>
 <div class="container">
@@ -10,16 +19,17 @@
             </div>
             <ul class="list-group list-group-flush">
                 {% for summary in summary_table %}
-                <li class="list-group-item">{{summary.display_name}} - {{summary.trades_cnt}}
+                <li class="list-group-item" style="background-color: transparent;">{{summary.display_name}} -
+                    {{summary.trades_cnt}}
                 </li>
                 {% endfor %}
             </ul>
         </div>
         <div class="col-auto">
-            <table class="table rounded table-hover">
+            <table class="table rounded table-hover" id="trade_tracker">
                 <thead class="" style="text-align:center">
                     <tr>
-                        <th scope="col">Manager</th>
+                        <th scope="col" data-sortable="false">Manager</th>
                         <th>Value Added</th>
                         <th>Value Droped</th>
                         <th>Total Value</th>
@@ -58,7 +68,7 @@
         </div>
         {% for transaction_id in transaction_ids %}
 
-        <div class="card border-0">
+        <div class="card border-0" style="background-color: transparent;">
             <div class="row justify-content-center">
                 <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
                 </h4>
@@ -72,7 +82,8 @@
 
                     {% endif %}
                     <ul class="list-group">
-                        <li class="list-group-item d-flex align-items-center border-0">
+                        <li class="list-group-item d-flex align-items-center border-0"
+                            style="background-color: transparent;">
                             <object class="avatar-player" data="{{asset.sleeper_id | sleeper_img}}" type="image/png">
                                 <img class="avatar-player"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
