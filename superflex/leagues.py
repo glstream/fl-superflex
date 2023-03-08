@@ -22,8 +22,16 @@ bp.secret_key = "hello"
 
 def n_user_id(user_name: str) -> str:
     user_url = f"https://api.sleeper.app/v1/user/{user_name}"
-    un_res = requests.get(user_url)
+    try:
+        un_res = requests.get(user_url)
+        un_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
     user_id = un_res.json()["user_id"]
+
     return user_id
 
 
@@ -33,41 +41,83 @@ def league_managers(league_id: str, user_id: str) -> list:
         if i[1] in league_id:
             LEAGUE_ID = i[1]
             league_managers_url = f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/users"
-            managers_res = requests.get(league_managers_url)
-            for i in managers_res.json():
-                a1 = (i["user_id"], i["display_name"], i["league_id"])
-                managers.append(a1)
+            try:
+                managers_res = requests.get(league_managers_url)
+                managers_res.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"HTTP error occurred: {err}")
+            except Exception as err:
+                print(f"Other error occurred: {err}")
+            managers_res_json = managers_res.json()
+            for i in managers_res_json:
+                inner_manager = (
+                    inner_manager["user_id"],
+                    inner_manager["display_name"],
+                    inner_manager["league_id"],
+                )
+                managers.append(inner_manager)
     return managers
 
 
 def get_league_managers(league_id: str) -> list:
     league_managers_url = f"https://api.sleeper.app/v1/league/{league_id}/users"
-    leg_managers_res = requests.get(league_managers_url)
+    try:
+        leg_managers_res = requests.get(league_managers_url)
+        leg_managers_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+    league_manager_json = leg_managers_res.json()
     leg_managers = [
-        (i["user_id"], i["display_name"], i["league_id"])
-        for i in leg_managers_res.json()
+        (i["user_id"], i["display_name"], i["league_id"]) for i in league_manager_json
     ]
     return leg_managers
 
 
 def get_user_name(user_id: str):
-    user_req = requests.get(f"https://api.sleeper.app/v1/user/{user_id}")
+    try:
+        user_req = requests.get(f"https://api.sleeper.app/v1/user/{user_id}")
+        user_req.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     user_meta = user_req.json()
     return (user_meta["username"], user_meta["display_name"])
 
 
 def get_user_id(user_name: str) -> str:
-    user_id_req = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
+    try:
+        user_id_req = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
+        user_id_req.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     return user_id_req.json()["user_id"]
 
 
 def get_league_name(league_id: str) -> str:
-    league_req = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
+    try:
+        league_req = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
+        league_req.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
     return league_req.json()["name"]
 
 
 def get_users_data(league_id):
-    users_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/users")
+    try:
+        users_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/users")
+        users_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     return [
         (user_meta["display_name"], user_meta["user_id"], user_meta["avatar"])
         for user_meta in users_res.json()
@@ -75,7 +125,13 @@ def get_users_data(league_id):
 
 
 def get_league_type(league_id: str):
-    league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
+    try:
+        league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
+        league_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     try:
         return (
             "sf_value"
@@ -87,40 +143,84 @@ def get_league_type(league_id: str):
 
 
 def get_league_rosters_size(league_id: str) -> int:
-    league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
+    try:
+        league_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
+        league_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     return league_res.json()["total_rosters"]
 
 
 def get_league_rosters(league_id: str) -> list:
-    rosters = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+    try:
+        rosters = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+        rosters.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     return rosters.json()
 
 
 def get_traded_picks(league_id: str) -> list:
-    total_res = requests.get(
-        f"https://api.sleeper.app/v1/league/{league_id}/traded_picks"
-    )
+    try:
+        total_res = requests.get(
+            f"https://api.sleeper.app/v1/league/{league_id}/traded_picks"
+        )
+        total_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
     return total_res.json()
 
 
 def get_full_league(league_id: str):
-    l_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+    try:
+        l_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+        l_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     return l_res.json()
 
 
 def get_draft_id(league_id: str) -> str:
-    draft = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/drafts")
+    try:
+        draft = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/drafts")
+        draft.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     draft_meta = draft.json()[0]
     return draft_meta
 
 
 def get_draft(draft_id: str):
-    draft_res = requests.get(f"https://api.sleeper.app/v1/draft/{draft_id}")
+    try:
+        draft_res = requests.get(f"https://api.sleeper.app/v1/draft/{draft_id}")
+        draft_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     return draft_res.json()
 
 
 def get_managers(league_id: str) -> list:
-    res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/users")
+    try:
+        res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/users")
+        res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
     manager_data = [
         ["sleeper", i["user_id"], league_id, i["avatar"], i["display_name"]]
         for i in res.json()
@@ -129,7 +229,15 @@ def get_managers(league_id: str) -> list:
 
 
 def get_roster_ids(league_id: str) -> list:
-    roster_res = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+    try:
+        roster_res = requests.get(
+            f"https://api.sleeper.app/v1/league/{league_id}/rosters"
+        )
+        roster_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
     roster_meta = roster_res.json()
     return [(r["owner_id"], str(r["roster_id"])) for r in roster_meta]
 
@@ -166,7 +274,14 @@ def insert_managers(db, managers: list):
 
 
 def is_user(user_name: str) -> bool:
-    res = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
+    try:
+        res = requests.get(f"https://api.sleeper.app/v1/user/{user_name}")
+        res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
     return True if res.text != "null" else False
 
 
@@ -220,8 +335,16 @@ def clean_league_picks(db, league_id: str) -> None:
     return
 
 
-def get_sleeper_state():
-    return requests.get("https://api.sleeper.app/v1/state/nfl").json()
+def get_sleeper_state() -> str:
+    try:
+        state = requests.get("https://api.sleeper.app/v1/state/nfl")
+        state.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
+    return state.json()
 
 
 def get_trades(league_id: str, nfl_state: dict) -> list:
@@ -231,19 +354,32 @@ def get_trades(league_id: str, nfl_state: dict) -> list:
         leg = nfl_state["leg"] if nfl_state["leg"] > 0 else 1
         week = 1
         for i in range(1, leg + 1):
-
-            trans_call = requests.get(
-                f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
-            ).json()
-            all_trades.extend(trans_call)
+            try:
+                trans_call = requests.get(
+                    f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
+                )
+                trans_call.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"HTTP error occurred: {err}")
+            except Exception as err:
+                print(f"Other error occurred: {err}")
+            transactions = trans_call.json()
+            all_trades.extend(transactions)
             week += 1
         trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
     else:
         for week in range(1, 18):
-            trans_call = requests.get(
-                f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
-            ).json()
-            all_trades.extend(trans_call)
+            try:
+                trans_call = requests.get(
+                    f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
+                )
+                trans_call.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"HTTP error occurred: {err}")
+            except Exception as err:
+                print(f"Other error occurred: {err}")
+            transactions = trans_call.json()
+            all_trades.extend(transactions)
             week += 1
         trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
 
@@ -620,9 +756,17 @@ def user_leagues(user_name: str, league_year: str) -> list:
     leagues_url = (
         f"https://api.sleeper.app/v1/user/{owner_id}/leagues/nfl/{league_year}"
     )
-    leagues_res = requests.get(leagues_url)
+    try:
+        leagues_res = requests.get(leagues_url)
+        leagues_res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
+    leagues_json = leagues_res.json()
     leagues = []
-    for league in leagues_res.json():
+    for league in leagues_json:
         qbs = len([i for i in league["roster_positions"] if i == "QB"])
         rbs = len([i for i in league["roster_positions"] if i == "RB"])
         wrs = len([i for i in league["roster_positions"] if i == "WR"])
