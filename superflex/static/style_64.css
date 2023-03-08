@@ -488,13 +488,9 @@ a.right {
 
 .avatar-manager {
     width: 38px;
-    height: 32px;
-    flex: 0 0 38px;
-    /* float: left; */
-    /* background: center center / cover rgb(239, 239, 239); */
-    border-radius: 1px;
-    border: 1px solid #6c757d;
-    border-radius: 50%;
+    height: 38px;
+    border-radius: 7px;
+    border: .5px solid #6c757d59;
 }
 
 html {
