@@ -656,9 +656,18 @@ def user_leagues(user_name: str, league_year: str) -> list:
 
 
 def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id: str):
-    league_single = requests.get(
-        f"https://api.sleeper.app/v1/league/{league_id}"
-    ).json()
+    try:
+        league_single_resp = requests.get(
+            f"https://api.sleeper.app/v1/league/{league_id}"
+        )
+        league_single_resp.raise_for_status()
+
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
+    league_single = league_single_resp.json()
     qbs = len([i for i in league_single["roster_positions"] if i == "QB"])
     rbs = len([i for i in league_single["roster_positions"] if i == "RB"])
     wrs = len([i for i in league_single["roster_positions"] if i == "WR"])
