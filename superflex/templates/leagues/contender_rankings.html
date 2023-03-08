@@ -12,10 +12,14 @@
     });
 
 </script>
-{{league_header(league_name, avatar, source='ESPN Player Projections')}}
+{{league_header(league_name, avatar)}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
+<div style="display: inline-block;">
+    <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted" style="margin-left: 1px;">ESPN</small>
+    </h3>
+</div>
 <div style="display: flex; gap:10px">
     <form method="post" class="form-inline">
         <button class="btn btn-outline-secondary" type="submit" name="contender_rankings"
@@ -80,10 +84,10 @@
                     const myChart = new Chart(ctx, {
                         type: 'radar',
                         data: {
-                            labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
+                            labels: ['QB', 'RB', 'WR', 'TE', 'Starters', 'Bench'],
                             datasets: [{
                                 label: '{{page_user[0][0]}}',
-                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
+                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}'],
                                 backgroundColor: 'rgb(39, 125, 161, .95)',
                                 borderColor: 'rgb(67, 170, 139, 1.0)',
                                 borderWidth: 3
@@ -96,7 +100,8 @@
                             },
                             plugins: {
                                 tooltip: {
-                                    bodyColor: '#F9C74F'
+                                    bodyColor: '#F9C74F',
+                                    backgroundColor: 'rgba(67, 170, 139, .8)',
                                 }
                             },
 
@@ -107,7 +112,6 @@
                                     max: {{ total_rosters }},
                 min: 1,
                     beginAtZero: false,
-
                         ticks: {
                     stepSize: 4,
                         display: false,

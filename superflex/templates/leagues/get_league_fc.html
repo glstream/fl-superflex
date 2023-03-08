@@ -12,13 +12,15 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
-{{league_header(league_name, avatar, source='FantasyCalc Player Values')}}
+{{league_header(league_name, avatar)}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
-<!-- <div class="desk">Large Screen</div>
-<div class="div-only-mobile">Only Mobile</div>
-<p>Demo Text.</p> -->
+<div style="display: inline-block;">
+    <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted"
+            style="margin-left: 1px;">FantasyCalc</small>
+    </h3>
+</div>
 
 <div style="display: flex; gap:10px">
     <form method="post" class="form-inline">
@@ -79,11 +81,11 @@
     </div>
     <div class="col-auto">
         <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
-            <canvas id="myChart" width="340" height="340"></canvas>
+            <canvas id="fc_pr_chart" width="340" height="340"></canvas>
             <script>
                 try {
-                    const ctx = document.getElementById('myChart').getContext('2d');
-                    const myChart = new Chart(ctx, {
+                    const ctx = document.getElementById('fc_pr_chart').getContext('2d');
+                    const fc_pr_chart = new Chart(ctx, {
                         type: 'radar',
                         data: {
                             labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
@@ -102,7 +104,8 @@
                             },
                             plugins: {
                                 tooltip: {
-                                    bodyColor: '#F9C74F'
+                                    bodyColor: '#F9C74F',
+                                    backgroundColor: 'rgba(67, 170, 139, .8)',
                                 }
                             },
 
