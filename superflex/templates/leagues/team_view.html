@@ -44,7 +44,7 @@
     {{buttons_large(session_id, user_id, league_id,ktc_button='')}}
 </div>
 <div class="row justify-content-center">
-    <canvas id="myChart" width="550" height="300"></canvas>
+    <canvas id="myChart" width="400" height="350"></canvas>
     <script>
         const ctx = document.getElementById('myChart').getContext('2d');
 
@@ -56,25 +56,31 @@
             datasets: [{
                 label: 'QBs',
                 data: qb_data,
-                backgroundColor: 'rgb(249, 65, 68, 0.7)'
+                backgroundColor: 'rgb(39, 125, 161, .7)',
+                pointRadius: 7,
             }, {
                 label: 'RBs',
                 data: rb_data,
-                backgroundColor: 'rgb(77, 144, 142, 0.7)'
+                backgroundColor: 'rgb(144, 190, 109, 0.7)',
+                pointRadius: 7,
             }, {
                 label: 'WRs',
                 data: wr_data,
-                backgroundColor: 'rgb(144, 190, 109, 0.7)'
+                backgroundColor: 'rgb(67, 170, 139, 0.7)',
+                pointRadius: 7,
             },
             {
                 label: 'TEs',
                 data: te_data,
-                backgroundColor: 'rgb(248, 150, 30, 0.7)'
+                backgroundColor: 'rgb(249, 132, 74, 0.7)',
+                pointRadius: 7,
             }],
+
         }
         const myChart1 = new Chart(ctx, {
-            type: 'scatter',
+            type: 'bubble',
             data: data,
+
             options: {
                 responsive: false,
                 plugins: {
@@ -93,16 +99,7 @@
                         }
                     }
                 },
-                scales: {
-                    y: {
-                        min: 0,
-                        max: 10199
-                    },
-                    x: {
-                        min: 20,
-                        max: 45
-                    }
-                }
+
             },
 
         });
@@ -111,11 +108,11 @@
 </div>
 <div>
     <div class="row justify-content-center">
-        <table class="table rounded table-hover" style="width:75%">
+        <table class="table rounded" style="width:75%">
             <thead style="text-align:center">
                 <tr>
-                    <th></th>
-                    <th>Qbs</th>
+                    <th>Manager</th>
+                    <th>QBs</th>
                     <th>RBs</th>
                     <th>WRs</th>
                     <th>TEs</th>
@@ -251,7 +248,7 @@
         </script>
         {% endif %}
         <div class="row justify-content-center" style="width:65em;">
-            <table class="table rounded table-hover" style="width:95%">
+            <table class="table rounded table-hover" style="width:95%;">
                 <thead style="text-align:center">
                     <tr>
                         <th>Player</th>
@@ -267,7 +264,7 @@
                     <td style="text-align:center" class="over-limit-{{player.val_tile}}">{{player.player_value}}</td>
                     <td style="text-align:center" class="over-limit-{{player.age_tile | age_adjust }}">{{player.age}}
                     </td>
-                    <td style="text-align:center">{{player.rank}}</td>
+                    <td style="text-align:center;">{{player.rank}}</td>
                     <td style="text-align:center">{{player.positional_rank}}</td>
                     </tr>
                     {% endfor %}
