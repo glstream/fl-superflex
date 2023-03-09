@@ -45,7 +45,8 @@
             <div class="card-body">
                 <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{league.avatar}}"
                     onError="this.onerror=null;this.src='static/XQH8I4-a_400x400.jpg';" />
-                <h5 class="card-title">{{league.league_name}} &bull; {{league.league_year}} </h5>
+                <h5 class="card-title" style="font-size: 18px;">{{league.league_name}} &bull; {{league.league_year}}
+                </h5>
 
                 <h5>
                     {% if league.league_cat == 0 %}
@@ -76,18 +77,16 @@
 
 
                 </h5>
-
-                <p></p>
                 <form method="post" class="form-inline">
-                    <div class="btn-group flex-wrap" style="gap:10px">
+                    <div class="btn-group flex-wrap" style="gap:10px;">
                         <div class="dropdown">
 
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                            <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 14px;"
+                                type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                 aria-expanded="false">
                                 Power Rankings
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                                 <button class="dropdown-item" type="submit" name="get_league"
                                     value="{{league.session_id,league.user_id,league.league_id}}">KeepTradeCut</button>
                                 <button class="dropdown-item" type="submit" name="get_league_dp"
@@ -100,12 +99,12 @@
                         </div>
                         <div class="dropdown">
 
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                            <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 14px;"
+                                type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                 aria-expanded="false">
                                 Contender Rankings
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                                 <button class="dropdown-item" type="submit" name="contender_rankings"
                                     value="{{league.session_id,league.user_id,league.league_id}}">ESPN
                                     Projections</button>
@@ -124,12 +123,13 @@
                         </div>
                         <div class="dropdown">
                             <form method="post" class="form-inline">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button"
-                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 14px;"
+                                    type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false">
                                     Trade Tracker
                                 </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+                                    style="font-size: 14px;">
                                     <button class="dropdown-item" type="submit" name="trade_tracker"
                                         value="{{league.session_id,league.user_id,league.league_id}}">KTC
                                         Rankings</button>

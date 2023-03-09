@@ -21,9 +21,12 @@
                                         <img src="{{url_for('static', filename='logo.png')}}" width="145" height="65"
                                             alt="">
                                     </div>
-                                    <p style="color:#4D908E">Superflex takes data from sources across the web and
-                                        combines them into one
-                                        all up league view to help you rank and value your teams.</p>
+                                    <h5 style="color:#4D908E">Superflex is the ultimate
+                                        resource
+                                        for fantasy football
+                                        managers. Our site combines data from across the web to give you a
+                                        comprehensive, all-up league view that helps you rank and value your
+                                        teams.</h5>
                                     <br>
                                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Enter Username
                                     </h5>
@@ -32,8 +35,10 @@
                                             name="username"
                                             value="{{ user_name[1] if user_name else request.form['username'] }}"
                                             placeholder="{{user_name[1] if user_name else 'Username...'}}" />
-                                        <label class="input-group-text" for="inputGroupSelect01">League Year</label>
-                                        <select class="form-select" name="league_year" id="inputGroupSelect01">
+                                        <label class="input-group-text" for="inputGroupSelect01"
+                                            style="font-size:16px;">League Year</label>
+                                        <select class="form-select" name="league_year" id="inputGroupSelect01"
+                                            style="font-size:16px;">
                                             <option selected>2023</option>
                                             <option value="2022">2022</option>
                                             <option value="2021">2021</option>
@@ -49,18 +54,19 @@
                                             aria-haspopup="true" aria-expanded="false">
                                             Submit
                                         </button>
-                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1"
+                                            style="font-size:14px;">
                                             <button class="dropdown-item" type="submit" data-toggle="submit"
                                                 aria-pressed="false" autocomplete="off">Sleeper</button>
                                             <button class="dropdown-item" href="" disabled="">MFL</button>
                                             <button class="dropdown-item" href="" disabled>Fleaflicker</button>
                                         </div>
                                     </div>
-                                    <br><span style="color: #de2121;">{{error_message}}</span><br>
+                                    <br><span style="color: #de2121;font-size:14px;">{{error_message}}</span><br>
                                 </form>
-                                <form method="post">
-                                    <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an username?<button
-                                            id="username" type="submit" class="btn btn-link"
+                                <form method="post" style="font-size:14px;">
+                                    <p class="mb-5" style="color: #393f81;">Don't have
+                                        an username?<button id="username" type="submit" class="btn btn-link"
                                             style="background-color:transparent" name="username" value="gray_matter">Try
                                             a demo</button></p>
                                     <a href="#!" class="small text-muted">Powered by data from</a><a
