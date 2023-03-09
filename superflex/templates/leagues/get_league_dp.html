@@ -81,11 +81,11 @@
     </div>
     <div class="col-auto">
         <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
-            <canvas id="myChart" width="340" height="340"></canvas>
+            <canvas id="dp_pr_chart" width="340" height="340"></canvas>
             <script>
                 try {
-                    const ctx = document.getElementById('myChart').getContext('2d');
-                    const myChart = new Chart(ctx, {
+                    const ctx = document.getElementById('dp_pr_chart').getContext('2d');
+                    const dp_pr_chart = new Chart(ctx, {
                         type: 'radar',
                         data: {
                             labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],

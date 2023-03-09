@@ -3,11 +3,11 @@ espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_t
 <form method="post" class="form-inline">
     <div class="btn-group flex-wrap" style="gap:10px">
         <div class="dropdown">
-            <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
+                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Power Rankings
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                 <button class="dropdown-item" type="submit" name="get_league" value="{{session_id, user_id, league_id}}"
                     {{ktc_button}}>KeepTradeCut</button>
                 <!-- <button class="dropdown-item" type="submit" name="get_league_fp"
@@ -20,11 +20,11 @@ espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_t
             </div>
         </div>
         <div class="dropdown">
-            <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
+                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Contender Rankings
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                 <button class="dropdown-item" type="submit" name="contender_rankings"
                     value="{{session_id, user_id, league_id}}" {{espn_button}}>ESPN Projections</button>
                 <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
@@ -38,11 +38,11 @@ espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_t
         </div>
         <div class="dropdown">
             <form method="post" class="form-inline">
-                <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
+                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Trade Tracker
                 </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                     <button class="dropdown-item" type="submit" name="trade_tracker"
                         value="{{session_id, user_id, league_id}}" {{tt_button}}>KTC Rankings</button>
                     <button class="dropdown-item" type="submit" name="trade_tracker_fc"

@@ -9,7 +9,7 @@
     });
 </script>
 <div class="table-responsive">
-    <table class="table table-striped table-hover" style="width:85%;font-size: 13px;;" id="power_ranks_table">
+    <table class="table table-striped table-hover" style="width:85%;font-size: 14px;" id="power_ranks_table">
         <thead style="text-align:center;">
             <tr>
                 <th scope="col" data-sortable="false"></th>
@@ -26,12 +26,11 @@
         <tbody>
             {% for owner in owners %}
 
-            <td style="text-align:center;"> <a
-                    style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px;"
+            <td style="text-align:center;"> <a style="color: rgb(255, 255, 255);text-decoration: none;"
                     href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
             </td>
 
-            <td style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px"
+            <td style="color: rgb(255, 255, 255);text-decoration: none;font-size: 12px"
                 class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" data-html="true"
                 title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>" data-sort="{{owner.total_rank}}">
                 {{owner.total_rank | suffix}}
@@ -89,12 +88,12 @@
     });
 </script>
 <div class="table-responsive">
-    <table class="table table-striped table-hover" style="width:85%;font-size: 13px;;" id="contender_ranks_rable">
+    <table class="table table-striped table-hover" style="width:85%;font-size: 13px;" id="contender_ranks_rable">
         <thead style="text-align:center;">
             <tr>
                 <th scope="col" data-sortable="false"></th>
-                <th scope="col" style="font-weight: normal;">Overall</th>
-                <th class="sorting" style="font-weight: normal;" scope="col">Starters</th>
+                <th scope="col">Overall</th>
+                <th class="sorting" scope="col">Starters</th>
                 <th class="sorting" style="font-weight: normal;" scope="col">QB</th>
                 <th class="sorting" style="font-weight: normal;" scope="col">RB</th>
                 <th class="sorting" style="font-weight: normal;" scope="col">WR</th>
@@ -108,7 +107,7 @@
             <td style="text-align:center;"> {{owner.display_name}}
             </td>
 
-            <td style="font-family: sans-serif;color: rgb(255, 255, 255);text-decoration: none;font-size: 12px"
+            <td style="color: rgb(255, 255, 255);text-decoration: none;font-size: 16px"
                 class="over-limit-{{owner.total_tile}}" data-toggle="tooltip" data-html="true"
                 title="Total Value: <b>{{'{:,}'.format(owner.total_value)}}</b>" data-sort="{{owner.total_rank}}">
                 {{owner.total_rank | suffix}}
