@@ -888,7 +888,16 @@ def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id:
 def insert_current_leagues(
     db, session_id: str, user_id: str, user_name: str, entry_time: str, leagues: list
 ) -> None:
+    delete_user_leagues_query = (
+        f"""DELETE FROM dynastr.current_leagues where user_id = '{user_id}'"""
+    )
     cursor = db.cursor()
+    cursor.execute(delete_user_leagues_query)
+
+    print(f"Leagues for user: {user_id} cleaned")
+
+    db.commit()
+    # insert leagues
     execute_batch(
         cursor,
         """INSERT INTO dynastr.current_leagues (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id)
