@@ -20,17 +20,13 @@
     <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted"
             style="margin-left: 1px;">FantasyPros</small>
     </h3>
+    <h7 style="margin-right: 10px;right: 0;">League refreshed {{ refresh_time }} minutes ago.</h7>
 </div>
-<div style="display: flex; gap:10px">
+<div style="display: flex; gap:8px; margin-top: 5px;">
     <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary" type="submit" name="contender_rankings"
-            value="{{session_id,user_id,cur_league.previous_league_id}}" {{bt}}>Load Previous
-            Year</button>
-    </form>
-    <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary" type="submit" name="contender_rankings"
-            value="{{session_id,user_id,session_league_id}}">Load Current
-            Year</button>
+        <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="fp_contender_rankings"
+            value="{{session_id,user_id,session_league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
+            Refresh League</button>
     </form>
 </div>
 <br>
@@ -143,6 +139,6 @@
 </div>
 <br>
 <div class="row justify-content-center">
-    {{ player_contender_cards(owners, users, aps, league_id, session_id, 'fp', 'contender_rankings_fp') }}
+    {{ player_contender_cards(owners, users, aps, league_id, session_id, 'fp_c', 'contender_rankings_fp') }}
 </div>
 {% endblock %}
