@@ -107,7 +107,7 @@ def get_league_name(league_id: str) -> str:
     except Exception as err:
         print(f"Other error occurred: {err}")
 
-    return league_req.json()["name"]
+    return league_req.json().get("name", "Not Available")
 
 
 def get_users_data(league_id):
@@ -1620,12 +1620,16 @@ def get_league():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -1859,12 +1863,16 @@ def get_league_fc():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2097,12 +2105,16 @@ def get_league_dp():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2305,12 +2317,16 @@ def get_league_fp():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2480,12 +2496,16 @@ def trade_tracker():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         return render_template(
             "leagues/trade_tracker.html",
@@ -2801,12 +2821,16 @@ def contender_rankings():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -3033,12 +3057,16 @@ def fc_contender_rankings():
         update_diff_minutes = round(
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -3264,12 +3292,16 @@ def nfl_contender_rankings():
         update_diff_minutes = round(
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -3496,12 +3528,16 @@ def fp_contender_rankings():
         fp_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round((current_time - fp_max_time).total_seconds() / 60.0)
-        refresh_time = round(
-            (
-                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
-            ).total_seconds()
-            / 60.0
-        )
+        try:
+            refresh_time = round(
+                (
+                    datetime.utcnow()
+                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
+                ).total_seconds()
+                / 60.0
+            )
+        except:
+            refresh_time = -1
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
