@@ -73,9 +73,9 @@ def create_app(test_config=None):
     @app.template_filter("age_adjust")
     def age_adjust(age_tile: int) -> int:
         return age_tile if age_tile < 11 else 10
-    
+
     @app.template_filter("init_cap_format")
-    def init_cap_format(phrase:str) -> str:
+    def init_cap_format(phrase: str) -> str:
         return " ".join([i.lower().capitalize() for i in phrase.split("_")])
 
     @app.route("/favicon.ico")

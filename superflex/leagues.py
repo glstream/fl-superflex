@@ -997,6 +997,24 @@ def player_manager_upates(
             )
 
 
+def seconds_text(refresh_time: int, nowtime: datetime.utcnow()) -> str:
+    from datetime import datetime
+
+    secs = round((nowtime - datetime.utcfromtimestamp(refresh_time)).total_seconds())
+    if secs > 60:
+        days = secs // 86400
+        hours = (secs - days * 86400) // 3600
+        minutes = (secs - days * 86400 - hours * 3600) // 60
+        result = (
+            ("{} days, ".format(days) if days else "")
+            + ("{} hours, ".format(hours) if hours else "")
+            + ("{} minutes, ".format(minutes) if minutes else "")
+        )
+        return result[0:-2]
+    else:
+        return "0 minutes"
+
+
 def render_players(players: list, rank_type: str):
     starting_qbs = [
         player
@@ -1621,13 +1639,7 @@ def get_league():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -1864,13 +1876,7 @@ def get_league_fc():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -2106,13 +2112,7 @@ def get_league_dp():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -2318,13 +2318,7 @@ def get_league_fp():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -2497,13 +2491,7 @@ def trade_tracker():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -2822,13 +2810,7 @@ def contender_rankings():
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -3058,13 +3040,7 @@ def fc_contender_rankings():
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -3293,13 +3269,7 @@ def nfl_contender_rankings():
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
@@ -3529,13 +3499,7 @@ def fp_contender_rankings():
         current_time = datetime.utcnow()
         update_diff_minutes = round((current_time - fp_max_time).total_seconds() / 60.0)
         try:
-            refresh_time = round(
-                (
-                    datetime.utcnow()
-                    - datetime.utcfromtimestamp(int(refresh_epoch_time))
-                ).total_seconds()
-                / 60.0
-            )
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
