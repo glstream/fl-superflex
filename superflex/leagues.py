@@ -512,7 +512,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
 
 def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> None:
     league_players = []
-    entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+    entry_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
     rosters = get_league_rosters(league_id)
 
     for roster in rosters:
@@ -1097,6 +1097,10 @@ def team_view(user_id, league_id, session_id, view_source):
         user_id = league_data[1]
         league_id = league_data[2]
 
+        refresh_epoch = round(
+            (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+        )
+
         player_manager_upates(db, button, session_id, user_id, league_id, startup=False)
         return redirect(
             url_for(
@@ -1104,6 +1108,7 @@ def team_view(user_id, league_id, session_id, view_source):
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
     source_mapping = {
@@ -1356,7 +1361,30 @@ def select_league():
             startup = startup_cursor.fetchone()[0]
             startup_cursor.close()
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            refresh_cursor = db.cursor()
+            refresh_cursor.execute(
+                f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+            )
+            refresh = refresh_cursor.fetchone()
+            refresh_cursor.close()
+
+            if refresh is not None:
+                print("HAS PLAYERS")
+                refresh_date = refresh[-1]
+                refresh_datetime = datetime.strptime(
+                    refresh_date, "%Y-%m-%dT%H:%M:%S.%f"
+                )
+                refresh_epoch = round(
+                    (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+                )
+            else:
+                refresh_epoch = round(
+                    (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+                )
+
+                player_manager_upates(
+                    db, button, session_id, user_id, league_id, startup
+                )
             return redirect(
                 url_for(
                     f"leagues.{button}",
@@ -1364,6 +1392,7 @@ def select_league():
                     league_id=league_id,
                     user_id=user_id,
                     session_league_id=session_league_id,
+                    rdm=refresh_epoch,
                 )
             )
     except:
@@ -1427,8 +1456,9 @@ def get_league():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
-        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        entry_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
 
         startup_cursor = db.cursor()
@@ -1438,13 +1468,33 @@ def get_league():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -1452,6 +1502,7 @@ def get_league():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
         league_pos_col = (
             "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
@@ -1569,6 +1620,12 @@ def get_league():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -1619,6 +1676,7 @@ def get_league():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1636,6 +1694,7 @@ def get_league_fc():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -1647,13 +1706,34 @@ def get_league_fc():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -1661,6 +1741,7 @@ def get_league_fc():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
         league_pos_col = (
             "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
@@ -1778,6 +1859,12 @@ def get_league_fc():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -1828,6 +1915,7 @@ def get_league_fc():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1845,6 +1933,7 @@ def get_league_dp():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -1856,13 +1945,34 @@ def get_league_dp():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -1870,6 +1980,7 @@ def get_league_dp():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
 
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -1986,6 +2097,12 @@ def get_league_dp():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2034,6 +2151,7 @@ def get_league_dp():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2050,6 +2168,7 @@ def get_league_fp():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
         startup_cursor = db.cursor()
         startup_cursor.execute(
             f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
@@ -2057,13 +2176,34 @@ def get_league_fp():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -2071,6 +2211,7 @@ def get_league_fp():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
         lt = "sf" if league_type == "sf_value" else "one_qb"
 
@@ -2164,6 +2305,12 @@ def get_league_fp():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2210,6 +2357,7 @@ def get_league_fp():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
 
 
@@ -2224,6 +2372,7 @@ def trade_tracker():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -2235,13 +2384,34 @@ def trade_tracker():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -2249,7 +2419,9 @@ def trade_tracker():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
+
         trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
@@ -2308,6 +2480,12 @@ def trade_tracker():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         return render_template(
             "leagues/trade_tracker.html",
@@ -2333,6 +2511,7 @@ def trade_tracker_fc():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -2344,13 +2523,34 @@ def trade_tracker_fc():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -2358,6 +2558,7 @@ def trade_tracker_fc():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
         trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -2440,6 +2641,7 @@ def contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -2451,13 +2653,34 @@ def contender_rankings():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -2465,6 +2688,7 @@ def contender_rankings():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
 
         contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -2577,6 +2801,12 @@ def contender_rankings():
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2623,6 +2853,7 @@ def contender_rankings():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2639,6 +2870,7 @@ def fc_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -2650,13 +2882,34 @@ def fc_contender_rankings():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+        print("button", button)
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -2664,6 +2917,7 @@ def fc_contender_rankings():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         league_type = get_league_type(league_id)
         fc_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -2779,6 +3033,12 @@ def fc_contender_rankings():
         update_diff_minutes = round(
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -2825,6 +3085,7 @@ def fc_contender_rankings():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2842,6 +3103,7 @@ def nfl_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -2853,13 +3115,33 @@ def nfl_contender_rankings():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -2867,6 +3149,7 @@ def nfl_contender_rankings():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
         nfl_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd() / "superflex" / "sql" / "details" / "contender_rankings_nfl.sql",
@@ -2981,6 +3264,12 @@ def nfl_contender_rankings():
         update_diff_minutes = round(
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -3027,6 +3316,7 @@ def nfl_contender_rankings():
             avatar=avatar,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -3044,6 +3334,7 @@ def fp_contender_rankings():
         session_id = league_data[0]
         user_id = league_data[1]
         league_id = league_data[2]
+        refresh_btn = league_data[-1]
 
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         insert_league(db, session_id, user_id, entry_time, league_id)
@@ -3055,13 +3346,33 @@ def fp_contender_rankings():
         startup = startup_cursor.fetchone()[0]
         startup_cursor.close()
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
         return redirect(
             url_for(
                 f"leagues.{button}",
                 session_id=session_id,
                 league_id=league_id,
                 user_id=user_id,
+                rdm=refresh_epoch,
             )
         )
 
@@ -3069,6 +3380,7 @@ def fp_contender_rankings():
         session_id = request.args.get("session_id")
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
 
         fp_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -3184,6 +3496,12 @@ def fp_contender_rankings():
         fp_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round((current_time - fp_max_time).total_seconds() / 60.0)
+        refresh_time = round(
+            (
+                datetime.utcnow() - datetime.utcfromtimestamp(int(refresh_epoch_time))
+            ).total_seconds()
+            / 60.0
+        )
 
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
@@ -3233,6 +3551,7 @@ def fp_contender_rankings():
             nfl_current_week=nfl_current_week,
             cur_league=cur_league,
             session_league_id=session_league_id,
+            refresh_time=refresh_time,
         )
     else:
         return redirect(url_for("leagues.index"))
