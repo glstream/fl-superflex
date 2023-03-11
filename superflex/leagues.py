@@ -960,7 +960,13 @@ def insert_current_leagues(
 
 
 def player_manager_upates(
-    db, button: str, session_id: str, user_id: str, league_id: str, startup
+    db,
+    button: str,
+    session_id: str,
+    user_id: str,
+    league_id: str,
+    startup,
+    refresh=False,
 ):
     if button in ["trade_tracker", "trade_tracker_fc"]:
         try:
@@ -997,6 +1003,14 @@ def player_manager_upates(
             insert_league_rosters(db, session_id, user_id, league_id)
             total_owned_picks(db, league_id, session_id, startup)
             draft_positions(db, league_id, user_id)
+
+            # delete traded players and picks
+            clean_player_trades(db, league_id)
+            clean_draft_trades(db, league_id)
+            # get trades
+            trades = get_trades(league_id, get_sleeper_state())
+            # insert trades draft Positions
+            insert_trades(db, trades, league_id)
         except:
             return redirect(
                 url_for(
