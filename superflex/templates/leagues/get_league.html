@@ -24,10 +24,22 @@
 </div>
 
 <div style="display: flex; gap:8px; margin-top: 5px;">
+    <!-- <div style="display: flex; gap:10px">
+        <form method="post" class="form-inline">
+            <button class="btn btn-outline-secondary bt-sm" type="submit" name="get_league"
+                value="{{session_id,user_id,cur_league.previous_league_id}}" {{bt}}>Load Previous
+                Year</button>
+        </form>
+        <form method="post" class="form-inline">
+            <button class="btn btn-outline-secondary" type="submit" name="get_league"
+                value="{{session_id,user_id,session_league_id}}">Load Current
+                Year</button>
+        </form>
+    </div> -->
     <form method="post" class="form-inline">
         <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="get_league"
-            value="{{session_id,user_id,session_league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
-            Refresh League</button>
+            value="{{session_id, user_id, league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
+            | refresh league</button>
     </form>
 </div>
 <br>
