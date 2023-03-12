@@ -654,7 +654,7 @@ def total_owned_picks(
 
 def clean_draft_positions(db, league_id: str):
     delete_query = (
-        f"""DELETE FROM dynastr.dev_draft_positions where league_id = '{league_id}'"""
+        f"""DELETE FROM dynastr.draft_positions where league_id = '{league_id}'"""
     )
     cursor = db.cursor()
     cursor.execute(delete_query)
@@ -740,7 +740,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     cursor = db.cursor()
     execute_batch(
         cursor,
-        """INSERT into dynastr.dev_draft_positions (season, rounds,  position, position_name, roster_id, user_id, league_id, draft_id, draft_set_flg)
+        """INSERT into dynastr.draft_positions (season, rounds,  position, position_name, roster_id, user_id, league_id, draft_id, draft_set_flg)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (season, rounds, position, user_id, league_id)
     DO UPDATE SET position_name = EXCLUDED.position_name
