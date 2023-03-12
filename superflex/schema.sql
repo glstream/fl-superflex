@@ -42,8 +42,9 @@ CREATE TABLE dynastr.league_players (
   league_id VARCHAR(75),
   user_id VARCHAR(75) ,
   insert_date VARCHAR(75),
-  PRIMARY KEY (user_id, player_id)
+  PRIMARY KEY (session_id, user_id, player_id, league_id)
 );
+
 
 CREATE TABLE IF NOT EXISTS dynastr.current_leagues (
   session_id VARCHAR(75),
