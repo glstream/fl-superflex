@@ -309,8 +309,8 @@ SELECT
                                     al.user_id
                                     , al.season
                                     , al.year 
-                                    --, CASE WHEN al.year = dname.season THEN al.year|| ' ' || dname.position_name || ' ' || al.round_name ELSE al.year|| ' Mid ' || al.round_name END AS player_full_name 
-                                    , al.year || ' Round ' || al.round as player_full_name
+                                    , CASE WHEN al.draft_set_flg = 'Y' THEN al.year || ' Round ' || al.round || ' Pick ' || dname.position
+									ELSE al.year || ' Round ' || al.round END AS player_full_name  
                                     FROM (                           
                                         SELECT dp.roster_id
                                         , dp.year
@@ -319,6 +319,7 @@ SELECT
                                         , dp.league_id
                                         , dpos.user_id
                                         , dpos.season
+                                        , dpos.draft_set_flg 
                                         FROM dynastr.draft_picks dp
                                         INNER JOIN dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id and dp.league_id = dpos.league_id
 
