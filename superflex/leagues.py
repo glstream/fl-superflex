@@ -654,7 +654,7 @@ def total_owned_picks(
 
 def clean_draft_positions(db, league_id: str):
     delete_query = (
-        f"""DELETE FROM dynastr.draft_positions where league_id = '{league_id}'"""
+        f"""DELETE FROM dynastr.dev_draft_positions where league_id = '{league_id}'"""
     )
     cursor = db.cursor()
     cursor.execute(delete_query)
@@ -674,12 +674,13 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     rounds = draft_id["settings"]["rounds"]
     roster_slot = {int(k): v for k, v in draft_slot.items() if v is not None}
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
-    if draft_dict is None:
+    if draft_dict is None or len(rs_dict.items()) > 12:
         # if no draft is present then create all managers at mid level for picks
         participents = get_roster_ids(league_id)
 
         for pos in range(len(rs_dict.items())):
             position_name = "Mid"
+            draft_set = "N"
             draft_order.append(
                 [
                     season,
@@ -690,6 +691,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
                     participents[pos][0],  # user_id
                     league_id,
                     draft_id["draft_id"],
+                    draft_set,
                 ]
             )
     else:
@@ -709,6 +711,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
         draft_order_ = dict([(value, key) for key, value in draft_order_dict.items()])
 
         for draft_position, roster_id in rs_dict.items():
+            draft_set = "Y"
             if draft_position <= 4:
                 position_name = "Early"
             elif draft_position <= 8:
@@ -730,18 +733,20 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
                         # draft_order_.get(int(draft_position), "Empty"),
                         league_id,
                         draft_id["draft_id"],
+                        draft_set,
                     ]
                 )
 
     cursor = db.cursor()
     execute_batch(
         cursor,
-        """INSERT into dynastr.draft_positions (season, rounds,  position, position_name, roster_id, user_id, league_id, draft_id)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """INSERT into dynastr.dev_draft_positions (season, rounds,  position, position_name, roster_id, user_id, league_id, draft_id, draft_set_flg)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (season, rounds, position, user_id, league_id)
     DO UPDATE SET position_name = EXCLUDED.position_name
             , roster_id = EXCLUDED.roster_id
             , draft_id = EXCLUDED.draft_id
+            , draft_set_flg = EXCLUDED.draft_set_flg
     ;""",
         tuple(draft_order),
         page_size=1000,

@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS dynastr.draft_positions (
     user_id VARCHAR(75),
     league_id VARCHAR(75),
     draft_id VARCHAR(75),
+    draft_set_flg VARCHAR(75),
     PRIMARY KEY (season, rounds, position, user_id, league_id)
 );
 
