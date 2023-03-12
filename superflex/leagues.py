@@ -132,14 +132,17 @@ def get_league_type(league_id: str):
         print(f"HTTP error occurred: {err}")
     except Exception as err:
         print(f"Other error occurred: {err}")
+    from collections import Counter
+
+    rp = Counter(league_res.json()["roster_positions"])
     try:
-        return (
-            "sf_value"
-            if "SUPER_FLEX" in league_res.json()["roster_positions"]
-            else "one_qb_value"
-        )
+        if rp["QB"] > 1 or "SUPER_FLEX" in rp.keys():
+            lt = "sf_value"
+        else:
+            lt = "one_qb_value"
+        return lt
     except:
-        return "sf_value"
+        return "one_qb_value"
 
 
 def get_league_rosters_size(league_id: str) -> int:
