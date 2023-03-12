@@ -887,9 +887,7 @@ def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id:
 def insert_current_leagues(
     db, session_id: str, user_id: str, user_name: str, entry_time: str, leagues: list
 ) -> None:
-    delete_user_leagues_query = (
-        f"""DELETE FROM dynastr.current_leagues where user_id = '{user_id}'"""
-    )
+    delete_user_leagues_query = f"""DELETE FROM dynastr.current_leagues where user_id = '{user_id}' and session_id ='{session_id}'"""
     cursor = db.cursor()
     cursor.execute(delete_user_leagues_query)
 
@@ -991,7 +989,6 @@ def player_manager_upates(
 
     else:
         try:
-            print("league_id", league_id)
             clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
             clean_league_picks(db, league_id)
