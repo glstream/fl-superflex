@@ -324,10 +324,8 @@ def clean_draft_trades(db, league_id: str) -> None:
     return
 
 
-def clean_league_picks(db, league_id: str) -> None:
-    delete_query = (
-        f"""DELETE FROM dynastr.draft_picks where league_id = '{league_id}'"""
-    )
+def clean_league_picks(db, league_id: str, session_id: str) -> None:
+    delete_query = f"""DELETE FROM dynastr.draft_picks where league_id = '{league_id}' and session_id = '{session_id}'"""
     cursor = db.cursor()
     cursor.execute(delete_query)
     cursor.close()
@@ -991,7 +989,7 @@ def player_manager_upates(
         try:
             clean_league_managers(db, league_id)
             clean_league_rosters(db, session_id, user_id, league_id)
-            clean_league_picks(db, league_id)
+            clean_league_picks(db, league_id, session_id)
             clean_draft_positions(db, league_id)
 
             managers = get_managers(league_id)
