@@ -225,7 +225,7 @@ WITH base_players as (SELECT
                                     al.user_id
                                     , al.season
                                     , al.year 
-                                    , CASE WHEN al.draft_set_flg = 'Y' THEN al.year || ' Round ' || al.round || ' Pick ' || dname.position
+                                    , CASE WHEN al.draft_set_flg = 'Y' and al.year = dname.season THEN al.year || ' Round ' || al.round || ' Pick ' || dname.position
 									ELSE al.year || ' Round ' || al.round END AS player_full_name                                    
                                     FROM (                           
                                         SELECT dp.roster_id
