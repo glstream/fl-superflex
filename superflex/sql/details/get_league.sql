@@ -26,24 +26,25 @@ WITH base_players as (SELECT
                     , base_picks as (SELECT t1.user_id
                                 , t1.season
                                 , t1.year
-                                , t1.player_name
+                                , t1.player_full_name
                                 , ktc.ktc_player_id
                                 FROM (
                                     SELECT  
                                     al.user_id
                                     , al.season
                                     , al.year 
-                                    , CASE WHEN al.year = dname.season 
-                                            THEN al.year|| ' ' || dname.position_name || ' ' || al.round_name 
+                                    , CASE WHEN al.draft_set_flg = 'Y' and al.year = dname.season THEN al.year || ' Round ' || al.round || ' Pick ' || dname.position
                                             ELSE al.year|| ' Mid ' || al.round_name 
-                                            END AS player_name 
+                                            END AS player_full_name 
                                     FROM (                           
                                         SELECT dp.roster_id
                                         , dp.year
                                         , dp.round_name
+                                        , dp.round
                                         , dp.league_id
                                         , dpos.user_id
                                         , dpos.season
+                                        , dpos.draft_set_flg
                                         FROM dynastr.draft_picks dp
                                         INNER JOIN dynastr.draft_positions dpos on dp.owner_id = dpos.roster_id and dp.league_id = dpos.league_id
 
@@ -52,7 +53,7 @@ WITH base_players as (SELECT
                                         ) al 
                                     INNER JOIN dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
-                                LEFT JOIN dynastr.ktc_player_ranks ktc on t1.player_name = ktc.player_full_name
+                                LEFT JOIN dynastr.ktc_player_ranks ktc on t1.player_full_name = ktc.player_full_name
                                     )						   
                     , starters as (SELECT  
                     qb.user_id
@@ -224,7 +225,7 @@ WITH base_players as (SELECT
                             user_id
                             ,null as player_id
                             ,picks.ktc_player_id
-                            ,picks.player_name as picks_player_name
+                            ,picks.player_full_name as picks_player_name
                             ,picks.year as draft_year
                             ,'PICKS' as player_position 
                             ,'PICKS' as fantasy_position
