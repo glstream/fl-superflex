@@ -15,6 +15,8 @@ from flask import (
 )
 from datetime import datetime
 from superflex.db import get_db, pg_db
+from flask_sqlalchemy import SQLAlchemy
+
 
 bp = Blueprint("leagues", __name__, url_prefix="/")
 bp.secret_key = "hello"
@@ -1329,6 +1331,21 @@ def team_view(user_id, league_id, session_id, view_source):
     )
 
 
+@bp.route("/player_values", methods=["GET"])
+def player_values():
+    db = pg_db()
+    players_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    players_query = """select player_full_name, coalesce(position, '-') as position, case when team = 'FA' then '-' else coalesce(team, '-') end as team, case when age = '-1.0' then '-' else coalesce(age, '-') end as age, sf_value as value, sf_rank as rank, 'sf_value' as rank_type from dynastr.ktc_player_ranks 
+UNION ALL
+select player_full_name, coalesce(position, '-') as position, case when team = 'FA' then '-' else coalesce(team, '-') end as team, case when age = '-1.0' then '-' else coalesce(age, '-') end as age, one_qb_value as value, rank as rank, 'one_qb_value' as rank_type from dynastr.ktc_player_ranks 
+"""
+    players_cursor.execute(players_query)
+    players = players_cursor.fetchall()
+    players_cursor.close()
+
+    return render_template("leagues/player_values.html", players=players)
+
+
 @bp.route("/faqs", methods=["GET"])
 def faqs():
     return render_template("leagues/faqs.html")
@@ -1351,6 +1368,7 @@ def index():
         entry_time,
     )
     cursor.execute(query, user_meta)
+    cursor.close()
 
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])

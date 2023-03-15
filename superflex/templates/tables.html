@@ -26,7 +26,7 @@
         <tbody>
             {% for owner in owners %}
 
-            <td style="text-align:center;"> <a style="color: rgb(255, 255, 255);text-decoration: none;"
+            <td class="tv" style="text-align:center;"> <a style="color: rgb(255, 255, 255);text-decoration: none;"
                     href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
             </td>
 
