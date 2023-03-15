@@ -1331,19 +1331,49 @@ def team_view(user_id, league_id, session_id, view_source):
     )
 
 
-@bp.route("/player_values", methods=["GET"])
-def player_values():
+@bp.route("/ktc_values", methods=["GET"])
+def ktc_values():
     db = pg_db()
-    players_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    players_query = """select player_full_name, coalesce(position, '-') as position, case when team = 'FA' then '-' else coalesce(team, '-') end as team, case when age = '-1.0' then '-' else coalesce(age, '-') end as age, sf_value as value, sf_rank as rank, 'sf_value' as rank_type from dynastr.ktc_player_ranks 
-UNION ALL
-select player_full_name, coalesce(position, '-') as position, case when team = 'FA' then '-' else coalesce(team, '-') end as team, case when age = '-1.0' then '-' else coalesce(age, '-') end as age, one_qb_value as value, rank as rank, 'one_qb_value' as rank_type from dynastr.ktc_player_ranks 
-"""
-    players_cursor.execute(players_query)
-    players = players_cursor.fetchall()
-    players_cursor.close()
+    ktc_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "ktc_values.sql", "r"
+    ) as ktc_values_file:
+        ktc_values_query = ktc_values_file.read()
+    ktc_values_cur.execute(ktc_values_query)
+    players = ktc_values_cur.fetchall()
+    ktc_values_cur.close()
 
-    return render_template("leagues/player_values.html", players=players)
+    return render_template("leagues/ktc_values.html", players=players)
+
+
+@bp.route("/fc_values", methods=["GET"])
+def fc_values():
+    db = pg_db()
+    fc_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "fc_values.sql", "r"
+    ) as fc_values_file:
+        fc_values_query = fc_values_file.read()
+    fc_values_cur.execute(fc_values_query)
+    players = fc_values_cur.fetchall()
+    fc_values_cur.close()
+
+    return render_template("leagues/fc_values.html", players=players)
+
+
+@bp.route("/dp_values", methods=["GET"])
+def dp_values():
+    db = pg_db()
+    dp_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "dp_values.sql", "r"
+    ) as dp_values_file:
+        dp_values_query = dp_values_file.read()
+    dp_values_cur.execute(dp_values_query)
+    players = dp_values_cur.fetchall()
+    dp_values_cur.close()
+
+    return render_template("leagues/dp_values.html", players=players)
 
 
 @bp.route("/faqs", methods=["GET"])
