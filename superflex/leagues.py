@@ -15,6 +15,8 @@ from flask import (
 )
 from datetime import datetime
 from superflex.db import get_db, pg_db
+from flask_sqlalchemy import SQLAlchemy
+
 
 bp = Blueprint("leagues", __name__, url_prefix="/")
 bp.secret_key = "hello"
@@ -1329,6 +1331,66 @@ def team_view(user_id, league_id, session_id, view_source):
     )
 
 
+@bp.route("/ktc_values", methods=["GET"])
+def ktc_values():
+    db = pg_db()
+    ktc_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "ktc_values.sql", "r"
+    ) as ktc_values_file:
+        ktc_values_query = ktc_values_file.read()
+    ktc_values_cur.execute(ktc_values_query)
+    players = ktc_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
+    ktc_values_cur.close()
+
+    return render_template(
+        "leagues/player_values/ktc_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
+
+
+@bp.route("/fc_values", methods=["GET"])
+def fc_values():
+    db = pg_db()
+    fc_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "fc_values.sql", "r"
+    ) as fc_values_file:
+        fc_values_query = fc_values_file.read()
+    fc_values_cur.execute(fc_values_query)
+    players = fc_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
+    fc_values_cur.close()
+
+    return render_template(
+        "leagues/player_values/fc_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
+
+
+@bp.route("/dp_values", methods=["GET"])
+def dp_values():
+    db = pg_db()
+    dp_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "dp_values.sql", "r"
+    ) as dp_values_file:
+        dp_values_query = dp_values_file.read()
+    dp_values_cur.execute(dp_values_query)
+    players = dp_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
+    dp_values_cur.close()
+
+    return render_template(
+        "leagues/player_values/dp_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
+
+
 @bp.route("/faqs", methods=["GET"])
 def faqs():
     return render_template("leagues/faqs.html")
@@ -1351,6 +1413,7 @@ def index():
         entry_time,
     )
     cursor.execute(query, user_meta)
+    cursor.close()
 
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
