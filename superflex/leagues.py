@@ -1343,7 +1343,7 @@ def ktc_values():
     players = ktc_values_cur.fetchall()
     ktc_values_cur.close()
 
-    return render_template("leagues/ktc_values.html", players=players)
+    return render_template("leagues/player_values/ktc_values.html", players=players)
 
 
 @bp.route("/fc_values", methods=["GET"])
@@ -1358,7 +1358,7 @@ def fc_values():
     players = fc_values_cur.fetchall()
     fc_values_cur.close()
 
-    return render_template("leagues/fc_values.html", players=players)
+    return render_template("leagues/player_values/fc_values.html", players=players)
 
 
 @bp.route("/dp_values", methods=["GET"])
@@ -1373,7 +1373,7 @@ def dp_values():
     players = dp_values_cur.fetchall()
     dp_values_cur.close()
 
-    return render_template("leagues/dp_values.html", players=players)
+    return render_template("leagues/player_values/dp_values.html", players=players)
 
 
 @bp.route("/faqs", methods=["GET"])
