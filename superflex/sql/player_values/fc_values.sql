@@ -4,6 +4,7 @@ with fc_players as (select player_full_name
 , sf_value as value
 , fc.player_position as _position
 , 'sf_value' as _rank_type 
+,fc.insert_date
 from dynastr.fc_player_ranks fc
 left join dynastr.players p on fc.sleeper_player_id = p.player_id
 where 1=1
@@ -16,6 +17,7 @@ select player_full_name
 , one_qb_value as value
 , fc.player_position as _position
 , 'one_qb_value' as _rank_type 
+,fc.insert_date
 from dynastr.fc_player_ranks fc 
 left join dynastr.players p on fc.sleeper_player_id = p.player_id 				
 where 1=1
@@ -30,4 +32,5 @@ select player_full_name
 , value
 , _position
 , _rank_type
+, TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z')-1 as _insert_date
 from fc_players

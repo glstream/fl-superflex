@@ -1341,9 +1341,14 @@ def ktc_values():
         ktc_values_query = ktc_values_file.read()
     ktc_values_cur.execute(ktc_values_query)
     players = ktc_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
     ktc_values_cur.close()
 
-    return render_template("leagues/player_values/ktc_values.html", players=players)
+    return render_template(
+        "leagues/player_values/ktc_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
 
 
 @bp.route("/fc_values", methods=["GET"])
@@ -1356,9 +1361,14 @@ def fc_values():
         fc_values_query = fc_values_file.read()
     fc_values_cur.execute(fc_values_query)
     players = fc_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
     fc_values_cur.close()
 
-    return render_template("leagues/player_values/fc_values.html", players=players)
+    return render_template(
+        "leagues/player_values/fc_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
 
 
 @bp.route("/dp_values", methods=["GET"])
@@ -1371,9 +1381,14 @@ def dp_values():
         dp_values_query = dp_values_file.read()
     dp_values_cur.execute(dp_values_query)
     players = dp_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
     dp_values_cur.close()
 
-    return render_template("leagues/player_values/dp_values.html", players=players)
+    return render_template(
+        "leagues/player_values/dp_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
 
 
 @bp.route("/faqs", methods=["GET"])

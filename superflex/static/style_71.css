@@ -620,10 +620,13 @@ table.dataTable thead .sorting_desc_disabled:before {
     bottom: .5em;
 }
 
+table.dataTable {
+    max-width: 100% !important;
+}
+
 .styled-table {
     border-collapse: collapse;
     background-color: transparent;
-    margin: 25px 0;
     font-size: 0.9em;
     font-family: sans-serif;
     min-width: 400px;
@@ -631,7 +634,7 @@ table.dataTable thead .sorting_desc_disabled:before {
 
 .styled-table thead tr {
     color: black;
-    text-align: left;
+    text-align: center;
 
 
 }
@@ -639,20 +642,24 @@ table.dataTable thead .sorting_desc_disabled:before {
 .styled-table th {
     padding: 12px 15px;
     border-bottom: none;
-    border-bottom: 1px solid #dddddd;
-    border-radius: 2rem;
+    border-bottom: 1px solid #0fad44;
 }
 
 .styled-table td {
     padding: 12px 15px;
+    border-bottom: none;
 }
 
 .styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid #000000;
+}
+
+.styled-table thead {
+    background-color: #c2c1bfb7;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
-    background-color: #aaa7a754;
+    background-color: #E3E2DF;
 }
 
 .styled-table tbody tr:last-of-type {
@@ -666,8 +673,8 @@ table.dataTable thead .sorting_desc_disabled:before {
 .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 20px;
+    width: 20px;
+    height: 10px;
 }
 
 .switch input {
@@ -683,7 +690,7 @@ table.dataTable thead .sorting_desc_disabled:before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: gray;
+    background-color: rgb(161, 8, 8);
     transition: .4s;
     border-radius: 34px;
 }
@@ -691,8 +698,8 @@ table.dataTable thead .sorting_desc_disabled:before {
 .slider:before {
     position: absolute;
     content: "";
-    height: 16px;
-    width: 16px;
+    height: 8px;
+    width: 8px;
     left: 2px;
     bottom: 2px;
     background-color: white;
@@ -701,11 +708,11 @@ table.dataTable thead .sorting_desc_disabled:before {
 }
 
 input:checked+.slider {
-    background-color: #2196F3;
+    background-color: #18b84d;
 }
 
 input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #df1111;
 }
 
 input:checked+.slider:before {
@@ -727,8 +734,8 @@ input:checked+.slider:before {
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 45px;
+    height: 20px;
     margin-bottom: 10px;
 }
 
@@ -748,14 +755,14 @@ input:checked+.slider:before {
     background-color: #c8c8c8;
     -webkit-transition: .4s;
     transition: .4s;
-    border-radius: 34px;
+    border-radius: 24px;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
+    height: 12px;
+    width: 12px;
     left: 4px;
     bottom: 4px;
     background-color: #fff;
@@ -782,9 +789,9 @@ input:checked+.slider:before {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 70px;
+    left: 50px;
     color: #000;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .sidebar {
@@ -819,4 +826,9 @@ input:checked+.slider:before {
         margin-left: 23%;
         max-width: 77%;
     }
+}
+
+.team-logo {
+    height: 20px;
+    width: 20px;
 }

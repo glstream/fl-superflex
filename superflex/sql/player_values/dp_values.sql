@@ -4,6 +4,7 @@ with dp_players as (select player_full_name
 , sf_value as value
 , fc.player_position as _position
 , 'sf_value' as _rank_type 
+, insert_date
 from dynastr.dp_player_ranks fc
 where 1=1
 and sf_value is not null
@@ -15,6 +16,7 @@ select player_full_name
 , one_qb_value as value
 , fc.player_position as _position
 , 'one_qb_value' as _rank_type 
+, insert_date
 from dynastr.dp_player_ranks fc 
 where 1=1
 and one_qb_value is not null 
@@ -28,4 +30,5 @@ select player_full_name
 , value
 , _position
 , _rank_type
+, TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z')-1 as _insert_date
 from dp_players
