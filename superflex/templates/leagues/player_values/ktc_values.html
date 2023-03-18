@@ -84,6 +84,21 @@
 
 
         });
+        $('input[type="checkbox"]').on('click', function () {
+            var columnIndex = $(this).parent().index() + 1;
+            $('td:nth-child(' + columnIndex + '),th:nth-child(' + columnIndex + ')').toggleClass('hidden');
+        });
+        $('#add-column').on('click', function () {
+            var newHeader = $('<th>').text('New Column');
+            var newCell = $('<td>').text('New Data');
+            $('thead tr').append(newHeader);
+            $('tbody tr').append(newCell);
+        });
+
+        $('#delete-column').on('click', function () {
+            var columnIndex = $('thead th:has(input:checked)').index();
+            $('thead tr th:nth-child(' + (columnIndex + 1) + '),tbody tr td:nth-child(' + (columnIndex + 1) + ')').remove();
+        });
     });
 </script>
 
@@ -164,6 +179,10 @@
                     <label>
                         <input type="checkbox" name="positionFilter" value="Pick" checked> Picks
                     </label>
+                    <label>
+                        <input type="checkbox" id="check-all"> Position
+                    </label>
+
                 </div>
             </div>
 
@@ -172,6 +191,7 @@
                     id="player-values-table">
                     <thead>
                         <tr>
+
                             <th>Player</th>
                             <th>Position</th>
                             <th>Team</th>
@@ -203,6 +223,24 @@
         </div>
     </div>
 </div>
+<table style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th style="border: 1px solid black; background-color: #f2f2f2; padding: 8px; text-align: left;">RB</th>
+            <th style="border: 1px solid black; background-color: #f2f2f2; padding: 8px; text-align: left;">Footballers
+            </th>
+            <th style="border: 1px solid black; background-color: #f2f2f2; padding: 8px; text-align: left;">ESPN</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border: 1px solid black; padding: 8px;">Bijan</td>
+            <td style="border: 1px solid black; padding: 8px;">7</td>
+            <td style="border: 1px solid black; padding: 8px;">12</td>
+        </tr>
+    </tbody>
+</table>
+
 
 
 {% endblock %}
