@@ -70,22 +70,24 @@ from
                                                 , status_updated
                                                 , dp.user_id
                                                 , dpt.transaction_type
-                                                , case when dpt.season = dp.season 
-                                                    THEN dpt.season ||' ' || ddp.position_name ||' ' ||dpt.round_suffix 
+                                                , CASE 
+                                                    WHEN ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                    THEN ddp.season || ' Round ' || dpt.round || ' Pick ' || ddp.position
                                                     ELSE dpt.season ||' Mid ' ||dpt.round_suffix
-                                                    end as asset
-                                                , case when dpt.season = dp.season 
-                                                    THEN dpt.season ||' ' || ddp.position_name ||' ' ||dpt.round_suffix 
+                                                    END AS asset
+                                                , CASE 
+                                                    WHEN ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                    THEN ddp.season || ' Round ' || dpt.round || ' Pick ' || ddp.position
                                                     ELSE dpt.season ||' Mid ' ||dpt.round_suffix
-                                                    end as player_name
+                                                    END AS player_name
                                                 , dp.position_name
                                                 , dpt.season
+                                                , dp.draft_set_flg
                                                 from dynastr.draft_pick_trades dpt
                                                 inner join dynastr.draft_positions dp on dpt.roster_id = dp.roster_id and dpt.league_id = dp.league_id
                                                 inner join dynastr.draft_positions ddp on dpt.org_owner_id = ddp.roster_id and dpt.league_id = ddp.league_id
                                                 where 1=1
                                                 and dpt.league_id = 'league_id' 
-                                                
                                                 )  a1
                                     inner join dynastr.ktc_player_ranks ktc on a1.player_name = ktc.player_full_name
                                     inner join dynastr.managers m on cast(a1.user_id as varchar) = cast(m.user_id as varchar)
