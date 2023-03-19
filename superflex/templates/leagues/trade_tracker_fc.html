@@ -40,7 +40,7 @@
                     {% for summary in summary_table %}
 
                     <tr>
-                        <td scope="row" style="text-align:center">{{summary.display_name}}</td>
+                        <td class="tv" scope="row" style="text-align:center">{{summary.display_name}}</td>
                         <td style="text-align:center" class="over-limit-{{summary.add_tile}}">
                             {{"{:,}".format(summary.total_add)}}</td>
                         <td style="text-align:center" class="over-limit-{{summary.drop_tile}}">

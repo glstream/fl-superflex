@@ -70,8 +70,16 @@ from
                                                 , status_updated
                                                 , dp.user_id
                                                 , dpt.transaction_type
-                                                , dpt.season || ' Round ' || dpt.round as asset
-                                                , dpt.season || ' Round ' || dpt.round as player_name
+                                                , CASE 
+                                                    WHEN ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                    THEN ddp.season || ' Round ' || dpt.round || ' Pick ' || ddp.position
+                                                    ELSE dpt.season || ' Round ' || dpt.round
+                                                    END AS asset
+                                                 , CASE 
+                                                    WHEN ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                    THEN ddp.season || ' Round ' || dpt.round || ' Pick ' || ddp.position
+                                                    ELSE dpt.season || ' Round ' || dpt.round
+                                                    END AS player_name
                                                 , dp.position_name
                                                 , dpt.season
                                                 from dynastr.draft_pick_trades dpt
