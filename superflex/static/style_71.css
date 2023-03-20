@@ -302,7 +302,7 @@ th {
     border-radius: .5em !important;
     background-color: rgb(39, 125, 161) !important;
     color: white !important;
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
     text-align: center !important;
 } */
@@ -312,104 +312,104 @@ td.tv {
     background-color: rgb(39, 125, 161, .7) !important;
     color: white !important;
     background-clip: padding-box !important;
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
 
 }
 
 td.over-limit-0 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(68, 184, 73, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-1 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(68, 184, 73, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-2 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(88, 171, 72, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-3 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(108, 158, 72, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-4 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgba(98, 97, 96, 0.69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-5 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgba(120, 108, 99, 0.69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-6 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(202, 121, 86, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-7 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(214, 107, 82, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-8 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(226, 93, 77, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-9 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(237, 79, 73, .69) !important;
     text-align: center !important;
     color: white !important;
 }
 
 td.over-limit-10 {
-    border: 4px solid transparent !important;
+    border: 2px solid transparent !important;
     background-clip: padding-box !important;
-    border-radius: .8em !important;
+    border-radius: .4em !important;
     background-color: rgb(249, 65, 68, .69) !important;
     text-align: center !important;
     color: white !important;
