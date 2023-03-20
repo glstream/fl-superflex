@@ -86,6 +86,10 @@ def create_app(test_config=None):
             mimetype="image/vnd.microsoft.icon",
         )
 
+    @app.route("/ads.txt")
+    def ads_txt():
+        return send_from_directory(os.path.join(app.root_path, "static"), "ads.txt")
+
     from . import db, leagues
 
     db.init_app(app)
