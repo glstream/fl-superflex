@@ -1813,7 +1813,7 @@ def get_league():
         league_cursor.close()
 
         return render_template(
-            "leagues/get_league.html",
+            "leagues/power_ranks/get_league.html",
             owners=owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -2050,7 +2050,7 @@ def get_league_fc():
         league_cursor.close()
 
         return render_template(
-            "leagues/get_league_fc.html",
+            "leagues/power_ranks/get_league_fc.html",
             owners=owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -2284,7 +2284,7 @@ def get_league_dp():
         league_cursor.close()
 
         return render_template(
-            "leagues/get_league_dp.html",
+            "leagues/power_ranks/get_league_dp.html",
             owners=owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -2489,7 +2489,7 @@ def get_league_fp():
         league_cursor.close()
 
         return render_template(
-            "leagues/get_league_fp.html",
+            "leagues/power_ranks/get_league_fp.html",
             owners=fp_owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -2636,15 +2636,30 @@ def trade_tracker():
             refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        cur_league = league_cursor.fetchone()
 
         return render_template(
-            "leagues/trade_tracker.html",
+            "leagues/trades/trade_tracker.html",
             transaction_ids=transaction_ids,
             trades_dict=trades_dict,
             summary_table=summary_table,
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
+            user_name=get_user_name(user_id)[1],
+            cur_league=cur_league,
+            avatar=avatar,
+            refresh_time=refresh_time,
             update_diff_minutes=update_diff_minutes,
             league_name=get_league_name(league_id),
         )
@@ -2767,14 +2782,29 @@ def trade_tracker_fc():
         current_time = datetime.utcnow()
         update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
 
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        cur_league = league_cursor.fetchone()
+
         return render_template(
-            "leagues/trade_tracker_fc.html",
+            "leagues/trades/trade_tracker_fc.html",
             transaction_ids=transaction_ids,
             trades_dict=trades_dict,
             summary_table=summary_table,
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
+            user_name=get_user_name(user_id)[1],
+            cur_league=cur_league,
+            avatar=avatar,
             update_diff_minutes=update_diff_minutes,
             league_name=get_league_name(league_id),
         )
@@ -2981,7 +3011,7 @@ def contender_rankings():
         league_cursor.close()
 
         return render_template(
-            "leagues/contender_rankings.html",
+            "leagues/contender_ranks/contender_rankings.html",
             owners=c_owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -3211,7 +3241,7 @@ def fc_contender_rankings():
         league_cursor.close()
 
         return render_template(
-            "leagues/contender_rankings_fc.html",
+            "leagues/contender_ranks/contender_rankings_fc.html",
             owners=fc_owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -3440,7 +3470,7 @@ def nfl_contender_rankings():
         league_cursor.close()
 
         return render_template(
-            "leagues/contender_rankings_nfl.html",
+            "leagues/contender_ranks/contender_rankings_nfl.html",
             owners=nfl_owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -3672,7 +3702,7 @@ def fp_contender_rankings():
         league_cursor.close()
 
         return render_template(
-            "leagues/contender_rankings_fp.html",
+            "leagues/contender_ranks/contender_rankings_fp.html",
             owners=fp_owners,
             page_user=page_user,
             total_rosters=total_rosters,

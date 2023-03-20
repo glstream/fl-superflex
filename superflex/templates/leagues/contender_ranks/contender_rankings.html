@@ -1,44 +1,30 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
-{% from 'buttons.html' import buttons_large %}
-{% from 'tables.html' import power_ranks %}
-{% from 'ranks.html' import power_status_ranks %}
-{% from 'best_available.html' import ba %}
-{% from 'header_page.html' import league_header %}
-{% from 'player_cards.html' import player_cards %}
-{% from 'table_footer.html' import table_footer %}
-
+{% from 'reusable/buttons.html' import buttons_large %}
+{% from 'reusable/tables.html' import contender_ranks %}
+{% from 'reusable/ranks.html' import contender_status_ranks %}
+{% from 'reusable/best_available.html' import ba %}
+{% from 'reusable/header_page.html' import league_header %}
+{% from 'reusable/player_cards.html' import player_contender_cards %}
+{% from 'reusable/table_footer.html' import table_footer %}
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+
 </script>
 {{league_header(league_name, avatar)}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
 {%endif%}
 <div style="display: inline-block;">
-    <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted"
-            style="margin-left: 1px;">KeepTradeCut</small>
+    <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted" style="margin-left: 1px;">ESPN</small>
     </h3>
     <h7 style="margin-right: 10px;right: 0;">League refreshed {{ refresh_time }} ago</h7>
 </div>
-
 <div style="display: flex; gap:8px; margin-top: 5px;">
-    <!-- <div style="display: flex; gap:10px">
-        <form method="post" class="form-inline">
-            <button class="btn btn-outline-secondary bt-sm" type="submit" name="get_league"
-                value="{{session_id,user_id,cur_league.previous_league_id}}" {{bt}}>Load Previous
-                Year</button>
-        </form>
-        <form method="post" class="form-inline">
-            <button class="btn btn-outline-secondary" type="submit" name="get_league"
-                value="{{session_id,user_id,session_league_id}}">Load Current
-                Year</button>
-        </form>
-    </div> -->
     <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="get_league"
-            value="{{session_id, user_id, league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
+        <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="contender_rankings"
+            value="{{session_id,user_id,session_league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
             | refresh league</button>
     </form>
 </div>
@@ -69,38 +55,35 @@
         {% else %}
         <span class="badge alert-primary">Single QB</span>
         {% endif %}
-
         <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
-
 </h5>
 <br>
-{{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
-
+{{buttons_large(session_id, user_id, league_id, espn_button='disabled')}}
 <br>
 <div class="row justify-content-between">
     <div class="col-auto">
-        {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id,
-        session_id,pct_values_dict,'get_league_ktc')}}
+        {{contender_status_ranks(owners, pct_values, 'Contender Rankings', league_id,
+        session_id,pct_values_dict,'contender_rankings_espn')}}
     </div>
     <div class="col">
         <div style="margin-top: 30px;">
-            {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
-            {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
+            {{contender_ranks(owners, user_id, league_id, session_id,'contender_ranks_espn')}}
+            {{table_footer('ESPN Player Projections', update_diff_minutes)}}
         </div>
     </div>
     <div class="col-auto">
         <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
-            <canvas id="ktc_chart" width="340" height="340"></canvas>
+            <canvas id="espn_chart" width="340" height="340"></canvas>
             <script>
                 try {
-                    const ctx = document.getElementById('ktc_chart').getContext('2d');
-                    const ktc_chart = new Chart(ctx, {
+                    const ctx = document.getElementById('espn_chart').getContext('2d');
+                    const espn_chart = new Chart(ctx, {
                         type: 'radar',
                         data: {
-                            labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
+                            labels: ['QB', 'RB', 'WR', 'TE', 'Starters', 'Bench'],
                             datasets: [{
                                 label: '{{page_user[0][0]}}',
-                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
+                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}'],
                                 backgroundColor: 'rgb(39, 125, 161, .95)',
                                 borderColor: 'rgb(67, 170, 139, 1.0)',
                                 borderWidth: 3
@@ -125,10 +108,13 @@
                                     max: {{ total_rosters }},
                 min: 1,
                     beginAtZero: false,
-
                         ticks: {
                     stepSize: 4,
-                        display: false
+                        display: false,
+                            font: {
+                        size: 16,
+                            weight: "bold"
+                    }
                 }
                                 },
                             },
@@ -152,6 +138,6 @@
 </div>
 <br>
 <div class="row justify-content-center">
-    {{ player_cards(owners, users, aps, league_id, session_id, 'ktc', 'get_league_ktc') }}
+    {{ player_contender_cards(owners, users, aps, league_id, session_id, 'espn', 'contender_rankings_espn') }}
 </div>
 {% endblock %}

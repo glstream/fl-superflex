@@ -1,11 +1,11 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
-{% from 'buttons.html' import buttons_large %}
-{% from 'tables.html' import contender_ranks %}
-{% from 'ranks.html' import contender_status_ranks %}
-{% from 'best_available.html' import ba %}
-{% from 'header_page.html' import league_header %}
-{% from 'player_cards.html' import player_contender_cards %}
-{% from 'table_footer.html' import table_footer %}
+{% from 'reusable/buttons.html' import buttons_large %}
+{% from 'reusable/tables.html' import contender_ranks %}
+{% from 'reusable/ranks.html' import contender_status_ranks %}
+{% from 'reusable/best_available.html' import ba %}
+{% from 'reusable/header_page.html' import league_header %}
+{% from 'reusable/player_cards.html' import player_contender_cards %}
+{% from 'reusable/table_footer.html' import table_footer %}
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
@@ -18,13 +18,13 @@
 {%endif%}
 <div style="display: inline-block;">
     <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted"
-            style="margin-left: 1px;">FantasyPros</small>
+            style="margin-left: 1px;">FantasyCalc</small>
     </h3>
     <h7 style="margin-right: 10px;right: 0;">League refreshed {{ refresh_time }} ago</h7>
 </div>
 <div style="display: flex; gap:8px; margin-top: 5px;">
     <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="fp_contender_rankings"
+        <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="fc_contender_rankings"
             value="{{session_id,user_id,session_league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
             | refresh league</button>
     </form>
@@ -59,26 +59,26 @@
         <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
 </h5>
 <br>
-{{buttons_large(session_id, user_id, league_id, fp_c_button='disabled')}}
+{{buttons_large(session_id, user_id, league_id, fc_c_button='disabled')}}
 <br>
 <div class="row justify-content-between">
     <div class="col-auto">
         {{contender_status_ranks(owners, pct_values, 'Contender Rankings', league_id,
-        session_id, pct_values_dict, 'contender_rankings_fp')}}
+        session_id,pct_values_dict,'contender_rankings_fc')}}
     </div>
     <div class="col">
         <div style="margin-top: 30px;">
-            {{contender_ranks(owners, user_id, league_id, session_id, 'contender_ranks_fp')}}
-            {{table_footer('FantasyPros Player Projections', update_diff_minutes)}}
+            {{contender_ranks(owners, user_id, league_id, session_id,'contender_ranks_fc')}}
+            {{table_footer('FantasyCalc Player Rankings', update_diff_minutes)}}
         </div>
     </div>
     <div class="col-auto">
         <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
-            <canvas id="fp_c_chart" width="340" height="340"></canvas>
+            <canvas id="fc_c_chart" width="340" height="340"></canvas>
             <script>
                 try {
-                    const ctx = document.getElementById('fp_c_chart').getContext('2d');
-                    const fp_c_chart = new Chart(ctx, {
+                    const ctx = document.getElementById('fc_c_chart').getContext('2d');
+                    const fc_c_chart = new Chart(ctx, {
                         type: 'radar',
                         data: {
                             labels: ['QB', 'RB', 'WR', 'TE', 'Starters', 'Bench'],
@@ -139,6 +139,6 @@
 </div>
 <br>
 <div class="row justify-content-center">
-    {{ player_contender_cards(owners, users, aps, league_id, session_id, 'fp_c', 'contender_rankings_fp') }}
+    {{ player_contender_cards(owners, users, aps, league_id, session_id, 'fc', 'contender_rankings_fc') }}
 </div>
 {% endblock %}
