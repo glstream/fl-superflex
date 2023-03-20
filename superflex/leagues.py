@@ -1,5 +1,5 @@
 import requests, uuid
-import psycopg2
+import psycopg2, time
 from psycopg2.extras import execute_batch, execute_values
 from pathlib import Path
 
@@ -38,26 +38,35 @@ def n_user_id(user_name: str) -> str:
 
 
 def league_managers(league_id: str, user_id: str) -> list:
+    MAX_RETRIES = 5
+    RETRY_DELAY = 1
     managers = []
     for i in user_leagues(user_id):
         if i[1] in league_id:
             LEAGUE_ID = i[1]
             league_managers_url = f"https://api.sleeper.app/v1/league/{LEAGUE_ID}/users"
-            try:
-                managers_res = requests.get(league_managers_url)
-                managers_res.raise_for_status()
-            except requests.exceptions.HTTPError as err:
-                print(f"HTTP error occurred: {err}")
-            except Exception as err:
-                print(f"Other error occurred: {err}")
-            managers_res_json = managers_res.json()
-            for i in managers_res_json:
-                inner_manager = (
-                    inner_manager["user_id"],
-                    inner_manager["display_name"],
-                    inner_manager["league_id"],
-                )
-                managers.append(inner_manager)
+            for call in range(MAX_RETRIES):
+                try:
+                    try:
+                        managers_res = requests.get(league_managers_url)
+                        managers_res.raise_for_status()
+                        break
+                    except requests.exceptions.HTTPError as err:
+                        print(f"HTTP error occurred: {err}")
+                    except Exception as err:
+                        print(f"Other error occurred: {err}")
+                except Exception as e:
+                    print("Attempt {} failed with error: {}".format(call + 1, e))
+                    time.sleep(RETRY_DELAY)
+
+                managers_res_json = managers_res.json()
+                for i in managers_res_json:
+                    inner_manager = (
+                        inner_manager["user_id"],
+                        inner_manager["display_name"],
+                        inner_manager["league_id"],
+                    )
+                    managers.append(inner_manager)
     return managers
 
 
