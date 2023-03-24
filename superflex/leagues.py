@@ -1190,8 +1190,11 @@ def team_view(user_id, league_id, session_id, view_source):
     }
     sql_view_table = source_mapping[view_source]["table"]
     rankings_source = source_mapping[view_source]["rankings"]
-
-    sf_league_type = get_league_type(league_id)
+    try:
+        sf_league_type = get_league_type(league_id)
+    except Exception as e:
+        print(f"An error occurred: {e} on get_league_type")
+        return redirect(url_for("leagues.index"))
 
     if sql_view_table == "get_league_ktc":
         positional_type = (
@@ -1714,7 +1717,12 @@ def get_league():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
+
         league_pos_col = (
             "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
         )
@@ -1959,7 +1967,12 @@ def get_league_sf():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        sf_league_type = get_league_type(league_id)
+        try:
+            sf_league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
+
         league_pos_col = (
             "superflex_sf_pos_rank"
             if sf_league_type == "sf_value"
@@ -2214,7 +2227,10 @@ def get_league_fc():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except:
+            return redirect(url_for("leagues.index"))
         league_pos_col = (
             "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
         )
@@ -2462,7 +2478,11 @@ def get_league_dp():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
 
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
@@ -2704,7 +2724,11 @@ def get_league_fp():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
         lt = "sf" if league_type == "sf_value" else "one_qb"
 
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -2923,7 +2947,11 @@ def trade_tracker():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
 
         trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -3087,7 +3115,11 @@ def trade_tracker_fc():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
         trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
@@ -3250,7 +3282,11 @@ def trade_tracker_sf():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        sf_league_type = get_league_type(league_id)
+        try:
+            sf_league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
         league_type = (
             "superflex_sf_value"
             if sf_league_type == "sf_value"
@@ -3662,7 +3698,11 @@ def fc_contender_rankings():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        league_type = get_league_type(league_id)
+        try:
+            league_type = get_league_type(league_id)
+        except Exception as e:
+            print(f"An error occurred: {e} on get_league_type")
+            return redirect(url_for("leagues.index"))
         fc_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
