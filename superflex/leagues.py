@@ -1198,17 +1198,19 @@ def team_view(user_id, league_id, session_id, view_source):
 
     if sql_view_table == "get_league_ktc":
         positional_type = (
-            "sf_positional_rank" if league_type == "sf_value" else "positional_rank"
+            "sf_positional_rank" if sf_league_type == "sf_value" else "positional_rank"
         )
-        total_rank_type = "sf_rank" if league_type == "sf_value" else "rank"
+        total_rank_type = "sf_rank" if sf_league_type == "sf_value" else "rank"
         league_type = sf_league_type
 
     elif sql_view_table == "get_league_fc":
         positional_type = (
-            "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
+            "sf_position_rank"
+            if sf_league_type == "sf_value"
+            else "one_qb_position_rank"
         )
         total_rank_type = (
-            "sf_overall_rank" if league_type == "sf_value" else "one_qb_overall_rank"
+            "sf_overall_rank" if sf_league_type == "sf_value" else "one_qb_overall_rank"
         )
         league_type = sf_league_type
 
