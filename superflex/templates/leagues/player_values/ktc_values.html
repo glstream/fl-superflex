@@ -200,20 +200,15 @@
                             <td style="text-align: left;"> {{ player.player_full_name }} ({{player._position}} | {{
                                 player.team or ' - '
                                 }}) {%if player._position =="QB" %}
-
                                 <span class="badge bg-primary">{{player.pos_rank}}</span>
-
                                 {% elif player._position =="RB" %}
                                 <span class="badge bg-success">{{player.pos_rank}}</span></h4>
                                 {% elif player._position =="WR" %}
                                 <span class="badge bg-warning">{{player.pos_rank}}</span></h4>
                                 {% elif player._position =="TE" %}
                                 <span class="badge bg-danger">{{player.pos_rank}}</span>
-
-
                                 {% elif player._position == "Pick" %}
                                 <span class="badge bg-dark">{{player.pos_rank}}</span>
-
                                 {%endif%}
                             </td>
                             <td>{{ player.pos_rank }}</td>
