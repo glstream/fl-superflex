@@ -16,25 +16,10 @@ from flask import (
 from datetime import datetime
 from superflex.db import get_db, pg_db
 from flask_sqlalchemy import SQLAlchemy
-
+from helpers import n_user_id
 
 bp = Blueprint("leagues", __name__, url_prefix="/")
 bp.secret_key = "hello"
-
-
-def n_user_id(user_name: str) -> str:
-    user_url = f"https://api.sleeper.app/v1/user/{user_name}"
-    try:
-        un_res = requests.get(user_url)
-        un_res.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        print(f"HTTP error occurred: {err}")
-    except Exception as err:
-        print(f"Other error occurred: {err}")
-
-    user_id = un_res.json()["user_id"]
-
-    return user_id
 
 
 def league_managers(league_id: str, user_id: str) -> list:
