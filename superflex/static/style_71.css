@@ -22,6 +22,17 @@ table {
     font-size: 12px;
 }
 
+.progress-bar {
+    border-radius: 2px;
+}
+
+.progress-bar.bg-dark {
+    color: rgba(41, 41, 41, 0.7);
+    border: 1px solid rgba(41, 41, 41, 0.20);
+    background-color: rgba(143, 145, 146, 0.20) !important;
+    border-right: rad;
+}
+
 .progress-bar.bg-primary {
     outline-color: rgb(39, 125, 161) !important;
     border-color: rgb(39, 125, 161) !important;
@@ -46,12 +57,7 @@ table {
     background-color: rgb(249, 132, 74, .7) !important;
 }
 
-.progress-bar.bg-dark {
-    outline-color: rgb(249, 199, 79) !important;
-    color: rgb(252, loc 252, 252) !important;
-    border-color: rgb(249, 199, 79) !important;
-    background-color: rgb(249, 199, 79, .7) !important;
-}
+
 
 .progress.border.border-dark {
     border-color: rgba(189, 195, 199, 0.6) !important;
