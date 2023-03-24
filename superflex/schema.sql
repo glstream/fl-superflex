@@ -337,6 +337,39 @@ create table if not exists history.user_geo_meta (
 	insert_date VARCHAR(150),
   PRIMARY KEY (session_id)
 )
+
+CREATE TABLE if not exists dynastr.sf_player_ranks (
+    player_full_name VARCHAR(255),
+    ktc_player_id INTEGER,
+    team VARCHAR(10),
+    _position VARCHAR(10),
+    ktc_sf_value INTEGER,
+    ktc_sf_rank INTEGER,
+    ktc_one_qb_value INTEGER,
+    ktc_one_qb_rank INTEGER,
+    fc_sf_value INTEGER,
+    fc_sf_rank INTEGER,
+    fc_one_qb_value INTEGER,
+    fc_one_qb_rank INTEGER,
+    dp_sf_value INTEGER,
+    dp_sf_rank INTEGER,
+    dp_one_qb_value INTEGER,
+    dp_one_qb_rank INTEGER,
+    ktc_sf_normalized_value FLOAT,
+    fc_sf_normalized_value FLOAT,
+    dp_sf_normalized_value FLOAT,
+    ktc_one_qb_normalized_value FLOAT,
+    fc_one_qb_normalized_value FLOAT,
+    dp_one_qb_normalized_value FLOAT,
+    average_normalized_sf_value FLOAT,
+    average_normalized_one_qb_value FLOAT,
+    superflex_sf_value INTEGER,
+    superflex_one_qb_value INTEGER,
+    superflex_sf_rank INTEGER,
+    superflex_one_qb_rank INTEGER,
+    insert_date VARCHAR(150),
+  PRIMARY KEY (ktc_player_id)
+);
 INSERT INTO history.user_geo_meta VALUES ('test',Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,Null,'2021-08-20T23:59:00.761669')
 
 CREATE TABLE IF NOT EXISTS history.managers (LIKE dynastr.managers INCLUDING ALL);

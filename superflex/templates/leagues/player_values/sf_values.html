@@ -26,7 +26,7 @@
         });
 
 
-        $('#player-values-table').DataTable().column(6).search('sf_value').draw();
+        $('#player-values-table').DataTable().column(6).search('superflex_sf_value').draw();
 
 
         $('#sf-toggle').on('click', function () {
@@ -34,14 +34,14 @@
             if (isChecked) {
                 table.column(6).search('sf_value').draw(); // Change index to match your data
                 table.rows().nodes().each(function (row) {
-                    if ($(row).find('td:eq(6)').text() != 'sf_value') {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
                         $(row).toggle(false);
                     }
                 });
             } else {
                 table.column(6).search('one_qb_value').draw(); // Change index to match your data
                 table.rows().nodes().each(function (row) {
-                    if ($(row).find('td:eq(6)').text() == 'one_qb_value') {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
                         $(row).toggle(true);
                     }
                 });
@@ -52,14 +52,14 @@
             if (isChecked) {
                 table.column(6).search('sf_value').draw(); // Change index to match your data
                 table.rows().nodes().each(function (row) {
-                    if ($(row).find('td:eq(6)').text() != 'sf_value') {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
                         $(row).toggle(false);
                     }
                 });
             } else {
                 table.column(6).search('one_qb_value').draw(); // Change index to match your data
                 table.rows().nodes().each(function (row) {
-                    if ($(row).find('td:eq(6)').text() == 'one_qb_value') {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
                         $(row).toggle(true);
                     }
                 });
@@ -88,7 +88,7 @@
 </script>
 
 <div class="container-fluid">
-    <h1 style="margin-bottom:20px">Dynasty Process</h1>
+    <h1 style="margin-bottom:20px">SuperFlex</h1>
     <div class="row flex-md-nowrap">
         <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
             <div class="dropdown  mb-3">
@@ -97,15 +97,14 @@
                     Rankings Source
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
+                    <button class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
+                        value="" disabled>SuperFlex</button>
                     <a class="dropdown-item" href="{{url_for('leagues.ktc_values')}}" type="submit" name="ktc_values"
                         value="">KeepTradeCut</a>
                     <a class="dropdown-item" href="{{url_for('leagues.fc_values')}}" type="submit" name="fc_values"
                         value="">FantasyCalc</a>
-
-                    <button class="dropdown-item" href="{{url_for('leagues.dp_values')}}" type="submit" name="dp_values"
-                        value="" disabled>Dynasty Process</button>
-                    <a class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
-                        value="">SuperFlex</a>
+                    <a class="dropdown-item" href="{{url_for('leagues.dp_values')}}" type="submit" name="dp_values"
+                        value="">Dynasty Process</a>
                 </div>
             </div>
             <div class="filter-div mb-3">
@@ -128,14 +127,14 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton"
                     style="font-size: 14px;">
-                    <a class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
-                        value="">SuperFlex</a>
                     <a class="dropdown-item" href="{{url_for('leagues.ktc_values')}}" type="submit" name="ktc_values"
                         value="">KeepTradeCut</a>
                     <a class="dropdown-item" href="{{url_for('leagues.fc_values')}}" type="submit" name="fc_values"
                         value="">FantasyCalc</a>
-                    <button class="dropdown-item" href="{{url_for('leagues.dp_values')}}" type="submit" name="dp_values"
-                        value="" disabled>Dynasty Process</button>
+                    <a class="dropdown-item" href="{{url_for('leagues.dp_values')}}" type="submit" name="dp_values"
+                        value="">Dynasty Process</a>
+                    <button class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
+                        value="" disabled>SuperFlex</button>
                 </div>
                 <div class="filter-div  mb-3">
                     <label class="switch float-right" style="margin-top: 15px;">
@@ -169,6 +168,7 @@
                     <label>
                         <input type="checkbox" name="positionFilter" value="Pick" checked> Picks
                     </label>
+
                 </div>
             </div>
 
@@ -177,6 +177,7 @@
                     id="player-values-table">
                     <thead>
                         <tr>
+
                             <th>Player</th>
                             <th>Position</th>
                             <th>Team</th>
@@ -208,6 +209,4 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}

@@ -832,3 +832,23 @@ input:checked+.slider:before {
     height: 20px;
     width: 20px;
 }
+
+#toast-container>.toast {
+    background-color: rgb(248, 150, 30);
+    font-size: 18px;
+    /* Increase text size */
+    min-height: 80px;
+    /* Increase banner height */
+    padding: 20px 15px;
+    /* Add padding for taller banner */
+    text-align: center;
+}
+
+/* Hide the icon */
+#toast-container>.toast:before {
+    display: none;
+}
+
+#toast-container>.toast {
+    background-image: none !important;
+}

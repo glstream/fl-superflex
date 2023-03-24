@@ -9,7 +9,7 @@ with sf_players as (select player_full_name
 , 'superflex_sf_value' as _rank_type 
 ,insert_date
 from dynastr.sf_player_ranks sf
-inner join dynastr.players p on sf.player_full_name = p.full_name
+left join dynastr.players p on sf.player_full_name = p.full_name
 UNION ALL
 select player_full_name
 ,  p.team
@@ -22,7 +22,7 @@ select player_full_name
 , 'superflex_one_qb_value' as _rank_type
 ,insert_date
 from dynastr.sf_player_ranks sf
-inner join dynastr.players p on sf.player_full_name = p.full_name)
+left join dynastr.players p on sf.player_full_name = p.full_name)
 															   
 select player_full_name
 ,CONCAT(_position, ' ', rank() OVER (partition by _rank_type, _position ORDER BY value DESC)) as pos_rank

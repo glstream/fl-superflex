@@ -97,12 +97,16 @@
                     Rankings Source
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
+                    <a class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
+                        value="">SuperFlex</a>
                     <a class="dropdown-item" href="{{url_for('leagues.ktc_values')}}" type="submit" name="ktc_values"
                         value="">KeepTradeCut</a>
                     <button class="dropdown-item" href="{{url_for('leagues.fc_values')}}" type="submit" name="fc_values"
                         value="" disabled>FantasyCalc</button>
                     <a class="dropdown-item" href="{{url_for('leagues.dp_values')}}" type="submit" name="dp_values"
                         value="">Dynasty Process</a>
+                    <a class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
+                        value="">SuperFlex</a>
                 </div>
             </div>
             <div class="filter-div mb-3">

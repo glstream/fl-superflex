@@ -3,17 +3,61 @@
 {% endblock %} {% block content %}
 <div id="accordion">
     <div class="card">
+        <div class="card-header" id="headingFour" style="font-size:16px">
+            <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true"
+                    aria-controls="collapseFour">
+                    How are composite SuperFlex ranks made?
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapseFour" class="collapse show" aria-labelledby="headingFour" data-parent="#accordion">
+            <div class="card-body" style="font-size:16px">
+                <p>
+                    Introducing the Super Flex Rankings: a comprehensive and robust ranking system that combines the
+                    best of
+                    three highly-regarded sources in the world of fantasy football. By integrating Keep Trade Cut's
+                    crowdsourced valuations, Dynasty Process's expert consensus rankings, and Fantasy Calc's trade-based
+                    assessments, our Super Flex Rankings provide you with a unique, data-driven perspective on player
+                    values.
+                </p>
+                <p>
+                    These Super Flex Rankings are designed to help you make better-informed decisions when it comes to
+                    managing your fantasy football team. By leveraging the wisdom of the crowd, expert analysis, and
+                    real-world trade data, our rankings offer an unparalleled level of insight into player performance
+                    and
+                    value.
+                </p>
+                <p>
+                    With Super Flex Rankings, you'll have access to a powerful tool that can aid you in your quest for
+                    fantasy football domination. Whether you're evaluating trades, updating your roster, or
+                    participating in
+                    a startup draft, our Super Flex Rankings will serve as an invaluable resource to help you make the
+                    best
+                    possible decisions for your team.
+                </p>
+                <p>
+                    Stay ahead of the competition and maximize your chances of success with our cutting-edge Super Flex
+                    Rankings – the ultimate fusion of data, expertise, and real-world insights in the realm of fantasy
+                    football.
+                </p>
+
+            </div>
+        </div>
+    </div>
+    <div class="card">
         <div class="card-header" id="headingOne">
             <h5 class="mb-0">
-                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false"
                     aria-controls="collapseOne">
                     What are Power Rankings?
                 </button>
             </h5>
         </div>
 
-        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-            <div class="card-body">
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body" style="font-size:16px">
                 Power Rankings are sourced from Keep Trade Cut, Fantasy Pros, Fantasy Calc and Dynasty Process. These
                 rankings are the
                 best way to determine the power of your team from a dynasty league perspective.
@@ -36,7 +80,7 @@
             </h5>
         </div>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-            <div class="card-body">
+            <div class="card-body" style="font-size:16px">
                 Contender Rankings are sourced from ESPN, Fantasy Pros, Fantasy Calc and NFL Projections. These rankings
                 are the best way to
                 determine if your team can contend this year and from a redraft perspective.
@@ -58,7 +102,7 @@
             </h5>
         </div>
         <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-            <div class="card-body">
+            <div class="card-body" style="font-size:16px">
                 Superflex source refresh times ->
                 Keep Trade Cut: 60 minutes
                 Fantasy Pros: 60 minutes

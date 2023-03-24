@@ -1,5 +1,4 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
-
 <div class="col-md-6" style="padding-top: 20px;">
     <div class="card-body">
         <div class="row">
@@ -94,6 +93,8 @@
                                     Process</button>
                                 <button class="dropdown-item" type="submit" name="get_league_fc"
                                     value="{{league.session_id,league.user_id,league.league_id}}">FantasyCalc</button>
+                                <button class="dropdown-item" type="submit" name="get_league_sf"
+                                    value="{{league.session_id,league.user_id,league.league_id}}">SuperFlex</button>
                             </div>
 
                         </div>
@@ -135,6 +136,8 @@
                                         Rankings</button>
                                     <button class="dropdown-item" type="submit" name="trade_tracker_fc"
                                         value="{{league.session_id,league.user_id,league.league_id}}">FantasyCalc</button>
+                                    <button class="dropdown-item" type="submit" name="trade_tracker_sf"
+                                        value="{{league.session_id,league.user_id,league.league_id}}">SuperFlex</button>
                                 </div>
                         </div>
                     </div>
