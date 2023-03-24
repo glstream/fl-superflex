@@ -155,33 +155,42 @@
             <div class="row justify-content-left">
                 <div class="checkbox-wrapper mb-3">
                     <label>
-                        <input type="checkbox" name="positionFilter" value="QB" checked> QB
+                        <input type="checkbox" name="positionFilter" value="QB" checked>
+                        <span style="margin-left: 3px;" class="badge bg-primary">QB</span>
                     </label>
                     <label>
-                        <input type="checkbox" name="positionFilter" value="RB" checked> RB
+                        <input type="checkbox" name="positionFilter" value="RB" checked> <span style="margin-left: 3px;"
+                            class="badge bg-success">RB</span>
                     </label>
                     <label>
-                        <input type="checkbox" name="positionFilter" value="WR" checked> WR
+                        <input type="checkbox" name="positionFilter" value="WR" checked><span style="margin-left: 3px;"
+                            class="badge bg-warning">
+                            WR</span>
                     </label>
                     <label>
-                        <input type="checkbox" name="positionFilter" value="TE" checked> TE
+                        <input type="checkbox" name="positionFilter" value="TE" checked><span style="margin-left: 3px;"
+                            class="badge bg-danger">
+                            TE</span>
                     </label>
                     <label>
-                        <input type="checkbox" name="positionFilter" value="Pick" checked> Picks
+                        <input type="checkbox" name="positionFilter" value="Pick" checked><span
+                            style="margin-left: 3px;" class="badge bg-dark">Picks</span>
                     </label>
+
                 </div>
             </div>
 
             <div class="styled-table">
                 <table class="table table-striped table-hover" style="font-size: 14px;text-align: center;"
                     id="player-values-table">
-                    <thead>
+                    <thead style="background-color: rgb(87, 117, 144);">
                         <tr>
-                            <th>Player</th>
-                            <th>Position</th>
-                            <th>Team</th>
-                            <th>Age </th>
-                            <th>Value</th>
+
+                            <th style="color:white; font-size:18px;">Player</th>
+                            <th style="color:white; font-size:18px;">Position</th>
+                            <th style="color:white; font-size:18px;">Team</th>
+                            <th style="color:white; font-size:18px;">Age </th>
+                            <th style="color:white; font-size:18px;">Value</th>
                             <th class="hidden">Position</th>
                             <th class="hidden">Rank Type</th>
                         </tr>
@@ -191,9 +200,18 @@
                         <tr>
                             <td style="text-align: left;"> {{ player.player_full_name }} ({{player._position}} | {{
                                 player.team or ' - '
-                                }}) <img class="team-logo"
-                                    src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/{{player.team}}.png&scale=crop&cquality=40&location=origin&w=80&h=80"
-                                    onError="this.onerror=null;this.src='static/sf_nfl.png';"></td>
+                                }}) {%if player._position =="QB" %}
+                                <span class="badge bg-primary">{{player.pos_rank}}</span>
+                                {% elif player._position =="RB" %}
+                                <span class="badge bg-success">{{player.pos_rank}}</span></h4>
+                                {% elif player._position =="WR" %}
+                                <span class="badge bg-warning">{{player.pos_rank}}</span></h4>
+                                {% elif player._position =="TE" %}
+                                <span class="badge bg-danger">{{player.pos_rank}}</span>
+                                {% elif player._position == "Pick" %}
+                                <span class="badge bg-dark">{{player.pos_rank}}</span>
+                                {%endif%}
+                            </td>
                             <td>{{ player.pos_rank }}</td>
                             <td>{{ player.team or '-' }}</td>
                             <td>{{ player.age |int}}</td>
