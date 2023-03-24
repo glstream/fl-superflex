@@ -102,16 +102,17 @@ table {
 }
 
 .btn-outline-info {
-    outline-color: rgb(249, 199, 79) !important;
-    color: white !important;
-    border-color: rgb(249, 199, 79) !important;
-    background-color: rgb(249, 199, 79) !important;
+    outline-color: rgba(143, 145, 146, 0.20) !important;
+    color: rgba(41, 41, 41, 0.7) !important;
+    border-color: rgba(143, 145, 146, 0.20) !important;
+    background-color: rgba(143, 145, 146, 0.20) !important;
 }
 
 .btn-outline-info:hover {
     outline-color: rgb(249, 199, 79) !important;
     background-color: white !important;
     color: gray !important;
+    color: rgba(41, 41, 41, 0.7) !important;
 }
 
 .btn {
@@ -212,8 +213,8 @@ table {
 .badge.bg-dark {
     outline-color: rgb(249, 199, 79) !important;
     color: rgb(252, loc 252, 252) !important;
-    border-color: rgb(249, 199, 79) !important;
-    background-color: rgb(249, 199, 79, .75) !important;
+    color: rgba(41, 41, 41, 0.7) !important;
+    background-color: rgba(143, 145, 146, 0.20) !important;
 }
 
 .badge.bg-dark-1 {
