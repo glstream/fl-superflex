@@ -148,79 +148,79 @@ table {
 .badge.bg-primary {
     outline-color: rgb(39, 125, 161) !important;
     border-color: rgb(39, 125, 161) !important;
-    background-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161, .75) !important;
 }
 
 .badge.bg-QB {
     outline-color: rgb(39, 125, 161) !important;
 
     border-color: rgb(39, 125, 161) !important;
-    background-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161, .75) !important;
 }
 
 .badge.bg-success {
     outline-color: rgb(144, 190, 109) !important;
     border-color: rgb(144, 190, 109) !important;
-    background-color: rgb(144, 190, 109) !important;
+    background-color: rgb(144, 190, 109, .75) !important;
 }
 
 .badge.bg-RB {
     outline-color: rgb(144, 190, 109) !important;
 
     border-color: rgb(144, 190, 109) !important;
-    background-color: rgb(144, 190, 109) !important;
+    background-color: rgb(144, 190, 109, .75) !important;
 }
 
 .badge.bg-warning {
     outline-color: rgb(67, 170, 139) !important;
     border-color: rgb(67, 170, 139) !important;
-    background-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139, .75) !important;
 }
 
 .badge.bg-WR {
     outline-color: rgb(67, 170, 139) !important;
 
     border-color: rgb(67, 170, 139) !important;
-    background-color: rgb(67, 170, 139) !important;
+    background-color: rgb(67, 170, 139, .75) !important;
 }
 
 .badge.bg-danger {
     outline-color: rgb(249, 132, 74) !important;
     border-color: rgb(249, 132, 74) !important;
-    background-color: rgb(249, 132, 74) !important;
+    background-color: rgb(249, 132, 74, .75) !important;
 }
 
 .badge.bg-TE {
     outline-color: rgb(249, 132, 74) !important;
 
     border-color: rgb(249, 132, 74) !important;
-    background-color: rgb(249, 132, 74) !important;
+    background-color: rgb(249, 132, 74, .75) !important;
 }
 
 .badge.bg-info {
     outline-color: rgb(77, 144, 142) !important;
     border-color: rgb(77, 144, 142) !important;
-    background-color: rgb(77, 144, 142) !important;
+    background-color: rgb(77, 144, 142, .75) !important;
 }
 
 .badge.bg-dark {
     outline-color: rgb(249, 199, 79) !important;
     color: rgb(252, loc 252, 252) !important;
     border-color: rgb(249, 199, 79) !important;
-    background-color: rgb(249, 199, 79) !important;
+    background-color: rgb(249, 199, 79, .75) !important;
 }
 
 .badge.bg-dark-1 {
     outline-color: rgb(3, 3, 3) !important;
     color: rgb(252, loc 252, 252) !important;
     border-color: rgb(249, 199, 79) !important;
-    background-color: rgba(22, 22, 22, 0.75) !important;
+    background-color: rgba(22, 22, 22) !important;
 }
 
 .badge.bg-light {
     outline-color: rgb(39, 125, 161) !important;
     border-color: rgb(39, 125, 161) !important;
-    background-color: rgb(39, 125, 161) !important;
+    background-color: rgb(39, 125, 161, .75) !important;
 }
 
 .badge.alert-secondary {
@@ -772,7 +772,7 @@ input:checked+.slider:before {
 }
 
 input:checked+.slider {
-    background-color: #007bff;
+    background-color: rgb(144, 190, 109);
 }
 
 input:focus+.slider {
@@ -851,4 +851,8 @@ input:checked+.slider:before {
 
 #toast-container>.toast {
     background-image: none !important;
+}
+
+.checkbox-wrapper label {
+    padding: 0 1px;
 }
