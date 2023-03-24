@@ -1172,6 +1172,11 @@ def team_view(user_id, league_id, session_id, view_source):
             "max": 12000,
             "rankings": "KeepTradeCut",
         },
+        "get_league_sf": {
+            "table": "get_league_sf",
+            "max": 12000,
+            "rankings": "SuperFlex",
+        },
         "get_league_fc": {
             "table": "get_league_fc",
             "max": 12000,
@@ -1186,14 +1191,14 @@ def team_view(user_id, league_id, session_id, view_source):
     sql_view_table = source_mapping[view_source]["table"]
     rankings_source = source_mapping[view_source]["rankings"]
 
-    league_type = get_league_type(league_id)
+    sf_league_type = get_league_type(league_id)
 
     if sql_view_table == "get_league_ktc":
         positional_type = (
             "sf_positional_rank" if league_type == "sf_value" else "positional_rank"
         )
         total_rank_type = "sf_rank" if league_type == "sf_value" else "rank"
-        league_type = league_type
+        league_type = sf_league_type
 
     elif sql_view_table == "get_league_fc":
         positional_type = (
@@ -1202,14 +1207,31 @@ def team_view(user_id, league_id, session_id, view_source):
         total_rank_type = (
             "sf_overall_rank" if league_type == "sf_value" else "one_qb_overall_rank"
         )
-        league_type = league_type
+        league_type = sf_league_type
+
+    elif sql_view_table == "get_league_sf":
+        positional_type = (
+            "superflex_sf_pos_rank"
+            if sf_league_type == "sf_value"
+            else "superflex_one_qb_pos_rank"
+        )
+        total_rank_type = (
+            "superflex_sf_rank"
+            if sf_league_type == "sf_value"
+            else "superflex_one_qb_rank"
+        )
+        league_type = (
+            "superflex_sf_value"
+            if sf_league_type == "sf_value"
+            else "superflex_one_qb_value"
+        )
 
     elif sql_view_table == "get_league_dp":
         positional_type = ""
         total_rank_type = (
-            "sf_rank_ecr" if league_type == "sf_value" else "one_qb_rank_ecr"
+            "sf_rank_ecr" if sf_league_type == "sf_value" else "one_qb_rank_ecr"
         )
-        league_type = league_type
+        league_type = sf_league_type
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     with open(
@@ -1222,7 +1244,7 @@ def team_view(user_id, league_id, session_id, view_source):
             .replace("'user_id'", f"'{user_id}'")
             .replace("sf_value", f"{league_type}")
             .replace("sf_positional_rank", f"{positional_type}")
-            .replace("sf_rank ", f"{total_rank_type}")
+            .replace("sf_rank", f"{total_rank_type}")
             .replace("sf_position_rank", f"{positional_type}")
             .replace("sf_rank_ecr", f"{total_rank_type}")
         )
@@ -1266,7 +1288,7 @@ def team_view(user_id, league_id, session_id, view_source):
             .replace("'session_id'", f"'{session_id}'")
             .replace("'league_id'", f"'{league_id}'")
             .replace("'user_id'", f"'{user_id}'")
-            .replace("league_type", f"{league_type}")
+            .replace("league_type", f"{sf_league_type}")
         )
     owner_cursor.execute(sql)
     owner = owner_cursor.fetchall()
@@ -1393,6 +1415,26 @@ order by value desc
     )
 
 
+@bp.route("/sf_values", methods=["GET"])
+def sf_values():
+    db = pg_db()
+    sf_values_cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    with open(
+        Path.cwd() / "superflex" / "sql" / "player_values" / "sf_values.sql", "r"
+    ) as sf_values_file:
+        sf_values_query = sf_values_file.read()
+    sf_values_cur.execute(sf_values_query)
+    players = sf_values_cur.fetchall()
+    last_refresh = players[0]["_insert_date"]
+    sf_values_cur.close()
+
+    return render_template(
+        "leagues/player_values/sf_values.html",
+        players=players,
+        last_refresh=last_refresh,
+    )
+
+
 @bp.route("/ktc_values", methods=["GET"])
 def ktc_values():
     db = pg_db()
@@ -1484,7 +1526,7 @@ def index():
         if is_user(request.form["username"]):
             session_id = session.get("session_id", str(uuid.uuid4()))
             user_name = request.form["username"]
-            year_ = request.form.get("league_year", "2022")
+            year_ = request.form.get("league_year", "2023")
             session["league_year"] = year_
             user_id = session["user_id"] = get_user_id(user_name)
             leagues = user_leagues(str(user_id), str(year_))
@@ -1679,7 +1721,8 @@ def get_league():
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "get_league.sql", "r"
+            Path.cwd() / "superflex" / "sql" / "details" / "power" / "get_league.sql",
+            "r",
         ) as get_league_detail_file:
             get_league_detail_sql = (
                 get_league_detail_file.read()
@@ -1696,7 +1739,8 @@ def get_league():
 
         owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "get_league.sql", "r"
+            Path.cwd() / "superflex" / "sql" / "summary" / "power" / "get_league.sql",
+            "r",
         ) as get_league_summary_file:
             get_league_summary_sql = (
                 get_league_summary_file.read()
@@ -1763,7 +1807,13 @@ def get_league():
 
         ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "ktc_ba.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "best_available"
+            / "power"
+            / "ktc_ba.sql",
+            "r",
         ) as sql_file:
             ktc_sql = (
                 sql_file.read()
@@ -1823,6 +1873,261 @@ def get_league():
 
         return render_template(
             "leagues/power_ranks/get_league.html",
+            owners=owners,
+            page_user=page_user,
+            total_rosters=total_rosters,
+            users=users,
+            league_name=get_league_name(league_id),
+            user_name=get_user_name(user_id)[1],
+            league_type=league_type,
+            aps=team_spots,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+            update_diff_minutes=update_diff_minutes,
+            labels=labels,
+            values=values,
+            pct_values=pct_values,
+            pct_values_dict=pct_values_dict,
+            best_available=best_available,
+            avatar=avatar,
+            cur_league=cur_league,
+            session_league_id=session_league_id,
+            refresh_time=refresh_time,
+        )
+    else:
+        return redirect(url_for("leagues.index"))
+
+
+@bp.route("/get_league_sf", methods=("GET", "POST"))
+def get_league_sf():
+    db = pg_db()
+    session_league_id = session.get("session_league_id", None)
+
+    if request.method == "POST":
+
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        refresh_btn = league_data[-1]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
+
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+                rdm=refresh_epoch,
+            )
+        )
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
+        sf_league_type = get_league_type(league_id)
+        league_pos_col = (
+            "superflex_sf_pos_rank"
+            if sf_league_type == "sf_value"
+            else "superflex_one_qb_pos_rank"
+        )
+        league_type = (
+            "superflex_sf_value"
+            if sf_league_type == "sf_value"
+            else "superflex_one_qb_value"
+        )
+
+        player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "power"
+            / "get_league_sf.sql",
+            "r",
+        ) as get_league_detail_file:
+            get_league_detail_sql = (
+                get_league_detail_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+                .replace("league_pos_col", f"{league_pos_col}")
+            )
+        player_cursor.execute(get_league_detail_sql)
+        players = player_cursor.fetchall()
+
+        if len(players) < 1:
+            return redirect(url_for("leagues.index"))
+
+        owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "power"
+            / "get_league_sf.sql",
+            "r",
+        ) as get_league_summary_file:
+            get_league_summary_sql = (
+                get_league_summary_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+            )
+        owner_cursor.execute(get_league_summary_sql)
+        owners = owner_cursor.fetchall()
+        page_user = [
+            (
+                i["display_name"],
+                i["qb_rank"],
+                i["rb_rank"],
+                i["wr_rank"],
+                i["te_rank"],
+                i["picks_rank"],
+                i["starters_rank"],
+                i["bench_rank"],
+            )
+            for i in owners
+            if i["user_id"] == user_id
+        ]
+
+        try:
+            labels = [row["display_name"] for row in owners]
+            values = [row["total_value"] for row in owners]
+            calc_value = [row["total_value"] for row in owners][0]
+            total_value = calc_value * 1.05
+
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in owners
+            ]
+            pct_values_dict = {
+                "total": [
+                    (((row["total_value"] - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "qb_total": [
+                    (((int(row["qb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "rb_total": [
+                    (((int(row["rb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "wr_total": [
+                    (((int(row["wr_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "te_total": [
+                    (((int(row["te_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+                "picks_total": [
+                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in owners
+                ],
+            }
+        except:
+            pct_values = []
+
+        ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd() / "superflex" / "sql" / "best_available" / "power" / "sf_ba.sql",
+            "r",
+        ) as sql_file:
+            ktc_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+            )
+        ktc_ba_cursor.execute(ktc_sql)
+        ba = ktc_ba_cursor.fetchall()
+
+        ba_qb = [player for player in ba if player["player_position"] == "QB"]
+        ba_rb = [player for player in ba if player["player_position"] == "RB"]
+        ba_wr = [player for player in ba if player["player_position"] == "WR"]
+        ba_te = [player for player in ba if player["player_position"] == "TE"]
+        best_available = {"QB": ba_qb, "RB": ba_rb, "WR": ba_wr, "TE": ba_te}
+
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute("select max(insert_date) from dynastr.sf_player_ranks")
+        _date = date_cursor.fetchall()
+        sf_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round((current_time - sf_max_time).total_seconds() / 60.0)
+        try:
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+        except:
+            refresh_time = -1
+
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        cur_league = league_cursor.fetchone()
+
+        users = get_users_data(league_id)
+
+        total_rosters = int(get_league_rosters_size(league_id))
+
+        team_spots = render_players(players, "power")
+
+        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+
+        owner_cursor.close()
+        player_cursor.close()
+        ktc_ba_cursor.close()
+        date_cursor.close()
+        avatar_cursor.close()
+        league_cursor.close()
+
+        return render_template(
+            "leagues/power_ranks/get_league_sf.html",
             owners=owners,
             page_user=page_user,
             total_rosters=total_rosters,
@@ -1917,7 +2222,13 @@ def get_league_fc():
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "get_league_fc.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "power"
+            / "get_league_fc.sql",
+            "r",
         ) as get_league_detail_file:
             get_league_detail_sql = (
                 get_league_detail_file.read()
@@ -1934,7 +2245,13 @@ def get_league_fc():
 
         owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "get_league_fc.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "power"
+            / "get_league_fc.sql",
+            "r",
         ) as get_league_summary_file:
             get_league_summary_sql = (
                 get_league_summary_file.read()
@@ -1998,18 +2315,19 @@ def get_league_fc():
         except:
             pct_values = []
 
-        ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "fc_ba.sql", "r"
+            Path.cwd() / "superflex" / "sql" / "best_available" / "power" / "fc_ba.sql",
+            "r",
         ) as sql_file:
-            ktc_sql = (
+            fc_sql = (
                 sql_file.read()
                 .replace("'session_id'", f"'{session_id}'")
                 .replace("'league_id'", f"'{league_id}'")
                 .replace("league_type", f"{league_type}")
             )
-        ktc_ba_cursor.execute(ktc_sql)
-        ba = ktc_ba_cursor.fetchall()
+        fc_ba_cursor.execute(fc_sql)
+        ba = fc_ba_cursor.fetchall()
 
         ba_qb = [player for player in ba if player["player_position"] == "QB"]
         ba_rb = [player for player in ba if player["player_position"] == "RB"]
@@ -2019,13 +2337,11 @@ def get_league_fc():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.ktc_player_ranks")
+        date_cursor.execute("select max(insert_date) from dynastr.fc_player_ranks")
         _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        fc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
-        update_diff_minutes = round(
-            (current_time - ktc_max_time).total_seconds() / 60.0
-        )
+        update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
         try:
             refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
         except:
@@ -2053,7 +2369,7 @@ def get_league_fc():
 
         owner_cursor.close()
         player_cursor.close()
-        ktc_ba_cursor.close()
+        fc_ba_cursor.close()
         date_cursor.close()
         avatar_cursor.close()
         league_cursor.close()
@@ -2150,7 +2466,13 @@ def get_league_dp():
 
         player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "get_league_dp.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "power"
+            / "get_league_dp.sql",
+            "r",
         ) as get_league_dp_details_file:
             get_league_dp_details_sql = (
                 get_league_dp_details_file.read()
@@ -2170,7 +2492,13 @@ def get_league_dp():
         owner_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "get_league_dp.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "power"
+            / "get_league_dp.sql",
+            "r",
         ) as get_league_dp_summary_file:
             get_league_dp_summary_sql = (
                 get_league_dp_summary_file.read()
@@ -2236,7 +2564,8 @@ def get_league_dp():
 
         ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "dp_ba.sql", "r"
+            Path.cwd() / "superflex" / "sql" / "best_available" / "power" / "dp_ba.sql",
+            "r",
         ) as sql_file:
             dp_sql = (
                 sql_file.read()
@@ -2380,7 +2709,13 @@ def get_league_fp():
 
         fp_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "get_league_fp.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "power"
+            / "get_league_fp.sql",
+            "r",
         ) as sql_file:
             sql = (
                 sql_file.read()
@@ -2398,7 +2733,13 @@ def get_league_fp():
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "get_league_fp.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "power"
+            / "get_league_fp.sql",
+            "r",
         ) as sql_file:
             summary_sql = (
                 sql_file.read()
@@ -2436,7 +2777,8 @@ def get_league_fp():
 
         fp_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "fp_ba.sql", "r"
+            Path.cwd() / "superflex" / "sql" / "best_available" / "power" / "fp_ba.sql",
+            "r",
         ) as sql_file:
             ba_sql = (
                 sql_file.read()
@@ -2586,7 +2928,13 @@ def trade_tracker():
         trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "trade_tracker.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "trade"
+            / "trade_tracker.sql",
+            "r",
         ) as trade_tracker_details_file:
             trade_tracker_details_sql = (
                 trade_tracker_details_file.read()
@@ -2600,7 +2948,13 @@ def trade_tracker():
         analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "trade_tracker.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "trade"
+            / "trade_tracker.sql",
+            "r",
         ) as trade_tracker_summary_file:
             trade_tracker_summary_sql = (
                 trade_tracker_summary_file.read()
@@ -2737,7 +3091,13 @@ def trade_tracker_fc():
         trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "trade_tracker_fc.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "trade"
+            / "trade_tracker_fc.sql",
+            "r",
         ) as trade_tracker_fc_details_file:
             trade_tracker_fc_details_sql = (
                 trade_tracker_fc_details_file.read()
@@ -2751,7 +3111,13 @@ def trade_tracker_fc():
         analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "trade_tracker_fc.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "trade"
+            / "trade_tracker_fc.sql",
+            "r",
         ) as trade_tracker_summary_file:
             trade_tracker_summary_sql = (
                 trade_tracker_summary_file.read()
@@ -2791,6 +3157,11 @@ def trade_tracker_fc():
         current_time = datetime.utcnow()
         update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
 
+        try:
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+        except:
+            refresh_time = -1
+
         avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
@@ -2814,6 +3185,174 @@ def trade_tracker_fc():
             user_name=get_user_name(user_id)[1],
             cur_league=cur_league,
             avatar=avatar,
+            refresh_time=refresh_time,
+            update_diff_minutes=update_diff_minutes,
+            league_name=get_league_name(league_id),
+        )
+
+
+@bp.route("/trade_tracker_sf", methods=["GET", "POST"])
+def trade_tracker_sf():
+    db = pg_db()
+
+    if request.method == "POST":
+
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        refresh_btn = league_data[-1]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
+
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+        )
+        startup = startup_cursor.fetchone()[0]
+        startup_cursor.close()
+
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+                rdm=refresh_epoch,
+            )
+        )
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
+        sf_league_type = get_league_type(league_id)
+        league_type = (
+            "superflex_sf_value"
+            if sf_league_type == "sf_value"
+            else "superflex_one_qb_value"
+        )
+        trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "trade"
+            / "trade_tracker_sf.sql",
+            "r",
+        ) as trade_tracker_sf_details_file:
+            trade_tracker_sf_details_sql = (
+                trade_tracker_sf_details_file.read()
+                .replace("'current_year'", f"'{current_year}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+            )
+
+        trades_cursor.execute(trade_tracker_sf_details_sql)
+
+        analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "trade"
+            / "trade_tracker_sf.sql",
+            "r",
+        ) as trade_tracker_summary_file:
+            trade_tracker_summary_sql = (
+                trade_tracker_summary_file.read()
+                .replace("'current_year'", f"'{current_year}'")
+                .replace("'league_id'", f"'{league_id}'")
+                .replace("league_type", f"{league_type}")
+            )
+
+        analytics_cursor.execute(trade_tracker_summary_sql)
+
+        trades = trades_cursor.fetchall()
+        summary_table = analytics_cursor.fetchall()
+        transaction_ids = list(
+            set([(i["transaction_id"], i["status_updated"]) for i in trades])
+        )
+        transaction_ids = sorted(
+            transaction_ids,
+            key=lambda x: datetime.utcfromtimestamp(int(str(x[-1])[:10])),
+            reverse=True,
+        )
+        managers_list = list(
+            set([(i["display_name"], i["transaction_id"]) for i in trades])
+        )
+        trades_dict = {}
+        for transaction_id in transaction_ids:
+            trades_dict[transaction_id[0]] = {
+                i[0]: [p for p in trades if p["display_name"] == i[0]]
+                for i in managers_list
+                if i[1] == transaction_id[0]
+            }
+
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute("select max(insert_date) from dynastr.sf_player_ranks")
+        _date = date_cursor.fetchall()
+        fc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
+        try:
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+        except:
+            refresh_time = -1
+
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        cur_league = league_cursor.fetchone()
+
+        return render_template(
+            "leagues/trades/trade_tracker_sf.html",
+            transaction_ids=transaction_ids,
+            trades_dict=trades_dict,
+            summary_table=summary_table,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+            user_name=get_user_name(user_id)[1],
+            cur_league=cur_league,
+            avatar=avatar,
+            refresh_time=refresh_time,
             update_diff_minutes=update_diff_minutes,
             league_name=get_league_name(league_id),
         )
@@ -2881,7 +3420,13 @@ def contender_rankings():
 
         contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "contender_rankings.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "contender"
+            / "contender_rankings.sql",
+            "r",
         ) as contender_rankings_details_file:
             contender_rankings_details_sql = (
                 contender_rankings_details_file.read()
@@ -2897,7 +3442,13 @@ def contender_rankings():
 
         c_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "contender_rankings.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "contender"
+            / "contender_rankings.sql",
+            "r",
         ) as contender_rankings_summary_file:
             contender_rankings_summary_sql = (
                 contender_rankings_summary_file.read()
@@ -2958,7 +3509,13 @@ def contender_rankings():
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "con_espn_ba.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "best_available"
+            / "contender"
+            / "con_espn_ba.sql",
+            "r",
         ) as sql_file:
             con_espn_sql = (
                 sql_file.read()
@@ -3108,7 +3665,12 @@ def fc_contender_rankings():
         league_type = get_league_type(league_id)
         fc_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "contender_rankings_fc.sql",
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "contender"
+            / "contender_rankings_fc.sql",
             "r",
         ) as contender_rankings_fc_details_file:
             contender_rankings_fc_details_sql = (
@@ -3126,7 +3688,12 @@ def fc_contender_rankings():
 
         fc_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "contender_rankings_fc.sql",
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "contender"
+            / "contender_rankings_fc.sql",
             "r",
         ) as contender_rankings_fc_summary_file:
             contender_rankings_fc_summary_sql = (
@@ -3189,7 +3756,13 @@ def fc_contender_rankings():
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "con_fc_ba.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "best_available"
+            / "contender"
+            / "con_fc_ba.sql",
+            "r",
         ) as sql_file:
             con_fc_sql = (
                 sql_file.read()
@@ -3337,7 +3910,12 @@ def nfl_contender_rankings():
         refresh_epoch_time = request.args.get("rdm")
         nfl_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "contender_rankings_nfl.sql",
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "contender"
+            / "contender_rankings_nfl.sql",
             "r",
         ) as contender_rankings_nfl_details_file:
             contender_rankings_nfl_details_sql = (
@@ -3354,7 +3932,12 @@ def nfl_contender_rankings():
 
         nfl_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "contender_rankings_nfl.sql",
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "contender"
+            / "contender_rankings_nfl.sql",
             "r",
         ) as contender_rankings_nfl_summary_file:
             contender_rankings_nfl_summary_sql = (
@@ -3417,7 +4000,13 @@ def nfl_contender_rankings():
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "con_nfl_ba.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "best_available"
+            / "contender"
+            / "con_nfl_ba.sql",
+            "r",
         ) as sql_file:
             con_nfl_sql = (
                 sql_file.read()
@@ -3567,7 +4156,12 @@ def fp_contender_rankings():
 
         fp_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "details" / "contender_rankings_fp.sql",
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "contender"
+            / "contender_rankings_fp.sql",
             "r",
         ) as contender_rankings_fp_details_file:
             contender_rankings_fp_details_sql = (
@@ -3585,7 +4179,12 @@ def fp_contender_rankings():
 
         fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "summary" / "contender_rankings_fp.sql",
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "contender"
+            / "contender_rankings_fp.sql",
             "r",
         ) as contender_rankings_fp_summary_file:
             contender_rankings_fp_summary_sql = (
@@ -3649,7 +4248,13 @@ def fp_contender_rankings():
 
         con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
-            Path.cwd() / "superflex" / "sql" / "best_available" / "con_fp_ba.sql", "r"
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "best_available"
+            / "contender"
+            / "con_fp_ba.sql",
+            "r",
         ) as sql_file:
             con_fp_sql = (
                 sql_file.read()
