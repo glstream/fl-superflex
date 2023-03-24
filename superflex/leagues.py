@@ -828,15 +828,23 @@ def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id:
         print(f"Other error occurred: {err}")
 
     league_single = league_single_resp.json()
-    qbs = len([i for i in league_single["roster_positions"] if i == "QB"])
-    rbs = len([i for i in league_single["roster_positions"] if i == "RB"])
-    wrs = len([i for i in league_single["roster_positions"] if i == "WR"])
-    tes = len([i for i in league_single["roster_positions"] if i == "TE"])
-    flexes = len([i for i in league_single["roster_positions"] if i == "FLEX"])
-    super_flexes = len(
-        [i for i in league_single["roster_positions"] if i == "SUPER_FLEX"]
-    )
-    rec_flexes = len([i for i in league_single["roster_positions"] if i == "REC_FLEX"])
+    try:
+        qbs = len([i for i in league_single["roster_positions"] if i == "QB"])
+        rbs = len([i for i in league_single["roster_positions"] if i == "RB"])
+        wrs = len([i for i in league_single["roster_positions"] if i == "WR"])
+        tes = len([i for i in league_single["roster_positions"] if i == "TE"])
+        flexes = len([i for i in league_single["roster_positions"] if i == "FLEX"])
+        super_flexes = len(
+            [i for i in league_single["roster_positions"] if i == "SUPER_FLEX"]
+        )
+        rec_flexes = len(
+            [i for i in league_single["roster_positions"] if i == "REC_FLEX"]
+        )
+    except Exception as e:
+        print(
+            f"An error occurred: {e} on league_single call, seession_id: {session_id}, user_id: {user_id}, league_id:{league_id}"
+        )
+        return redirect(url_for("leagues.index"))
     starters = sum([qbs, rbs, wrs, tes, flexes, super_flexes, rec_flexes])
     user_name = get_user_name(user_id)[1]
     cursor = db.cursor()
