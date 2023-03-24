@@ -7,7 +7,7 @@ WITH base_players as (SELECT
 					, dp.player_full_name
                     , pl.player_position
                     , 'n/a'
-                    , dp.sf_rank_ecr
+                    , dp.sf_rank
                     , coalesce(dp.sf_value, -1) as player_value
                     , pl.age
                     , RANK() OVER (PARTITION BY lp.user_id, pl.player_position ORDER BY coalesce(dp.sf_value, -1) desc) as player_order
@@ -195,7 +195,7 @@ WITH base_players as (SELECT
                     ,tp.fantasy_designation
                     ,coalesce(dp.sf_value, -1) as player_value
                     ,'n/a' as positional_rank
-                    ,coalesce(cast(dp.sf_rank_ecr::decimal as integer), 0) as rank
+                    ,coalesce(cast(dp.sf_rank::decimal as integer), 0) as rank
                     from (select 
                             user_id
                             ,ap.player_id

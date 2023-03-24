@@ -1251,7 +1251,6 @@ def team_view(user_id, league_id, session_id, view_source):
             .replace("sf_positional_rank", f"{positional_type}")
             .replace("sf_rank", f"{total_rank_type}")
             .replace("sf_position_rank", f"{positional_type}")
-            .replace("sf_rank_ecr", f"{total_rank_type}")
         )
     cursor.execute(sql)
     players = cursor.fetchall()
