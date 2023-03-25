@@ -863,3 +863,8 @@ input:checked+.slider:before {
 .checkbox-wrapper label {
     padding: 0 1px;
 }
+
+.container {
+    max-width: 2560px;
+    /* set the max-width to 960 pixels */
+}
