@@ -105,15 +105,13 @@
                         value="" disabled>FantasyCalc</button>
                     <a class="dropdown-item" href="{{url_for('leagues.dp_values')}}" type="submit" name="dp_values"
                         value="">Dynasty Process</a>
-                    <a class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
-                        value="">SuperFlex</a>
                 </div>
             </div>
             <div class="filter-div mb-3">
                 <label class="switch float-right">
                     <input type="checkbox" id="sf-toggle" checked>
                     <span class="slider"></span>
-                    <span class="slider-label">Superflex</span>
+                    <span class="slider-label">Superflex/2QB</span>
                 </label>
             </div>
             <div class="filter-div  mb-3">
@@ -127,8 +125,9 @@
                     id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Rankings Source
                 </button>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton"
-                    style="font-size: 14px;">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
+                    <a class="dropdown-item" href="{{url_for('leagues.sf_values')}}" type="submit" name="sf_values"
+                        value="">SuperFlex</a>
                     <a class="dropdown-item" href="{{url_for('leagues.ktc_values')}}" type="submit" name="ktc_values"
                         value="">KeepTradeCut</a>
                     <button class="dropdown-item" href="{{url_for('leagues.fc_values')}}" type="submit" name="fc_values"
@@ -140,7 +139,7 @@
                     <label class="switch float-right" style="margin-top: 15px;">
                         <input type="checkbox" id="sf-toggle-mobile" checked>
                         <span class="slider"></span>
-                        <span class="slider-label">Superflex</span>
+                        <span class="slider-label">Superflex/2QB</span>
                     </label>
                 </div>
                 <div class="filter-div  mb-3">
