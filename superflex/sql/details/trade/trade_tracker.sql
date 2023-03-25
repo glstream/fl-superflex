@@ -11,6 +11,7 @@ SELECT *
                     , display_name
                     , player_id as sleeper_id
                     , sum(value) OVER (partition by transaction_id, user_id) as owner_total
+                    , sum(value) OVER (partition by transaction_id) as deal_total
                     , dense_rank() OVER (partition by transaction_id order by user_id) + dense_rank() OVER (partition by transaction_id order by user_id desc) - 1 num_managers
 
                     from   ( select pt.league_id
