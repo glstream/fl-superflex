@@ -77,60 +77,60 @@
 {{buttons_large(session_id, user_id, league_id, ktc_button='disabled')}}
 
 <br>
-<div class="container mx-auto">
-    <div class="row justify-content-between">
-        <div class="col-auto">
-            {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id,
-            session_id,pct_values_dict,'get_league_ktc')}}
+
+<div class="row justify-content-between">
+    <div class="col-auto">
+        {{power_status_ranks(owners, pct_values, 'Power Rankings', league_id,
+        session_id,pct_values_dict,'get_league_ktc')}}
+    </div>
+    <div class="col">
+        <div style="margin-top: 30px;">
+            {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
+            {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
         </div>
-        <div class="col">
-            <div style="margin-top: 30px;">
-                {{power_ranks(owners, user_id, league_id, session_id,'get_league_ktc')}}
-                {{table_footer('KeepTradeCut Player Values', update_diff_minutes)}}
-            </div>
-        </div>
-        <div class="col-auto">
-            <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
-                <canvas id="ktc_chart" width="340" height="340"></canvas>
-                <script>
-                    try {
-                        const ctx = document.getElementById('ktc_chart').getContext('2d');
-                        const ktc_chart = new Chart(ctx, {
-                            type: 'radar',
-                            data: {
-                                labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
-                                datasets: [{
-                                    label: '{{page_user[0][0]}}',
-                                    data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
-                                    backgroundColor: 'rgb(39, 125, 161, .95)',
-                                    borderColor: 'rgb(67, 170, 139, 1.0)',
-                                    borderWidth: 3
-                                }]
+    </div>
+    <div class="col-auto">
+        <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
+            <canvas id="ktc_chart" width="340" height="340"></canvas>
+            <script>
+                try {
+                    const ctx = document.getElementById('ktc_chart').getContext('2d');
+                    const ktc_chart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
+                            datasets: [{
+                                label: '{{page_user[0][0]}}',
+                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
+                                backgroundColor: 'rgb(39, 125, 161, .95)',
+                                borderColor: 'rgb(67, 170, 139, 1.0)',
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            font: {
+                                size: 16,
+                                weight: "bolder"
                             },
-                            options: {
-                                font: {
-                                    size: 16,
-                                    weight: "bolder"
-                                },
-                                plugins: {
-                                    tooltip: {
-                                        bodyColor: '#F9C74F',
-                                        backgroundColor: 'rgba(67, 170, 139, .8)',
-                                    }
-                                },
+                            plugins: {
+                                tooltip: {
+                                    bodyColor: '#F9C74F',
+                                    backgroundColor: 'rgba(67, 170, 139, .8)',
+                                }
+                            },
 
-                                scales: {
+                            scales: {
 
-                                    r: {
-                                        reverse: true,
-                                        max: {{ total_rosters }},
-                    min: 1,
-                        beginAtZero: false,
+                                r: {
+                                    reverse: true,
+                                    max: {{ total_rosters }},
+                min: 1,
+                    beginAtZero: false,
 
-                            ticks: {
-                        stepSize: 4,
-                            display: false
-                    }
+                        ticks: {
+                    stepSize: 4,
+                        display: false
+                }
                                 },
                             },
         
@@ -138,22 +138,21 @@
                     });
             } catch (e) {
 
-                    }
-                </script>
-            </div>
-            <div style="margin-top: 30px;">
-                {{ba(best_available)}}
-            </div>
+                }
+            </script>
+        </div>
+        <div style="margin-top: 30px;">
+            {{ba(best_available)}}
         </div>
     </div>
-    <br>
+</div>
+<br>
 
-    <div> <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
-            aria-controls="collapseExample"><i class="fa fa-expand" aria-hidden="true"></i> | all teams</a>
-    </div>
-    <br>
-    <div class="row justify-content-center">
-        {{ player_cards(owners, users, aps, league_id, session_id, 'ktc', 'get_league_ktc') }}
-    </div>
+<div> <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false"
+        aria-controls="collapseExample"><i class="fa fa-expand" aria-hidden="true"></i> | all teams</a>
+</div>
+<br>
+<div class="row justify-content-center">
+    {{ player_cards(owners, users, aps, league_id, session_id, 'ktc', 'get_league_ktc') }}
 </div>
 {% endblock %}
