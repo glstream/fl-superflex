@@ -10,7 +10,9 @@ SELECT *
                     , value
                     , display_name
                     , player_id as sleeper_id
+                    , _position
                     , sum(value) OVER (partition by transaction_id, user_id) as owner_total
+                    , sum(value) OVER (partition by transaction_id) as deal_total
                     , dense_rank() OVER (partition by transaction_id order by user_id) + dense_rank() OVER (partition by transaction_id order by user_id desc) - 1 num_managers
 
                     from   ( select pt.league_id
@@ -23,6 +25,7 @@ SELECT *
                                     , coalesce(sf.league_type, 0) as value
                                     , m.display_name
                                     , p.player_id
+                                    , p.player_position as  _position
                                     from dynastr.player_trades pt
                                     inner join dynastr.players p on pt.player_id = p.player_id
                                     left join dynastr.sf_player_ranks sf on sf.player_full_name = p.full_name
@@ -44,6 +47,7 @@ SELECT *
                                     , sf.league_type as value
                                     , m.display_name
                                     , null as player_id
+                                    ,'' as _position
                                             from 
                                                 ( select 
                                                 dpt.league_id
