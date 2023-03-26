@@ -883,24 +883,14 @@ input:checked+.slider:before {
     /* set the max-width to 960 pixels */
 }
 
-.trade-w-badge {
+.trade-badge {
     display: inline-block;
     padding: 4px 8px;
-    background-color: rgb(144, 190, 109, .7);
+    background-color: rgb(74, 74, 74, .1);
     color: #4a4a4a;
     border-radius: 4px;
     font-size: 14px;
     font-weight: bold;
     text-align: center;
-}
-
-.trade-l-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    background-color: rgb(249, 65, 68, .5);
-    color: #4a4a4a;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
+    border: 1px solid rgb(74, 74, 74, .5);
 }
