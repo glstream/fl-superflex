@@ -43,8 +43,8 @@ SELECT *
                                     ,a1.status_updated
                                     , a1.user_id
                                     , a1.transaction_type
-                                    , case when a1.season != 'current_year' THEN replace(a1.asset, 'Mid', '') else a1.asset end as asset
-                                    , case when a1.season != 'current_year' THEN replace(a1.asset, 'Mid', '') else a1.asset end as player_name
+                                    , asset
+                                    , player_name
                                     , ktc.league_type as value
                                     , m.display_name
                                     , null as player_id
@@ -56,16 +56,18 @@ SELECT *
                                                 , status_updated
                                                 , dp.user_id
                                                 , dpt.transaction_type
-                                                , CASE 
-                                                    WHEN ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
-                                                    THEN ddp.season || ' Round ' || dpt.round || ' Pick ' || ddp.position
-                                                    ELSE dpt.season ||' Mid ' ||dpt.round_suffix
-                                                    END AS asset
-                                                , CASE 
-                                                    WHEN ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
-                                                    THEN ddp.season || ' Round ' || dpt.round || ' Pick ' || ddp.position
-                                                    ELSE dpt.season ||' Mid ' ||dpt.round_suffix
-                                                    END AS player_name
+                                                , CASE WHEN (ddp.position::integer) < 13 and ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                        THEN dpt.season  || ' Round ' || dpt.round || ' Pick ' || ddp.position
+                                                    WHEN (ddp.position::integer) > 12 and ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                        THEN  dpt.season || ' ' || ddp.position_name || ' ' || dpt.round_suffix
+                                                    ELSE dpt.season || ' Mid ' || dpt.round_suffix
+                                                        END AS asset 
+                                                , CASE WHEN (ddp.position::integer) < 13 and ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                        THEN dpt.season  || ' Round ' || dpt.round || ' Pick ' || ddp.position
+                                                    WHEN (ddp.position::integer) > 12 and ddp.draft_set_flg = 'Y' and dpt.season = ddp.season 
+                                                        THEN  dpt.season || ' ' || ddp.position_name || ' ' || dpt.round_suffix
+                                                    ELSE dpt.season || ' Mid ' || dpt.round_suffix 
+                                                        END AS player_name 
                                                 , dp.position_name
                                                 , dpt.season
                                                 , dp.draft_set_flg
