@@ -48,7 +48,7 @@ SELECT *
                                     , fc.league_type as value
                                     , m.display_name
                                     , null as player_id
-                                     ,'' as _position
+                                    ,'' as _position
                                             from 
                                                 ( select 
                                                 dpt.league_id
