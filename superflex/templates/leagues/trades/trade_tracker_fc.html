@@ -153,22 +153,6 @@
                             &bull; <span style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
                             {%endif%}
                         </div>
-                        <div class="d-flex align-items-center">
-                            <img class="avatar-traded-asset" style="margin-right:5px"
-                                src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
-                                onError="this.onerror=null;this.src='static/player_default.webp';" />
-                            <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
-                            {{ asset.asset }}
-                            {%if asset._position == 'QB' %}
-                            &bull; <span style="color:rgb(39, 125, 161); margin-left: 2px;">{{asset._position}}</span>
-                            {% elif asset._position == 'RB' %}
-                            &bull; <span style="color:rgb(144, 190, 109); margin-left: 2px;">{{asset._position}}</span>
-                            {% elif asset._position == 'WR' %}
-                            &bull; <span style="color:rgb(67, 170, 139); margin-left: 2px;">{{asset._position}}</span>
-                            {% elif asset._position == 'TE' %}
-                            &bull; <span style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
-                            {%endif%}
-                        </div>
                         <span class="text-lg-right">{{"{:,}".format(asset.value)}}</span>
                     </li>
                     {% endfor %}
