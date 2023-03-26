@@ -533,9 +533,17 @@ def player_manager_upates(
 ):
     if button in ["trade_tracker", "trade_tracker_fc"]:
         try:
-            # insert managers names
+            clean_league_managers(db, league_id)
+            clean_league_rosters(db, session_id, user_id, league_id)
+            clean_league_picks(db, league_id, session_id)
+            clean_draft_positions(db, league_id)
+
             managers = get_managers(league_id)
             insert_managers(db, managers)
+
+            insert_league_rosters(db, session_id, user_id, league_id)
+            total_owned_picks(db, league_id, session_id, startup)
+            draft_positions(db, league_id, user_id)
 
             # delete traded players and picks
             clean_player_trades(db, league_id)
@@ -543,7 +551,6 @@ def player_manager_upates(
             # get trades
             trades = get_trades(league_id, get_sleeper_state())
             # insert trades draft Positions
-            draft_positions(db, league_id, user_id)
             insert_trades(db, trades, league_id)
         except:
             return redirect(
@@ -593,12 +600,12 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     season = draft["season"]
     rounds = (
         draft_id["settings"]["rounds"]
-        if int(draft_id["settings"]["rounds"]) <= 5
-        else "5"
+        if int(draft_id["settings"]["rounds"]) <= 4
+        else "4"
     )
     roster_slot = {int(k): v for k, v in draft_slot.items() if v is not None}
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
-    if draft_dict is None or len(rs_dict.items()) > 12:
+    if draft_dict is None:
         # if no draft is present then create all managers at mid level for picks
         participents = get_roster_ids(league_id)
 
@@ -750,8 +757,8 @@ def total_owned_picks(
         )
         rd = (
             draft_id["settings"]["rounds"]
-            if int(draft_id["settings"]["rounds"]) <= 5
-            else 5
+            if int(draft_id["settings"]["rounds"]) <= 4
+            else 4
         )
         rounds = [r for r in range(1, rd + 1)]
 
