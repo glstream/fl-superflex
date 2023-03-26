@@ -391,8 +391,8 @@ def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id:
     cursor.execute(
         """
     INSERT INTO dynastr.current_leagues 
-    (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    (session_id, user_id, user_name, league_id, league_name, avatar, total_rosters, qb_cnt, rb_cnt, wr_cnt, te_cnt, flex_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id, league_status) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (session_id, league_id) DO UPDATE 
     SET user_id = excluded.user_id,
   		user_name = excluded.user_name,
@@ -413,7 +413,8 @@ def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id:
         rf_cnt = excluded.rf_cnt,
         league_cat = excluded.league_cat,
         league_year = excluded.league_year,
-        previous_league_id = excluded.previous_league_id;""",
+        previous_league_id = excluded.previous_league_id,
+        league_status = excluded.league_status;""",
         (
             session_id,
             user_id,
@@ -436,6 +437,7 @@ def insert_league(db, session_id: str, user_id: str, entry_time: str, league_id:
             league_single["settings"]["type"],
             league_single["season"],
             league_single["previous_league_id"],
+            league_single["status"],
         ),
     )
 
@@ -589,7 +591,11 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
     draft_dict = draft["draft_order"]
     draft_slot = {k: v for k, v in draft["slot_to_roster_id"].items() if v is not None}
     season = draft["season"]
-    rounds = draft_id["settings"]["rounds"]
+    rounds = (
+        draft_id["settings"]["rounds"]
+        if int(draft_id["settings"]["rounds"]) <= 5
+        else "5"
+    )
     roster_slot = {int(k): v for k, v in draft_slot.items() if v is not None}
     rs_dict = dict(sorted(roster_slot.items(), key=lambda item: int(item[0])))
     if draft_dict is None or len(rs_dict.items()) > 12:
@@ -742,8 +748,12 @@ def total_owned_picks(
             if draft_id["status"] == "complete"
             else [str(int(draft_id["season"]) + i) for i in range(0, 3)]
         )
-
-        rounds = [r for r in range(1, draft_id["settings"]["rounds"] + 1)]
+        rd = (
+            draft_id["settings"]["rounds"]
+            if int(draft_id["settings"]["rounds"]) <= 5
+            else 5
+        )
+        rounds = [r for r in range(1, rd + 1)]
 
         traded_picks = [
             [pick["season"], pick["round"], pick["roster_id"], pick["owner_id"]]

@@ -456,9 +456,12 @@ def select_league():
 
             startup_cursor = db.cursor()
             startup_cursor.execute(
-                f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+                f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
             )
-            startup = startup_cursor.fetchone()[0]
+            try:
+                startup = startup_cursor.fetchone()[0]
+            except:
+                startup = True
             startup_cursor.close()
 
             refresh_cursor = db.cursor()
@@ -563,9 +566,13 @@ def get_league():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
+
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -812,9 +819,12 @@ def get_league_sf():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1072,9 +1082,12 @@ def get_league_fc():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1323,9 +1336,12 @@ def get_league_dp():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1569,9 +1585,12 @@ def get_league_fp():
         refresh_btn = league_data[-1]
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1792,9 +1811,12 @@ def trade_tracker():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1960,9 +1982,12 @@ def trade_tracker_fc():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2127,9 +2152,12 @@ def trade_tracker_sf():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2298,9 +2326,12 @@ def contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2543,9 +2574,12 @@ def fc_contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2794,9 +2828,12 @@ def nfl_contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -3039,9 +3076,12 @@ def fp_contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}'"
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
-        startup = startup_cursor.fetchone()[0]
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
