@@ -117,9 +117,19 @@
                     {% set total = asset.owner_total %}
                     {% set deal_outcome = asset.deal_total - asset.owner_total %}
                     {%if total >= deal_outcome %}
-                    <span class="trade-w-badge">{{"{:,}".format(total)}}</span>
+                    <div class="d-flex align-items-center">
+                        <span style="font-size:10px;margin-right: 5px;color:rgb(144, 190, 109)">+{{"{:,}".format(total
+                            -
+                            deal_outcome)}}</span>
+                        <span class="trade-badge">{{"{:,}".format(total)}}</span>
+                    </div>
                     {% else %}
-                    <span class="trade-l-badge">{{"{:,}".format(total)}}</span>
+                    <div class="d-flex align-items-center">
+                        <span style="font-size:10px;margin-right: 5px;color:rgb(249, 65, 68)">{{"{:,}".format(total
+                            -
+                            deal_outcome)}}</span>
+                        <span class="trade-badge">{{"{:,}".format(total)}}</span>
+                    </div>
                     {%endif%}
                 </div>
                 {% endif %}
