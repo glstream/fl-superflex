@@ -802,6 +802,7 @@ table.dataTable {
     font-size: 0.9em;
     font-family: sans-serif;
     min-width: 400px;
+    border-bottom: #000000;
 }
 
 .styled-table thead tr {
@@ -818,13 +819,13 @@ table.dataTable tbody tr {
 
 .styled-table th {
     padding: 12px 15px;
-    border-bottom: none;
     border-bottom: 1px solid #0fad44;
 }
 
 .styled-table td {
     padding: 12px 15px;
-    border-bottom: none;
+    border-bottom: 1px solid var(--text-color);
+
 }
 
 .styled-table tbody tr {
@@ -967,7 +968,7 @@ input:checked+.slider:before {
     top: 50%;
     transform: translateY(-50%);
     left: 50px;
-    color: #000;
+    color: var(--text-color);
     font-size: 16px;
 }
 
