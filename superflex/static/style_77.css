@@ -1,15 +1,86 @@
 * {
     font-family: 'Titillium Web', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container-fluid {
+    padding: 10px;
+    background-color: var(--background-color) !important;
+    /* This will be the "padding color" */
+}
+
+.light-theme {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --padding-color: #f0f0f0;
+    --inverse-color: #555555;
+    --button-outline-color: rgb(87, 117, 144);
+    --link-color: #0d6efd;
+}
+
+.dark-theme {
+    --background-color: #444444;
+    --text-color: #ffffff;
+    --padding-color: #555555;
+    --inverse-color: #555555;
+    --button-outline-color: #ffffff;
+    --link-color: #bdbaba;
+}
+
+.fa-plus {
+    color: #3CB371;
+    background: transparent;
+}
+
+.fa-bars {
+    color: var(--text-color) !important;
+}
+
+.fa-refresh {
+    color: rgb(87, 117, 144) !important;
+    color: var(--button-outline-color) !important;
+}
+
+.fa-chevron-down:before {
+    background-color: transparent;
+
 }
 
 html {
     padding: 1rem;
+    background-color: var(--background-color) !important;
 
 }
 
 body {
     margin: 0 auto;
-    background-color: #E3E2DF;
+
+
+}
+
+.navbar-dark .navbar-toggler-icon {
+    color: var(--button-outline-color) !important;
+    border-color: var(--button-outline-color) !important;
+}
+
+h5 {
+    background-color: transparent;
+}
+
+h4 {
+    background-color: transparent;
+}
+
+
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--text-color) !important;
+}
+
+a:link {
+    background-color: transparent;
 }
 
 table {
@@ -65,8 +136,19 @@ table {
 
 .btn-outline-primary {
     outline-color: rgb(87, 117, 144) !important;
-    color: rgb(87, 117, 144) !important;
-    border-color: rgb(87, 117, 144) !important;
+    color: var(--button-outline-color) !important;
+    border-color: var(--button-outline-color) !important;
+}
+
+.btn-outline-dark {
+    color: var(--button-outline-color) !important;
+    border-color: var(--button-outline-color) !important;
+}
+
+.btn-outline-secondary {
+    outline-color: rgb(87, 117, 144) !important;
+    color: var(--button-outline-color) !important;
+    border-color: var(--button-outline-color) !important;
 }
 
 .btn-outline-primary:hover {
@@ -103,9 +185,10 @@ table {
 
 .btn-outline-info {
     outline-color: rgba(143, 145, 146, 0.20) !important;
-    color: rgba(41, 41, 41, 0.7) !important;
-    border-color: rgba(143, 145, 146, 0.20) !important;
-    background-color: rgba(143, 145, 146, 0.20) !important;
+    border-color: var(--text-color) !important;
+    background-color: var(--background-color) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--text-color);
 }
 
 .btn-outline-info:hover {
@@ -113,6 +196,10 @@ table {
     background-color: white !important;
     color: gray !important;
     color: rgba(41, 41, 41, 0.7) !important;
+}
+
+.text-lg-right {
+    background-color: transparent !important;
 }
 
 .btn {
@@ -275,14 +362,20 @@ table {
     margin-top: 25px;
     padding: 1.5em .5em .5em;
     border-radius: .5em;
-    box-shadow: 0 3px 5px rgba(39, 125, 161, 0.2);
+    box-shadow: 0 3px 5px rgba(104, 136, 150, 0.2);
     /* border: 1em;
     border-style: solid;
     border-width: 1px 1px 1px 1px; 
     border-color: rgb(77, 144, 142); */
-    background-color: rgba(143, 145, 146, 0.15);
+    background-color: rgba(143, 145, 146, 0.25);
 
 }
+
+.card-body {
+    background-color: transparent;
+}
+
+
 
 .card-top-sl {
     margin-bottom: 25px;
@@ -517,6 +610,22 @@ input[type=submit] {
 
 .text-left {
     text-align: left;
+    background-color: transparent;
+}
+
+.b-transparent {
+    background-color: transparent;
+}
+
+.b-link {
+    color: var(--link-color) !important;
+    text-decoration: none;
+    font-size: 14px
+}
+
+
+.d-flex {
+    background-color: transparent !important;
 }
 
 a.right {
@@ -559,8 +668,23 @@ html {
     font-size: .69rem;
 }
 
+.span-fr {
+    background-color: transparent;
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: .5rem 1rem;
+    color: #212529;
+    text-decoration: none;
+    background-color: transparent !important;
+    border: 1px solid rgba(0, 0, 0, .125);
+}
+
 .list-group {
     display: inline-block;
+    background-color: transparent !important;
 }
 
 
@@ -659,6 +783,11 @@ table.dataTable {
 
 
 }
+
+table.dataTable tbody tr {
+    background-color: transparent !important;
+}
+
 
 .styled-table th {
     padding: 12px 15px;
@@ -874,6 +1003,11 @@ input:checked+.slider:before {
     background-image: none !important;
 }
 
+.toast-message {
+    background-color: rgb(248, 150, 30);
+    ;
+}
+
 .checkbox-wrapper label {
     padding: 0 1px;
 }
@@ -886,11 +1020,11 @@ input:checked+.slider:before {
 .trade-badge {
     display: inline-block;
     padding: 4px 8px;
-    background-color: rgb(74, 74, 74, .1);
-    color: #4a4a4a;
+    background-color: var(--background-color);
+    color: var(--text-color);
     border-radius: 4px;
     font-size: 14px;
     font-weight: bold;
     text-align: center;
-    border: 1px solid rgb(74, 74, 74, .5);
+    border: 1px solid var(--text-color);
 }

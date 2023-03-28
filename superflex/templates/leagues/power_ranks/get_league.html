@@ -12,6 +12,7 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
+
 {{league_header(league_name, avatar)}}
 {% if cur_league.previous_league_id is none %}
 {% set bt = 'disabled'%}
@@ -110,7 +111,8 @@
                         options: {
                             font: {
                                 size: 16,
-                                weight: "bolder"
+                                weight: "bolder",
+                                color: 'rbg(118, 118, 118)'
                             },
                             plugins: {
                                 tooltip: {
@@ -124,13 +126,18 @@
                                 r: {
                                     reverse: true,
                                     max: {{ total_rosters }},
+
                 min: 1,
                     beginAtZero: false,
 
                         ticks: {
                     stepSize: 4,
                         display: false
-                }
+                },
+                grid: {
+                    color: 'rbg(118, 118, 118)', // Change the grid color
+      },
+                
                                 },
                             },
         
