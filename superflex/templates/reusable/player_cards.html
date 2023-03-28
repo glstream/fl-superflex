@@ -2,37 +2,39 @@
 
 {% for owner in owners %}
 <div class="col-auto">
-    {% for user in users %}
-    {% if user[1] == owner.user_id %}
-    <a
-        href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">
-        <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{user[2]}}"
-            onError="this.onerror=null;this.src='static/XQH8I4-a_400x400.jpg';" />
-    </a>
-    <h4 class="text-left" style="vertical-align: middle;font-size: 18px;">{{owner.total_rank | suffix}} &bull;
-        <a class="b-link" style="font-size: 18px;"
-            href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
-        &bull;
-        {{"{:,}".format(owner.total_value)}}
-    </h4>
-    {% endif %}
-    {%endfor%}
-    <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse-{{owner.user_id}}"
-        aria-expanded="false" aria-controls="collapseExample-all">
-        <i class="fa fa-expand" aria-hidden="true"></i>
-    </a>
-    <a class="btn btn-outline-danger" data-toggle="collapse" href="#collapse-{{owner.user_id}}-starters"
-        aria-expanded="true" aria-controls="collapseExample-starters">
-        <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Starters
-    </a>
-    <a class="btn btn-outline-warning" data-toggle="collapse" href="#collapse-{{owner.user_id}}-bench"
-        aria-expanded="true" aria-controls="collapseExample-bench">
-        <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Bench
-    </a>
-    <a class="btn btn-outline-info" data-toggle="collapse" href="#collapse-{{owner.user_id}}-picks" aria-expanded="true"
-        aria-controls="collapseExample-picks">
-        <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Picks
-    </a>
+    <div style="margin-left:1rem">
+        {% for user in users %}
+        {% if user[1] == owner.user_id %}
+        <a
+            href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">
+            <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{user[2]}}"
+                onError="this.onerror=null;this.src='static/XQH8I4-a_400x400.jpg';" />
+        </a>
+        <h4 class="text-left" style="vertical-align: middle;font-size: 18px;">{{owner.total_rank | suffix}} &bull;
+            <a class="b-link" style="font-size: 18px;"
+                href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
+            &bull;
+            {{"{:,}".format(owner.total_value)}}
+        </h4>
+        {% endif %}
+        {%endfor%}
+        <a class="btn btn-outline-dark" data-toggle="collapse" data-target=".multi-collapse-{{owner.user_id}}"
+            aria-expanded="false" aria-controls="collapseExample-all">
+            <i class="fa fa-expand" aria-hidden="true"></i>
+        </a>
+        <a class="btn btn-outline-danger" data-toggle="collapse" href="#collapse-{{owner.user_id}}-starters"
+            aria-expanded="true" aria-controls="collapseExample-starters">
+            <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Starters
+        </a>
+        <a class="btn btn-outline-warning" data-toggle="collapse" href="#collapse-{{owner.user_id}}-bench"
+            aria-expanded="true" aria-controls="collapseExample-bench">
+            <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Bench
+        </a>
+        <a class="btn btn-outline-info" data-toggle="collapse" href="#collapse-{{owner.user_id}}-picks"
+            aria-expanded="true" aria-controls="collapseExample-picks">
+            <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Picks
+        </a>
+    </div>
     <div class="card-fr" style="width: 31rem;">
         {% for k, v in aps.items()%}
         {% set designation = k %}
