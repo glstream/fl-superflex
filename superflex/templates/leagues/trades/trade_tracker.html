@@ -110,22 +110,24 @@
             {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for display_name,items in v.items() %}
             <div class="card-fr" style="width: 24rem; margin-right: 10px;margin-left: 10px;"
                 id="trade-id-{{display_name}}">
-                <div class="d-flex justify-content-between" style="font-size: 18px;">
-                    <span class="text-left">{{display_name}}</span>
+                <div class="d-flex justify-content-between" style="font-size: 18px;background:transparent;">
+                    <span class="text-left" style="background:transparent;">{{display_name}}</span>
                     {% for asset in items if asset.transaction_id == transaction_id[0] %}
                     {% if loop.index == 1 %}
                     {% set total = asset.owner_total %}
                     {% set deal_outcome = asset.deal_total - asset.owner_total %}
                     {%if total >= deal_outcome %}
                     <div class="d-flex align-items-center">
-                        <span style="font-size:10px;margin-right: 5px;color:rgb(144, 190, 109)">+{{"{:,}".format(total
+                        <span class="b-transparent"
+                            style="font-size:10px;margin-right: 5px;color:rgb(144, 190, 109)">+{{"{:,}".format(total
                             -
                             deal_outcome)}}</span>
-                        <span class="trade-badge">{{"{:,}".format(total)}}</span>
+                        <span class="trade-badge" class="trade-badge">{{"{:,}".format(total)}}</span>
                     </div>
                     {% else %}
-                    <div class="d-flex align-items-center">
-                        <span style="font-size:10px;margin-right: 5px;color:rgb(249, 65, 68)">{{"{:,}".format(total
+                    <div class="d-flex align-items-center" style="background:transparent;">
+                        <span class="b-transparent"
+                            style="font-size:10px;margin-right: 5px;color:rgb(249, 65, 68);">{{"{:,}".format(total
                             -
                             deal_outcome)}}</span>
                         <span class="trade-badge">{{"{:,}".format(total)}}</span>
@@ -136,24 +138,29 @@
 
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between border-0"
-                        style="background-color: transparent;font-size: 14px;">
+                        style="font-size: 14px;background:transparent;">
                         <div class="d-flex align-items-center">
                             <img class="avatar-traded-asset" style="margin-right:5px"
                                 src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
                                 onError="this.onerror=null;this.src='static/player_default.webp';" />
-                            <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
+                            <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;"></i>
                             {{ asset.asset }}
                             {%if asset._position == 'QB' %}
-                            &bull; <span style="color:rgb(39, 125, 161); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(39, 125, 161); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'RB' %}
-                            &bull; <span style="color:rgb(144, 190, 109); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(144, 190, 109); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'WR' %}
-                            &bull; <span style="color:rgb(67, 170, 139); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(67, 170, 139); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'TE' %}
-                            &bull; <span style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
                             {%endif%}
                         </div>
-                        <span class="text-lg-right">{{"{:,}".format(asset.value)}}</span>
+                        <span class="text-lg-right"
+                            style="background:transparent;">{{"{:,}".format(asset.value)}}</span>
                     </li>
                     {% endfor %}
                 </ul>
@@ -162,7 +169,6 @@
             {% endfor %}
         </div>
     </div>
-    <hr>
     {% endfor %}
 </div>
 {% endfor %}

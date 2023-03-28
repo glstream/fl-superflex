@@ -1,28 +1,28 @@
 {% macro ba(best_available) %}
 
-<div class="card border-0" style="width: 31rem;background-color: transparent;"">
-    <div class=" header">
-    <h4 class="title">Best Available</h4>
-</div>
-<div class="row">
-    {% for pos, player in best_available.items() %}
-    <div class="col-6">
-        <div class="card border-0" style="background-color: transparent;">
-            <div style="display: flex; justify-content: space-between;">
-                <h5 class="float:left;"><span class="badge bg-light">{{pos}}</span></h5>
-                <h5 style="float:right;"><span class="badge bg-secondary">Value</span></h5>
-            </div>
-
-            {% for p in player %}
-            <div style="display: flex; justify-content: space-between;">
-                <span class="pb-2">{{p.full_name}}</span>
-                <span><b>{{"{:,}".format(p.player_value) | default('', True)}}</b></span>
-            </div>
-            {%endfor%}
-        </div>
+<div class="card border-0" style="width: 31rem;background-color: transparent;">
+    <div class="header">
+        <h4 class="title">Best Available</h4>
     </div>
-    {%endfor%}
-</div>
+    <div class="row">
+        {% for pos, player in best_available.items() %}
+        <div class="col-6">
+            <div class="card border-0" style="background-color: transparent;">
+                <div style="display: flex; justify-content: space-between;">
+                    <h4 class="float:left;"><span class="badge bg-light">{{pos}}</span></h5>
+                        <h4 style="float:right;"><span class="badge bg-secondary">Value</span></h5>
+                </div>
+
+                {% for p in player %}
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-size:14px" class="pb-2">{{p.full_name}}</span>
+                    <span style="font-size:14px"><b>{{"{:,}".format(p.player_value) | default('', True)}}</b></span>
+                </div>
+                {%endfor%}
+            </div>
+        </div>
+        {%endfor%}
+    </div>
 
 
 </div>

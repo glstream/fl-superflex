@@ -98,14 +98,14 @@
 
 <div class="row">
     <div class="header text-center">
-        <h4 style="padding:10px" class="title">Trade History</h4>
+        <h2 style="padding:10px" class="title">Trade History</h2>
     </div>
     {% for transaction_id in transaction_ids %}
 
     <div class="card border-0" style="background-color: transparent;">
         <div class="row justify-content-center">
-            <h4 class="text-center">{{transaction_id[1] | timestamp_convert }}
-            </h4>
+            <h3 class="text-center">{{transaction_id[1] | timestamp_convert }}
+            </h3>
             {% for k,v in trades_dict.items() if k == transaction_id[0] %} {% for display_name,items in v.items() %}
             <div class="card-fr" style="width: 24rem; margin-right: 10px;margin-left: 10px;"
                 id="trade-id-{{display_name}}">
@@ -117,14 +117,16 @@
                     {% set deal_outcome = asset.deal_total - asset.owner_total %}
                     {%if total >= deal_outcome %}
                     <div class="d-flex align-items-center">
-                        <span style="font-size:10px;margin-right: 5px;color:rgb(144, 190, 109)">+{{"{:,}".format(total
+                        <span class="b-transparent"
+                            style="font-size:10px;margin-right: 5px;color:rgb(144, 190, 109)">+{{"{:,}".format(total
                             -
                             deal_outcome)}}</span>
                         <span class="trade-badge">{{"{:,}".format(total)}}</span>
                     </div>
                     {% else %}
                     <div class="d-flex align-items-center">
-                        <span style="font-size:10px;margin-right: 5px;color:rgb(249, 65, 68)">{{"{:,}".format(total
+                        <span class="b-transparent"
+                            style="font-size:10px;margin-right: 5px;color:rgb(249, 65, 68)">{{"{:,}".format(total
                             -
                             deal_outcome)}}</span>
                         <span class="trade-badge">{{"{:,}".format(total)}}</span>
@@ -141,21 +143,22 @@
                                 src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
                                 onError="this.onerror=null;this.src='static/player_default.webp';" />
                             <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
-
-
-
                             {{ asset.asset }}
                             {%if asset._position == 'QB' %}
-                            &bull; <span style="color:rgb(39, 125, 161); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(39, 125, 161); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'RB' %}
-                            &bull; <span style="color:rgb(144, 190, 109); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(144, 190, 109); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'WR' %}
-                            &bull; <span style="color:rgb(67, 170, 139); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent"
+                                style="color:rgb(67, 170, 139); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'TE' %}
-                            &bull; <span style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
+                            &bull; <span class="b-transparent" class="b-transparent"
+                                style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
                             {%endif%}
                         </div>
-                        <span class="text-lg-right">{{"{:,}".format(asset.value)}}</span>
+                        <span class="b-transparent" class="text-lg-right">{{"{:,}".format(asset.value)}}</span>
                     </li>
                     {% endfor %}
                 </ul>
@@ -164,7 +167,6 @@
             {% endfor %}
         </div>
     </div>
-    <hr>
     {% endfor %}
 </div>
 {% endfor %}

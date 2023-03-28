@@ -10,7 +10,7 @@
             onError="this.onerror=null;this.src='static/XQH8I4-a_400x400.jpg';" />
     </a>
     <h4 class="text-left" style="vertical-align: middle;font-size: 18px;">{{owner.total_rank | suffix}} &bull;
-        <a style="font-size: 18px;"
+        <a class="b-link" style="font-size: 18px;"
             href="{{url_for('leagues.team_view', user_id=owner.user_id, league_id=league_id, session_id=session_id, view_source=view_source)}}">{{owner.display_name}}</a>
         &bull;
         {{"{:,}".format(owner.total_value)}}
@@ -23,15 +23,15 @@
     </a>
     <a class="btn btn-outline-danger" data-toggle="collapse" href="#collapse-{{owner.user_id}}-starters"
         aria-expanded="true" aria-controls="collapseExample-starters">
-        <i class="fa fa-chevron-down" aria-hidden="true"></i> Starters
+        <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Starters
     </a>
     <a class="btn btn-outline-warning" data-toggle="collapse" href="#collapse-{{owner.user_id}}-bench"
         aria-expanded="true" aria-controls="collapseExample-bench">
-        <i class="fa fa-chevron-down" aria-hidden="true"></i> Bench
+        <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Bench
     </a>
     <a class="btn btn-outline-info" data-toggle="collapse" href="#collapse-{{owner.user_id}}-picks" aria-expanded="true"
         aria-controls="collapseExample-picks">
-        <i class="fa fa-chevron-down" aria-hidden="true"></i> Picks
+        <i class="fa fa-chevron-down" aria-hidden="true" style="background:transparent"></i> Picks
     </a>
     <div class="card-fr" style="width: 31rem;">
         {% for k, v in aps.items()%}
@@ -51,7 +51,7 @@
         <div class="card d-flex border-0" id="{{designation}}" style="background-color: transparent;">
             {% for c in j if c.user_id == owner.user_id %} {% if k != 'll' %}
 
-            <div class="collapse multi-collapse multi-collapse-{{owner.user_id}}"
+            <div style="background-color: transparent;" class="collapse multi-collapse multi-collapse-{{owner.user_id}}"
                 id="collapse-{{owner.user_id}}-{{designation}}">
                 <div class="d-flex justify-content-between" style="background-color: transparent;">
                     {%if loop.index == 1%} {%if c.fantasy_position =="QB" %}
@@ -94,8 +94,7 @@
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                             </object>
                         </a>
-                        <a class="text-left align-left"
-                            href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
+                        <a class="b-link" href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
                             target="_blank">{{c.full_name}}</a>
                         {% elif source == 'ktc' %}
                         <a href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}" target="_blank">
@@ -105,7 +104,7 @@
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                             </object>
                         </a>
-                        <a class="text-left align-left"
+                        <a class="b-link" class="text-left align-left"
                             href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
                             target="_blank">{{c.full_name}}</a>
                         {% elif source == 'fc' %}
