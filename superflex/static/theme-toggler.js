@@ -2,7 +2,7 @@ function toggleTheme() {
     const html = document.documentElement;
     const body = document.body;
 
-    if (body.classList.contains('light-theme')) {
+    if (body.classList.contains('light-theme') || html.classList.contains('light-theme')) {
         html.classList.remove('light-theme');
         html.classList.add('dark-theme');
         body.classList.remove('light-theme');

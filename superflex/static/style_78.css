@@ -29,6 +29,32 @@
     --link-color: #bdbaba;
 }
 
+.theme-icon {
+    display: none;
+}
+
+.light-icon {
+    display: inline-block;
+}
+
+.light-theme .light-icon {
+    display: none;
+}
+
+.light-theme .dark-icon {
+    display: inline-block;
+}
+
+.dark-theme .light-icon {
+    display: inline-block;
+}
+
+.dark-theme .dark-icon {
+    display: none;
+}
+
+
+
 .fa-plus {
     color: #3CB371;
     background: transparent;
