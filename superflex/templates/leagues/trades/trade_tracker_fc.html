@@ -14,7 +14,7 @@
 {{league_header(league_name, avatar)}}
 <div style="display: inline-block;">
     <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted"
-            style="margin-left: 1px;">FantasyCalc</small>
+            style="margin-left: 1px;">FantasyCalc</small> &bull; Trade Tracker
     </h3>
     <h7 style="margin-right: 10px;right: 0;">League refreshed {{ refresh_time }} ago</h7>
 </div>
@@ -140,23 +140,38 @@
                     <li class="list-group-item d-flex justify-content-between border-0"
                         style="background-color: transparent;font-size: 14px;">
                         <div class="d-flex align-items-center">
-                            <img class="avatar-traded-asset" style="margin-right:5px"
+
+
+                            {%if asset._position == 'QB' %}
+                            <img class="avatar-traded-asset-qb" style="margin-right:5px"
                                 src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
                                 onError="this.onerror=null;this.src='static/player_default.webp';" />
                             <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
-                            {{ asset.asset }}
-                            {%if asset._position == 'QB' %}
-                            &bull; <span class="b-transparent"
+                            {{ asset.asset }} &bull; <span class="b-transparent"
                                 style="color:rgb(39, 125, 161); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'RB' %}
-                            &bull; <span class="b-transparent"
+                            <img class="avatar-traded-asset-rb" style="margin-right:5px"
+                                src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
+                                onError="this.onerror=null;this.src='static/player_default.webp';" />
+                            <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
+                            {{ asset.asset }} &bull; <span class="b-transparent"
                                 style="color:rgb(144, 190, 109); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'WR' %}
-                            &bull; <span class="b-transparent"
+                            <img class="avatar-traded-asset-wr" style="margin-right:5px"
+                                src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
+                                onError="this.onerror=null;this.src='static/player_default.webp';" />
+                            <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
+                            {{ asset.asset }} &bull; <span class="b-transparent"
                                 style="color:rgb(67, 170, 139); margin-left: 2px;">{{asset._position}}</span>
                             {% elif asset._position == 'TE' %}
-                            &bull; <span class="b-transparent"
+                            <img class="avatar-traded-asset-te" style="margin-right:5px"
+                                src="https://sleepercdn.com/content/nfl/players/thumb/{{asset.sleeper_id}}.jpg"
+                                onError="this.onerror=null;this.src='static/player_default.webp';" />
+                            <i class="fa fa-plus position-absolute" style="bottom: 3px; left: 12px;color:#3CB371"></i>
+                            {{ asset.asset }} &bull; <span class="b-transparent" class="b-transparent"
                                 style="color:rgb(249, 132, 74); margin-left: 2px;">{{asset._position}}</span>
+                            {%else%}
+                            {{ asset.asset }}
                             {%endif%}
                         </div>
                         <span class="b-transparent" class="text-lg-right">{{"{:,}".format(asset.value)}}</span>

@@ -154,12 +154,13 @@
                     </li>
                 </ul>
                 {% else %}
-                <div>
-                    <p style="float:left">{{c.full_name}}</p>
+                <div style="background-color: transparent;">
+                    <span class="b-transparent"
+                        style="margin-left:5px;float:left;font-size: 16px;">{{c.full_name}}</span>
                     <b>
-                        <p style="float:right">
+                        <span class="b-transparent" style="margin-right:5px;float:right;font-size: 16px;">
                             {{"{:,}".format(c.player_value)|
-                            replace(-1,"Unranked") }}</p>
+                            replace(-1,"Unranked") }}</span>
                     </b>
                 </div>
 
