@@ -1,0 +1,13 @@
+{% macro power_radar_chart() %}
+<div class="card border-0" style="margin-top: 30px;background-color: transparent;">
+    <canvas id="power_radar" width="340" height="340"></canvas>
+    <script src="{{ url_for('static', filename='js/radars/power_radar.js') }}"></script>
+</div>
+{% endmacro %}
+
+{% macro contender_radar_chart() %}
+<div class="card border-0" style="margin-top: 30px;background-color: transparent;">
+    <canvas id="contender_radar" width="340" height="340"></canvas>
+    <script src="{{ url_for('static', filename='js/radars/contender_radar.js') }}"></script>
+</div>
+{% endmacro %}

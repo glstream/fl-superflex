@@ -6,11 +6,16 @@
 {% from 'reusable/header_page.html' import league_header %}
 {% from 'reusable/player_cards.html' import player_cards %}
 {% from 'reusable/table_footer.html' import table_footer %}
+{% from 'reusable/viz/radar_chart.html' import power_radar_chart %}
 
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+</script>
+<script type="text/javascript">
+    var jsonData = {{ radar_chart_data | tojson}};
+    var totalRosters = {{ total_rosters | tojson}};
 </script>
 {{league_header(league_name, avatar)}}
 {% if cur_league.previous_league_id is none %}
@@ -76,63 +81,7 @@
         </div>
     </div>
     <div class="col-auto">
-        <div class="card border-0" style="margin-top: 30px;background-color: transparent;">
-            <canvas id="fc_pr_chart" width="340" height="340"></canvas>
-            <script>
-                try {
-                    const ctx = document.getElementById('fc_pr_chart').getContext('2d');
-                    const fc_pr_chart = new Chart(ctx, {
-                        type: 'radar',
-                        data: {
-                            labels: ['QB', 'RB', 'WR', 'TE', 'Picks', 'Starters', 'Bench'],
-                            datasets: [{
-                                label: '{{page_user[0][0]}}',
-                                data: ['{{page_user[0][1]}}', '{{page_user[0][2]}}', '{{page_user[0][3]}}', '{{page_user[0][4]}}', '{{page_user[0][5]}}', '{{page_user[0][6]}}', '{{page_user[0][7]}}'],
-                                backgroundColor: 'rgb(39, 125, 161, .95)',
-                                borderColor: 'rgb(67, 170, 139, 1.0)',
-                                borderWidth: 3
-                            }]
-                        },
-                        options: {
-                            font: {
-                                size: 16,
-                                weight: "bolder"
-                            },
-                            plugins: {
-                                tooltip: {
-                                    bodyColor: '#F9C74F',
-                                    backgroundColor: 'rgba(67, 170, 139, .8)',
-                                }
-                            },
-
-                            scales: {
-
-                                r: {
-                                    reverse: true,
-                                    max: {{ total_rosters }},
-                min: 1,
-                    beginAtZero: false,
-
-                        ticks: {
-                    stepSize: 4,
-                        display: false,
-                            font: {
-                        size: 16,
-                            weight: "bold"
-                    }
-                }, grid: {
-                    color: 'rbg(118, 118, 118)', // Change the grid color
-      },
-                                },
-                            },
-        
-                        }
-                    });
-            } catch (e) {
-
-                }
-            </script>
-        </div>
+        {{power_radar_chart()}}
         <div style="margin-top: 30px;">
             {{ba(best_available)}}
         </div>

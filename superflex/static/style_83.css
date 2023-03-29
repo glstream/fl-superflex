@@ -76,7 +76,10 @@
 
 .fa-chevron-down:before {
     background-color: transparent;
+}
 
+.fa-chevron-down {
+    background-color: transparent;
 }
 
 html {

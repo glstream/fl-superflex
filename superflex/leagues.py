@@ -651,21 +651,34 @@ def get_league():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["picks_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "picks_rank": i["picks_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in owners
             if i["user_id"] == user_id
-        ]
-
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "picks_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -763,8 +776,6 @@ def get_league():
 
         team_spots = render_players(players, "power")
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         owner_cursor.close()
         player_cursor.close()
         ktc_ba_cursor.close()
@@ -775,7 +786,6 @@ def get_league():
         return render_template(
             "leagues/power_ranks/get_league.html",
             owners=owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -795,6 +805,7 @@ def get_league():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -922,20 +933,34 @@ def get_league_sf():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["picks_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "picks_rank": i["picks_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "picks_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
 
         try:
             labels = [row["display_name"] for row in owners]
@@ -1026,8 +1051,6 @@ def get_league_sf():
 
         team_spots = render_players(players, "power")
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         owner_cursor.close()
         player_cursor.close()
         ktc_ba_cursor.close()
@@ -1038,7 +1061,6 @@ def get_league_sf():
         return render_template(
             "leagues/power_ranks/get_league_sf.html",
             owners=owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -1058,6 +1080,7 @@ def get_league_sf():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1176,20 +1199,34 @@ def get_league_fc():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["picks_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "picks_rank": i["picks_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "picks_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
 
         try:
             labels = [row["display_name"] for row in owners]
@@ -1280,8 +1317,6 @@ def get_league_fc():
 
         team_spots = render_players(players, "power")
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         owner_cursor.close()
         player_cursor.close()
         fc_ba_cursor.close()
@@ -1292,7 +1327,6 @@ def get_league_fc():
         return render_template(
             "leagues/power_ranks/get_league_fc.html",
             owners=owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -1312,6 +1346,7 @@ def get_league_fc():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -1431,20 +1466,34 @@ def get_league_dp():
 
         owner_cursor.execute(get_league_dp_summary_sql)
         owners = owner_cursor.fetchall()
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["picks_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "picks_rank": i["picks_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "picks_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1534,8 +1583,6 @@ def get_league_dp():
 
         total_rosters = get_league_rosters_size(league_id)
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         owner_cursor.close()
         player_cursor.close()
         ba_cursor.close()
@@ -1546,7 +1593,6 @@ def get_league_dp():
         return render_template(
             "leagues/power_ranks/get_league_dp.html",
             owners=owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -1566,6 +1612,7 @@ def get_league_dp():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2411,19 +2458,32 @@ def contender_rankings():
         c_owners_cursor.execute(contender_rankings_summary_sql)
         c_owners = c_owners_cursor.fetchall()
 
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in c_owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
         try:
             labels = [row["display_name"] for row in c_owners]
             values = [row["total_value"] for row in c_owners]
@@ -2520,8 +2580,6 @@ def contender_rankings():
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         contenders_cursor.close()
         c_owners_cursor.close()
         date_cursor.close()
@@ -2532,7 +2590,6 @@ def contender_rankings():
         return render_template(
             "leagues/contender_ranks/contender_rankings.html",
             owners=c_owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -2551,6 +2608,7 @@ def contender_rankings():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2666,19 +2724,32 @@ def fc_contender_rankings():
 
         fc_owners = fc_owners_cursor.fetchall()
 
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in fc_owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
         try:
             labels = [row["display_name"] for row in fc_owners]
             values = [row["total_value"] for row in fc_owners]
@@ -2773,8 +2844,6 @@ def fc_contender_rankings():
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         fc_contenders_cursor.close()
         fc_owners_cursor.close()
         date_cursor.close()
@@ -2785,7 +2854,6 @@ def fc_contender_rankings():
         return render_template(
             "leagues/contender_ranks/contender_rankings_fc.html",
             owners=fc_owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -2804,6 +2872,7 @@ def fc_contender_rankings():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -2912,19 +2981,32 @@ def nfl_contender_rankings():
 
         nfl_owners = nfl_owners_cursor.fetchall()
 
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in nfl_owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
         try:
             labels = [row["display_name"] for row in nfl_owners]
             values = [row["total_value"] for row in nfl_owners]
@@ -3021,8 +3103,6 @@ def nfl_contender_rankings():
         users = get_users_data(league_id)
         total_rosters = get_league_rosters_size(league_id)
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         nfl_contenders_cursor.close()
         nfl_owners_cursor.close()
         date_cursor.close()
@@ -3033,7 +3113,6 @@ def nfl_contender_rankings():
         return render_template(
             "leagues/contender_ranks/contender_rankings_nfl.html",
             owners=nfl_owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -3052,6 +3131,7 @@ def nfl_contender_rankings():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
@@ -3162,19 +3242,32 @@ def fp_contender_rankings():
 
         fp_owners = fp_owners_cursor.fetchall()
 
-        page_user = [
-            (
-                i["display_name"],
-                i["qb_rank"],
-                i["rb_rank"],
-                i["wr_rank"],
-                i["te_rank"],
-                i["starters_rank"],
-                i["bench_rank"],
-            )
+        radar_chart_data = [
+            {
+                "display_name": i["display_name"],
+                "qb_rank": i["qb_rank"],
+                "rb_rank": i["rb_rank"],
+                "wr_rank": i["wr_rank"],
+                "te_rank": i["te_rank"],
+                "starters_rank": i["starters_rank"],
+                "bench_rank": i["bench_rank"],
+            }
             for i in fp_owners
             if i["user_id"] == user_id
-        ]
+        ][0]
+        radar_chart_data = (
+            radar_chart_data
+            if len(radar_chart_data) > 0
+            else {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        )
 
         try:
             labels = [row["display_name"] for row in fp_owners]
@@ -3272,8 +3365,6 @@ def fp_contender_rankings():
         nfl_current_week = get_sleeper_state()["leg"]
         total_rosters = get_league_rosters_size(league_id)
 
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
-
         fp_contenders_cursor.close()
         fp_owners_cursor.close()
         date_cursor.close()
@@ -3284,7 +3375,6 @@ def fp_contender_rankings():
         return render_template(
             "leagues/contender_ranks/contender_rankings_fp.html",
             owners=fp_owners,
-            page_user=page_user,
             total_rosters=total_rosters,
             users=users,
             league_name=get_league_name(league_id),
@@ -3304,6 +3394,7 @@ def fp_contender_rankings():
             cur_league=cur_league,
             session_league_id=session_league_id,
             refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
         )
     else:
         return redirect(url_for("leagues.index"))
