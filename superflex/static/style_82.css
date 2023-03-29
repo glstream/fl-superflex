@@ -60,6 +60,11 @@
     background: transparent;
 }
 
+.fa-square-plus {
+    color: #3CB371;
+    background: transparent;
+}
+
 .fa-bars {
     color: var(--text-color) !important;
 }
@@ -673,7 +678,7 @@ a.right {
     border: 1px solid rgb(39, 125, 161);
 }
 
-.avatar-traded-asset {
+.avatar-traded-asset-qb {
     width: 38px;
     height: 32px;
     flex: 0 0 38px;
@@ -682,6 +687,50 @@ a.right {
     border-radius: 50%;
     background-color: transparent;
     border: 2px solid rgb(39, 125, 161);
+}
+
+.avatar-traded-asset-rb {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(144, 190, 109);
+}
+
+.avatar-traded-asset-wr {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(67, 170, 139);
+}
+
+.avatar-traded-asset-te {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(249, 132, 74);
+}
+
+.avatar-traded-asset-pick {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(90, 145, 168);
 }
 
 .avatar-manager {
