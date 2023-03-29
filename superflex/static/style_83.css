@@ -2,7 +2,7 @@
     font-family: 'Titillium Web', sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
-    transition: background-color 0.3s, color 0.3s;
+    /* transition: background-color 0.1s, color 0.1s; */
 }
 
 .container-fluid {
