@@ -90,7 +90,8 @@
                         style="background-color: transparent;">
                         {% if source in ['dp', 'nfl'] %}
                         <a href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/" target="_blank">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                            <object class="avatar-player-{{c.player_position}}" data="{{c.sleeper_id | sleeper_img}}"
+                                type="image/png">
                                 <img class="avatar-player"
                                     href="https://www.nfl.com/players/{{c.first_name}}-{{c.last_name}}/stats/"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
@@ -100,8 +101,9 @@
                             target="_blank">{{c.full_name}}</a>
                         {% elif source == 'ktc' %}
                         <a href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}" target="_blank">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
-                                <img class="avatar-player"
+                            <object class="avatar-player-{{c.player_position}}" data="{{c.sleeper_id | sleeper_img}}"
+                                type="image/png">
+                                <img class="avatar-player-{{c.fantasy_position}}"
                                     href="https://keeptradecut.com/dynasty-rankings/players/{{c.hyper_link}}"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
                             </object>
@@ -111,7 +113,8 @@
                             target="_blank">{{c.full_name}}</a>
                         {% elif source == 'fc' %}
                         <a href="https://fantasycalc.com/players/{{c.full_name}}-{{c.hyper_link}}" target="_blank">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                            <object class="avatar-player-{{c.player_position}}" data="{{c.sleeper_id | sleeper_img}}"
+                                type="image/png">
                                 <img class="avatar-player"
                                     href="https://fantasycalc.com/players/{{c.full_name}}-{{c.player_id}}"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
@@ -122,7 +125,8 @@
                             target="_blank">{{c.full_name}}</a>
                         {% elif source == 'espn' %}
                         <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                            <object class="avatar-player-{{c.player_position}}" data="{{c.sleeper_id | sleeper_img}}"
+                                type="image/png">
                                 <img class="avatar-player"
                                     href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
@@ -133,7 +137,8 @@
                         {% elif source == 'fp_c' %}
                         <a href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
                             target="_blank">
-                            <object class="avatar-player" data="{{c.sleeper_id | sleeper_img}}" type="image/png">
+                            <object class="avatar-player-{{c.player_position}}" data="{{c.sleeper_id | sleeper_img}}"
+                                type="image/png">
                                 <img class="avatar-player"
                                     href="https://www.fantasypros.com/nfl/players/{{c.first_name}}-{{c.last_name}}.php"
                                     src="https://sleepercdn.com/images/v2/icons/player_default.webp" />
