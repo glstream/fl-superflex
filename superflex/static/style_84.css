@@ -60,6 +60,7 @@
     background: transparent;
 }
 
+
 .fa-square-plus {
     color: #3CB371;
     background: transparent;
@@ -72,6 +73,7 @@
 .fa-refresh {
     color: rgb(87, 117, 144) !important;
     color: var(--button-outline-color) !important;
+    background-color: transparent;
 }
 
 .fa-chevron-down:before {
@@ -681,6 +683,54 @@ a.right {
     border: 1px solid rgb(39, 125, 161);
 }
 
+.avatar-player-QB {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    /* border-radius: 50%; */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(39, 125, 161);
+}
+
+.avatar-player-RB {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    /* border-radius: 50%; */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(144, 190, 109);
+}
+
+.avatar-player-WR {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    /* border-radius: 50%; */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(67, 170, 139);
+}
+
+.avatar-player-TE {
+    width: 38px;
+    height: 32px;
+    flex: 0 0 38px;
+    /* float: left; */
+    /* background: center center / cover rgb(239, 239, 239); */
+    /* border-radius: 50%; */
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid rgb(249, 132, 74);
+}
+
 .avatar-traded-asset-qb {
     width: 38px;
     height: 32px;
@@ -780,13 +830,18 @@ h5>.badge {
 }
 
 .tooltip>.tooltip-inner {
-    background-color: #ffffff !important;
-    color: rgb(0, 0, 0) !important;
+    background-color: var(--background-color) !important;
+    color: var(--text-color) !important;
     border: 1px solid rgb(98, 97, 97) !important;
     font-size: 12px !important;
     border-radius: .5em !important;
 }
 
+.bs-tooltip-auto[data-popper-placement^=top],
+.bs-tooltip-top {
+    padding: 0 !important;
+    border-radius: .5rem !important;
+}
 
 .tooltip.show {
     opacity: 1.0 !important;
