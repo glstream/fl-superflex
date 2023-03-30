@@ -145,8 +145,7 @@ def get_trades(league_id: str, nfl_state: dict) -> list:
     all_trades = []
     if nfl_state["season_type"] != "off":
         leg = nfl_state["leg"] if nfl_state["leg"] > 0 else 1
-        week = 1
-        for _ in range(1, leg + 1):
+        for week in range(1, leg + 1):
             transactions = make_api_call(
                 f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
             )
@@ -154,12 +153,10 @@ def get_trades(league_id: str, nfl_state: dict) -> list:
             week += 1
         trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
     else:
-        for week in range(1, 18):
-            transactions = make_api_call(
-                f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
-            )
-            all_trades.extend(transactions)
-            week += 1
+        transactions = make_api_call(
+            f"https://api.sleeper.app/v1/league/{league_id}/transactions/1"
+        )
+        all_trades.extend(transactions)
         trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
 
     return trades_payload
