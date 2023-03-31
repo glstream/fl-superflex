@@ -410,6 +410,7 @@ def index():
 
     if request.method == "GET" and "user_id" in session:
         user_name = get_user_name(session["user_id"])
+        print(session)
         return render_template("leagues/index.html", user_name=user_name)
     if request.method == "POST":
         if is_user(request.form["username"]):

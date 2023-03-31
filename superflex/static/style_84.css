@@ -21,7 +21,7 @@
 }
 
 .dark-theme {
-    --background-color: #444444;
+    --background-color: #424242;
     --text-color: #ffffff;
     --padding-color: #555555;
     --inverse-color: #555555;
@@ -58,6 +58,10 @@
 .fa-plus {
     color: #3CB371;
     background: transparent;
+}
+
+.fa-expand {
+    background-color: transparent;
 }
 
 
@@ -1119,7 +1123,7 @@ input:checked+.slider:before {
 }
 
 #toast-container>.toast {
-    background-color: rgb(248, 150, 30);
+    background-color: purple;
     font-size: 18px;
     /* Increase text size */
     min-height: 80px;
@@ -1139,8 +1143,7 @@ input:checked+.slider:before {
 }
 
 .toast-message {
-    background-color: rgb(248, 150, 30);
-    ;
+    background-color: purple;
 }
 
 .checkbox-wrapper label {
@@ -1162,4 +1165,140 @@ input:checked+.slider:before {
     font-weight: bold;
     text-align: center;
     border: 1px solid var(--text-color);
+}
+
+.cards-badge-1 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(68, 184, 73, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-2 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(88, 171, 72, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-3 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(108, 158, 72, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-4 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgba(98, 97, 96, 0.69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-5 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgba(120, 108, 99, 0.69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-6 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(202, 121, 86, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-7 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(214, 107, 82, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-8 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(226, 93, 77, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-9 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(237, 79, 73, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.cards-badge-10 {
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: #fff;
+    background-color: rgb(249, 65, 68, .69);
+    border-radius: 0.25rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+
+.cards-badge:hover {
+    background-color: grey;
+    cursor: pointer;
 }

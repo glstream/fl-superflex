@@ -3,6 +3,7 @@ from flask import Flask
 import requests
 from datetime import datetime
 from flask import send_from_directory
+from calls import make_api_call
 
 
 def create_app(test_config=None):
@@ -77,6 +78,21 @@ def create_app(test_config=None):
     @app.template_filter("init_cap_format")
     def init_cap_format(phrase: str) -> str:
         return " ".join([i.lower().capitalize() for i in phrase.split("_")])
+
+    @app.template_filter("get_user_name")
+    def get_user_name(user_id: str) -> str:
+        print(user_id)
+        if user_id:
+            try:
+                username_url = f"https://api.sleeper.app/v1/user/{user_id}"
+                user_name = requests.get(username_url).json()["display_name"]
+            except:
+                print("hit")
+                return ""
+        else:
+            return ""
+        print(user_name)
+        return user_name
 
     @app.route("/favicon.ico")
     def favicon():
