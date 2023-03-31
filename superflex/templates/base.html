@@ -26,9 +26,14 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <nav class="navbar navbar-expand-lg navbar-light" style="margin-left:10px;margin-right:10px">
             <a class="navbar-brand" href="{{url_for('leagues.index')}}">
-                <img src="{{url_for('static', filename='logo.png')}}" width="145" height="65" alt="">
+                <img src="{{url_for('static', filename='logos/logo.png')}}" width="145" height="65" alt="">
             </a>
-            <i id="toggleThemeBtn" style="font-size:22px;" class="fa-solid fa-moon" aria-hidden="true"></i>
+            <a href="{{url_for('leagues.select_league')}}" style="text-decoration: none; color: inherit;"><span
+                    style="color:rgb(39, 125, 161);margin-right:16px;font-size:20px;"> {{session.user_id | get_user_name
+                    }}
+                </span></a>
+            <i id="toggleThemeBtn" style="margin-right:18px;font-size:22px;" class="fa-solid fa-moon"
+                aria-hidden="true"></i>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#superflex_nav_toggler"
                 aria-controls="superflex_nav_toggler" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,8 +44,7 @@
             </button>
 
             <div class="collapse navbar-collapse" id="superflex_nav_toggler">
-
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
                         <a id="Leagues" class="nav-link" href="{{url_for('leagues.index')}}">home</a>
                     </li>
@@ -50,21 +54,16 @@
                     <li class="nav-item">
                         <a id="Leagues" class="nav-link" href="{{url_for('leagues.sf_values')}}">ranks</a>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a id="Leagues" class="nav-link" href="{{url_for('leagues.live_draft')}}">draft</a>
-                    </li> -->
                     <li class="nav-item">
-                        <a class="nav-link" href="https://www.buymeacoffee.com/superflex" target=”_blank”>donate</a>
+                        <a class="nav-link" href="https://www.buymeacoffee.com/superflex" target="_blank">donate</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('leagues.faqs')}}">info</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="https://twitter.com/superflex_app" target=”_blank”><i
-                                class="fa-brands fa-twitter" aria-hidden=" true"></i></a>
+                        <a class="nav-link" href="https://twitter.com/superflex_app" target="_blank"><i
+                                class="fa-brands fa-twitter" aria-hidden="true"></i></a>
                     </li>
-
-
                 </ul>
             </div>
         </nav>
@@ -101,7 +100,7 @@
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
         <div class="col-md-4 d-flex align-items-center">
             <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none">
-                <img src="{{url_for('static', filename='logo_small.png')}}" width="50" height="25 alt="">
+                <img src="{{url_for('static', filename='logos/logo_small.png')}}" width="50" height="25 alt="">
             </a>
             <span class=" text-muted">2023 Superflex. Follow <a
                     href="https://twitter.com/superflex_app">@superflex_app</a>. <a style="margin: left 5px;"
@@ -110,13 +109,15 @@
         <div class="col" style="float:right;">
             <ul class="nav col-md-4 justify-content-center list-unstyled d-flex" style="float:right;">
                 <li> <a class="text-muted" href="https://www.buymeacoffee.com/superflex" target=”_blank”><img
-                            src="{{url_for('static', filename='bmc-logo-no-background.png')}}" width="30" height="30"
-                            alt=""></a></li>
+                            src="{{url_for('static', filename='logos/bmc-logo-no-background.png')}}" width="30"
+                            height="30" alt=""></a></li>
                 <li class="ms-3"><a class="text-muted" href="https://twitter.com/superflex_app"><img
-                            src="{{url_for('static', filename='twitter_logo.png')}}" width="30" height="30" alt=""></a>
+                            src="{{url_for('static', filename='logos/twitter_logo.png')}}" width="30" height="30"
+                            alt=""></a>
                 </li>
                 <li class="ms-3"><a class="text-muted" href="https://www.reddit.com/r/DynastyFF/" target=”_blank”><img
-                            src="{{url_for('static', filename='reddit_logo.png')}}" width="30" height="30" alt=""></a>
+                            src="{{url_for('static', filename='logos/reddit_logo.png')}}" width="30" height="30"
+                            alt=""></a>
                 </li>
             </ul>
         </div>
