@@ -4,7 +4,7 @@ from requests.exceptions import RequestException
 
 
 def make_api_call(
-    url, params=None, headers=None, timeout=10, max_retries=3, backoff_factor=1
+    url, params=None, headers=None, timeout=10, max_retries=5, backoff_factor=1
 ):
     for retry in range(max_retries):
         try:
