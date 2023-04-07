@@ -6,7 +6,6 @@
 }
 
 .container-fluid {
-    padding: 10px;
     background-color: var(--background-color) !important;
     /* This will be the "padding color" */
 }
@@ -858,13 +857,29 @@ h5>.badge {
     }
 }
 
-@media screen and (max-width : 906px) {
+@media screen and (max-width : 844px) {
     .desk {
         visibility: hidden;
     }
 
     .div-only-mobile {
         visibility: visible;
+    }
+}
+
+@media (max-width: 844px) {
+    div.dt-buttons {
+        max-width: 100%;
+        overflow-x: auto;
+        display: block;
+    }
+}
+
+@media (max-width: 844px) {
+    #player-values-table {
+        max-width: 100%;
+        overflow-x: auto;
+        display: block;
     }
 }
 
@@ -881,9 +896,7 @@ h5>.badge {
     background-color: #ccc;
 }
 
-table.dataTable thead th {
-    border-bottom: 0 !important;
-}
+
 
 table.dataTable.no-footer {
     border-bottom: 0 !important;
@@ -904,24 +917,22 @@ table.dataTable thead .sorting_desc_disabled:before {
 }
 
 table.dataTable {
-    max-width: 100% !important;
+    max-width: 1000px !important;
+    border-collapse: collapse !important;
+    margin-left: 0 !important;
 }
 
 .styled-table {
-    border-collapse: collapse;
-    background-color: transparent;
     font-size: 0.9em;
     font-family: sans-serif;
-    min-width: 400px;
+    min-width: 300px;
     border-bottom: #000000;
 }
 
 .styled-table thead tr {
-    color: black;
     text-align: center;
-
-
 }
+
 
 table.dataTable tbody tr {
     background-color: transparent !important;
@@ -930,21 +941,21 @@ table.dataTable tbody tr {
 
 .styled-table th {
     padding: 12px 15px;
-    border-bottom: 1px solid #0fad44;
+
+}
+
+.styled-table tr {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--inverse-color);
 }
 
 .styled-table td {
     padding: 12px 15px;
     border-bottom: 1px solid var(--text-color);
-
 }
 
 .styled-table tbody tr {
     border-bottom: 1px solid #000000;
-}
-
-.styled-table thead {
-    background-color: #c2c1bfb7;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
@@ -1274,7 +1285,7 @@ input:checked+.slider:before {
 .cards-badge-9 {
     display: inline-block;
     padding: 0.25em 0.5em;
-    font-size: 0.875em;
+    font-sze: 0.875em;
     font-weight: 600;
     color: #fff;
     background-color: rgb(237, 79, 73, .69);
@@ -1301,4 +1312,20 @@ input:checked+.slider:before {
 .cards-badge:hover {
     background-color: grey;
     cursor: pointer;
+}
+
+.table {
+    box-shadow: none
+}
+
+div.dt-buttons {
+    float: none !important;
+    background-color: transparent !important;
+}
+
+button.dt-button,
+div.dt-button,
+a.dt-button {
+    background-color: transparent !important;
+    /* Replace #your-color with your desired color */
 }
