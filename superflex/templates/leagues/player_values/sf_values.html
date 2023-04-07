@@ -1,6 +1,7 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
 <!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.0/css/buttons.dataTables.min.css" />
 
 <!-- DataTables JS -->
@@ -13,12 +14,14 @@
 <script src="https://cdn.datatables.net/buttons/1.4.0/js/buttons.flash.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.0/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.0/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
 
 <script>
 
     $(document).ready(function () {
         var table = $('#player-values-table').DataTable({
-            dom: 'Bfrtip',
+            dom: 'Brtip',
             buttons: [
                 'csv', 'excel', 'pdf'
             ],
@@ -180,15 +183,15 @@
             </div>
 
             <div class="styled-table">
-                <table class="table table-hover" style="font-size: 14px;text-align: center;" id="player-values-table">
-                    <thead style="background-color: rgb(87, 117, 144);">
-                        <tr>
+                <table class="table" style="font-size: 14px;text-align: center;" id="player-values-table">
+                    <thead>
+                        <tr style="background-color: rgb(87, 117, 144)">
 
-                            <th style="font-size:18px;">Player</th>
-                            <th style="font-size:18px;">Position</th>
-                            <th style="font-size:18px;">Team</th>
-                            <th style="font-size:18px;">Age </th>
-                            <th style="font-size:18px;">Value</th>
+                            <th style="font-size:16px;">Player</th>
+                            <th style="font-size:16px;">Position</th>
+                            <th style="font-size:16px;">Team</th>
+                            <th style="font-size:16px;">Age </th>
+                            <th style="font-size:16px;">Value</th>
                             <th class="hidden">Position</th>
                             <th class="hidden">Rank Type</th>
                         </tr>
