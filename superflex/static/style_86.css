@@ -934,11 +934,6 @@ table.dataTable {
 }
 
 
-table.dataTable tbody tr {
-    background-color: transparent !important;
-}
-
-
 .styled-table th {
     padding: 12px 15px;
 
@@ -947,6 +942,26 @@ table.dataTable tbody tr {
 .styled-table tr {
     padding: 12px 15px;
     border-bottom: 1px solid var(--inverse-color);
+}
+
+.styled-table tr[data-status="QB"] {
+    background-color: rgb(39, 125, 161, .45);
+}
+
+.styled-table tr[data-status="RB"] {
+    background-color: rgb(144, 190, 109, .45);
+}
+
+.styled-table tr[data-status="WR"] {
+    background-color: rgb(67, 170, 139, .45);
+}
+
+.styled-table tr[data-status="TE"] {
+    background-color: rgb(249, 132, 74, .45);
+}
+
+.styled-table tr[data-status="Pick"] {
+    background-color: rgb(143, 145, 146, .60);
 }
 
 .styled-table td {
@@ -958,9 +973,6 @@ table.dataTable tbody tr {
     border-bottom: 1px solid #000000;
 }
 
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #E3E2DF;
-}
 
 .styled-table tbody tr:last-of-type {
     border-bottom: 2px solid #009879;
