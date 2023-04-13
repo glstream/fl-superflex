@@ -198,7 +198,7 @@
                     </thead>
                     <tbody>
                         {% for player in players %}
-                        <tr>
+                        <tr data-status="{{player._position}}">
                             <td style="text-align: left;"> {{ player.player_full_name }} ({{player._position}} | {{
                                 player.team or ' - '
                                 }}) {%if player._position =="QB" %}

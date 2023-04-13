@@ -6,6 +6,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    make_response,
     session,
     url_for,
 )
@@ -408,10 +409,24 @@ def index():
     cursor.execute(query, user_meta)
     cursor.close()
 
-    if request.method == "GET" and "user_id" in session:
-        user_name = get_user_name(session["user_id"])
-        print(session)
-        return render_template("leagues/index.html", user_name=user_name)
+    c_username = request.cookies.get("c_username")
+
+    c_username = request.cookies.get("c_username")
+    print(request.cookies.get("c_username"))
+    print("c_username", c_username)
+
+    if request.method == "GET" and "c_username" in request.cookies and request.args.get("home") != 'home':
+        session_id = session.get("session_id", str(uuid.uuid4()))
+        user_name = request.cookies.get("c_username")
+        session["league_year"] = "2023"
+        year_ = "2023"
+        user_id = session["user_id"] = get_user_id(user_name)
+        leagues = user_leagues(str(user_id), str(year_))
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+
+        insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
+        return redirect(url_for("leagues.select_league", year=year_))
+
     if request.method == "POST":
         if is_user(request.form["username"]):
             session_id = session.get("session_id", str(uuid.uuid4()))
@@ -425,13 +440,21 @@ def index():
             insert_current_leagues(
                 db, session_id, user_id, user_name, entry_time, leagues
             )
+            response = make_response(
+                redirect(url_for("leagues.select_league", year=year_))
+            )
+            c_username = request.form["username"]
+            response.set_cookie(
+                "c_username", c_username, max_age=60 * 60 * 24 * 30
+            )  # Optional: set max_age to expire the cookie after 30 days
+            print("c_username", c_username)
         else:
             return render_template(
                 "leagues/index.html",
                 error_message="Username not found. Please enter a valid sleeper username.",
             )
 
-        return redirect(url_for("leagues.select_league", year=year_))
+        return response
 
     return render_template("leagues/index.html")
 
@@ -441,65 +464,60 @@ def select_league():
     db = pg_db()
 
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
+        print("HIT")
         return redirect(url_for("leagues.index"))
-    try:
-        session_id = session.get("session_id", str(uuid.uuid4()))
-        user_id = session["user_id"]
-        session_year = session["league_year"]
+    session_id = session.get("session_id", str(uuid.uuid4()))
+    user_id = session["user_id"]
+    session_year = session["league_year"]
 
-        if request.method == "POST":
-            button = list(request.form)[0]
-            league_data = eval(request.form[button])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            session_league_id = session["session_league_id"] = league_id
+    if request.method == "POST":
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        session_league_id = session["session_league_id"] = league_id
 
-            startup_cursor = db.cursor()
-            startup_cursor.execute(
-                f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+        )
+        try:
+            startup = startup_cursor.fetchone()[0]
+        except:
+            startup = True
+        startup_cursor.close()
+
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
-            try:
-                startup = startup_cursor.fetchone()[0]
-            except:
-                startup = True
-            startup_cursor.close()
-
-            refresh_cursor = db.cursor()
-            refresh_cursor.execute(
-                f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
-            refresh = refresh_cursor.fetchone()
-            refresh_cursor.close()
 
-            if refresh is not None:
-                print("HAS PLAYERS")
-                refresh_date = refresh[-1]
-                refresh_datetime = datetime.strptime(
-                    refresh_date, "%Y-%m-%dT%H:%M:%S.%f"
-                )
-                refresh_epoch = round(
-                    (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
-                )
-            else:
-                refresh_epoch = round(
-                    (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-                )
-
-                player_manager_upates(
-                    db, button, session_id, user_id, league_id, startup
-                )
-            return redirect(
-                url_for(
-                    f"leagues.{button}",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                    session_league_id=session_league_id,
-                    rdm=refresh_epoch,
-                )
+            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+                session_league_id=session_league_id,
+                rdm=refresh_epoch,
             )
-    except:
+        )
         return redirect(url_for("leagues.index"))
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -527,11 +545,12 @@ def select_league():
             , sum(sf_cnt) as superflex
             , (select count(*) from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}') - sum(sf_cnt) as single_qb 
             from dynastr.current_leagues 
-            where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
+            where user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
             group by
             league_year"""
     )
     try:
+        print("hit")
         league_summary = ls_cursor.fetchall()[0]
         ls_cursor.close()
     except:
@@ -545,6 +564,7 @@ def select_league():
             "leagues/select_league.html", leagues=leagues, league_summary=league_summary
         )
     else:
+        print("last HIT")
         return redirect(url_for("leagues.index"))
 
 
