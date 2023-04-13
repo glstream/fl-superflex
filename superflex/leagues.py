@@ -554,7 +554,7 @@ def select_league():
             , sum(sf_cnt) as superflex
             , (select count(*) from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}') - sum(sf_cnt) as single_qb 
             from dynastr.current_leagues 
-            where user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
+            where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'
             group by
             league_year"""
     )
