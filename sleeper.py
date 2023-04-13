@@ -351,7 +351,7 @@ def insert_current_leagues(
                 for league in iter(leagues)
             ]
         ),
-        page_size=1000,
+        page_size=1500,
     )
     db.commit()
     cursor.close()
@@ -486,7 +486,7 @@ def draft_positions(db, league_id: str, user_id: str, draft_order: list = []) ->
             , draft_set_flg = EXCLUDED.draft_set_flg
     ;""",
         tuple(draft_order),
-        page_size=1000,
+        page_size=1500,
     )
     db.commit()
     cursor.close()
@@ -536,7 +536,7 @@ def insert_league_rosters(db, session_id: str, user_id: str, league_id: str) -> 
                 )
                 for league_player in iter(league_players)
             ],
-            page_size=1000,
+            page_size=1500,
         )
 
     return
@@ -633,7 +633,7 @@ def total_owned_picks(
                             )
                             for draft_pick in iter(draft_picks)
                         ],
-                        page_size=1000,
+                        page_size=1500,
                     )
     return
 
@@ -645,7 +645,6 @@ def clean_draft_positions(db, league_id: str):
     cursor = db.cursor()
     cursor.execute(delete_query)
     cursor.close()
-    print("Draft Positions Cleaned.")
     return
 
 
@@ -655,7 +654,6 @@ def clean_league_managers(db, league_id: str):
     cursor.execute(delete_query)
     db.commit()
     cursor.close()
-    print("Managers Deleted.")
     return
 
 
@@ -675,7 +673,7 @@ def insert_managers(db, managers: list):
                 (manager[0], manager[1], manager[2], manager[3], manager[4])
                 for manager in iter(managers)
             ],
-            page_size=1000,
+            page_size=1500,
         )
     return
 
@@ -686,7 +684,6 @@ def clean_league_rosters(db, session_id: str, user_id: str, league_id: str):
     cursor.execute(delete_query)
     db.commit()
     cursor.close()
-    print("Players Deleted.")
     return
 
 
@@ -697,7 +694,6 @@ def clean_player_trades(db, league_id: str) -> None:
     cursor = db.cursor()
     cursor.execute(delete_query)
     db.commit()
-    print("Player trades Deleted")
     return
 
 
@@ -708,7 +704,6 @@ def clean_draft_trades(db, league_id: str) -> None:
     cursor = db.cursor()
     cursor.execute(delete_query)
     db.commit()
-    print("Draft Pick Trades Deleted.")
     return
 
 
@@ -717,7 +712,6 @@ def clean_league_picks(db, league_id: str, session_id: str) -> None:
     cursor = db.cursor()
     cursor.execute(delete_query)
     cursor.close()
-    print("Draft Picks Deleted.")
     return
 
 
@@ -805,7 +799,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
     """,
         tuple(draft_adds_db),
-        page_size=1000,
+        page_size=1500,
     )
     execute_batch(
         cursor,
@@ -813,7 +807,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)  
     """,
         tuple(draft_drops_db),
-        page_size=1000,
+        page_size=1500,
     )
     execute_batch(
         cursor,
@@ -821,7 +815,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
     VALUES (%s, %s, %s, %s, %s, %s) 
     """,
         tuple(player_adds_db),
-        page_size=1000,
+        page_size=1500,
     )
     execute_batch(
         cursor,
@@ -829,7 +823,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
     VALUES (%s, %s, %s, %s, %s, %s) 
     """,
         tuple(player_drops_db),
-        page_size=1000,
+        page_size=1500,
     )
     db.commit()
     cursor.close()
