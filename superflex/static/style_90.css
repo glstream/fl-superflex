@@ -1352,6 +1352,13 @@ a.dt-button {
     z-index: 2;
 }
 
+#league_meta {
+    position: absolute;
+    top: -4%;
+    right: -2%;
+    z-index: 2;
+}
+
 #contender_leagues_ranks {
     position: absolute;
     bottom: -3%;

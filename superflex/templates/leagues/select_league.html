@@ -49,16 +49,36 @@
                 </h5>
 
 
-                <div id="power_leagues_ranks">
-                    <span class="badge bg-light d-inline-block mr-2 big-badge">Power Ranks</span> <span
-                        class="badge bg-light d-inline-block mr-2 big-badge">KTC {{league.ktc_power_rank |
-                        select_league_ranks}}</span>
-                    <span class="badge bg-light d-inline-block mr-2 big-badge"> SF {{league.sf_power_rank |
-                        select_league_ranks}}</span>
-                    <span class="badge bg-light  d-inline-block mr-5 big-badge"> FC {{league.fc_power_rank |
-                        select_league_ranks}}</span>
-                    <span class="badge bg-light  d-inline-block mr-5 big-badge"> DP {{league.dp_power_rank |
-                        select_league_ranks}}</span>
+                <div style="background-color: transparent;" id="league_meta">
+                    <h5>
+                        {% if league.league_cat == 0 %}
+                        <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>
+                        {% endif %}
+                        {% if league.league_cat == 1 %}
+                        <span class="badge alert-light">{{league.league_cat | league_cat}}</span>
+                        {% endif %}
+                        {% if league.league_cat == 2 %}
+                        <span class="badge alert-success">{{league.league_cat | league_cat}}</span>
+                        {% endif %}
+                        {% if league.total_rosters < 12 %} <span class="badge alert-success">{{league.total_rosters}}
+                            Team</span>
+                            {% endif %}
+                            {% if league.total_rosters == 12 %}
+                            <span class="badge alert-danger">{{league.total_rosters}} Team</span>
+                            {% endif %}
+                            {% if league.total_rosters > 12 %}
+                            <span class="badge alert-light">{{league.total_rosters}} Team</span>
+                            {% endif %}
+                            {% if league.qb_cnt + league.sf_cnt > 1 %}
+                            <span class="badge alert-secondary">Superflex</span>
+                            {% else %}
+                            <span class="badge alert-primary">Single QB</span>
+                            {% endif %}
+
+                            <span class="badge bg-warning">{{league.starter_cnt}} Starters</span>
+
+
+                    </h5>
                 </div>
                 <!-- <div id="contender_leagues_ranks">
                     <span class="badge bg-light d-inline-block mr-2 big-badge">Contender Ranks</span> <span
@@ -71,37 +91,6 @@
                     <span class="badge bg-light  d-inline-block big-badge"> FC {{league.fc_contender_rank |
                         select_league_ranks}}</span>
                 </div> -->
-
-
-                <h5>
-                    {% if league.league_cat == 0 %}
-                    <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>
-                    {% endif %}
-                    {% if league.league_cat == 1 %}
-                    <span class="badge alert-light">{{league.league_cat | league_cat}}</span>
-                    {% endif %}
-                    {% if league.league_cat == 2 %}
-                    <span class="badge alert-success">{{league.league_cat | league_cat}}</span>
-                    {% endif %}
-                    {% if league.total_rosters < 12 %} <span class="badge alert-success">{{league.total_rosters}}
-                        Team</span>
-                        {% endif %}
-                        {% if league.total_rosters == 12 %}
-                        <span class="badge alert-danger">{{league.total_rosters}} Team</span>
-                        {% endif %}
-                        {% if league.total_rosters > 12 %}
-                        <span class="badge alert-light">{{league.total_rosters}} Team</span>
-                        {% endif %}
-                        {% if league.qb_cnt + league.sf_cnt > 1 %}
-                        <span class="badge alert-secondary">Superflex</span>
-                        {% else %}
-                        <span class="badge alert-primary">Single QB</span>
-                        {% endif %}
-
-                        <span class="badge bg-warning">{{league.starter_cnt}} Starters</span>
-
-
-                </h5>
                 <form method="post" class="form-inline">
                     <div class="btn-group flex-wrap" style="gap:10px;background-color: rgba(143, 145, 146, 0.25)">
                         <div class="dropdown">
