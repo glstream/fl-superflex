@@ -14,6 +14,7 @@ from datetime import datetime
 from superflex.db import pg_db
 from sleeper import *
 from helpers import *
+from psycopg2.extras import execute_batch, execute_values
 
 bp = Blueprint("leagues", __name__, url_prefix="/")
 bp.secret_key = str(uuid.uuid4())
@@ -532,7 +533,7 @@ def select_league():
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     cursor.execute(
-        f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year  from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
+        f"select session_id, cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank from dynastr.current_leagues cl left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  where session_id = '{str(session_id)}' and cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
     )
 
     leagues = cursor.fetchall()
@@ -679,6 +680,30 @@ def get_league():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, ktc_power_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , ktc_power_rank = EXCLUDED.ktc_power_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in owners
+                ]
+            ),
+        )
+        cursor.close()
         radar_chart_data = [
             {
                 "display_name": i["display_name"],
@@ -961,6 +986,30 @@ def get_league_sf():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, sf_power_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , sf_power_rank = EXCLUDED.sf_power_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in owners
+                ]
+            ),
+        )
+        cursor.close()
         radar_chart_data = [
             {
                 "display_name": i["display_name"],
@@ -1227,6 +1276,30 @@ def get_league_fc():
             )
         owner_cursor.execute(get_league_summary_sql)
         owners = owner_cursor.fetchall()
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, fc_power_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , fc_power_rank = EXCLUDED.fc_power_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in owners
+                ]
+            ),
+        )
+        cursor.close()
         radar_chart_data = [
             {
                 "display_name": i["display_name"],
@@ -1494,6 +1567,30 @@ def get_league_dp():
 
         owner_cursor.execute(get_league_dp_summary_sql)
         owners = owner_cursor.fetchall()
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, dp_power_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , dp_power_rank = EXCLUDED.dp_power_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in owners
+                ]
+            ),
+        )
+        cursor.close()
         radar_chart_data = [
             {
                 "display_name": i["display_name"],
@@ -2485,7 +2582,30 @@ def contender_rankings():
             )
         c_owners_cursor.execute(contender_rankings_summary_sql)
         c_owners = c_owners_cursor.fetchall()
-
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, espn_contender_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , espn_contender_rank = EXCLUDED.espn_contender_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in c_owners
+                ]
+            ),
+        )
+        cursor.close()
         radar_chart_data = [
             {
                 "display_name": i["display_name"],
@@ -2752,6 +2872,31 @@ def fc_contender_rankings():
 
         fc_owners = fc_owners_cursor.fetchall()
 
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, fc_contender_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , fc_contender_rank = EXCLUDED.fc_contender_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in fc_owners
+                ]
+            ),
+        )
+        cursor.close()
+
         radar_chart_data = [
             {
                 "display_name": i["display_name"],
@@ -3008,6 +3153,30 @@ def nfl_contender_rankings():
         nfl_owners_cursor.execute(contender_rankings_nfl_summary_sql)
 
         nfl_owners = nfl_owners_cursor.fetchall()
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, nfl_contender_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , nfl_contender_rank = EXCLUDED.nfl_contender_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in nfl_owners
+                ]
+            ),
+        )
+        cursor.close()
 
         radar_chart_data = [
             {
@@ -3269,6 +3438,31 @@ def fp_contender_rankings():
         fp_owners_cursor.execute(contender_rankings_fp_summary_sql)
 
         fp_owners = fp_owners_cursor.fetchall()
+
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, fp_contender_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , fp_contender_rank = EXCLUDED.fp_contender_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in fp_owners
+                ]
+            ),
+        )
+        cursor.close()
 
         radar_chart_data = [
             {

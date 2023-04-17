@@ -102,6 +102,17 @@ def create_app(test_config=None):
             mimetype="image/vnd.microsoft.icon",
         )
 
+    @app.template_filter("select_league_ranks")
+    def get_owners(rank: str) -> str:
+        if rank is None:
+            output = "-"
+        else:
+            ith = {1: "st", 2: "nd", 3: "rd"}.get(
+                int(rank) % 10 * (int(rank) % 100 not in [11, 12, 13]), "th"
+            )
+            output = f"{rank}{ith}"
+        return output
+
     @app.route("/ads.txt")
     def ads_txt():
         return send_from_directory(os.path.join(app.root_path, "static"), "ads.txt")
