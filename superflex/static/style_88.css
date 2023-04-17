@@ -350,9 +350,8 @@ table {
 }
 
 .badge.bg-light {
-    outline-color: rgb(39, 125, 161) !important;
-    border-color: rgb(39, 125, 161) !important;
-    background-color: rgb(39, 125, 161, .75) !important;
+    color: var(--inverse-color) !important;
+    border: 1px solid var(--inverse-color);
 }
 
 .badge.alert-secondary {
