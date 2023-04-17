@@ -13,6 +13,7 @@
 .light-theme {
     --background-color: #ffffff;
     --text-color: #000000;
+    --outline-color: #55555581;
     --padding-color: #f0f0f0;
     --inverse-color: #555555;
     --button-outline-color: rgb(87, 117, 144);
@@ -22,9 +23,10 @@
 .dark-theme {
     --background-color: #424242;
     --text-color: #ffffff;
+    --outline-color: #ffffff80;
     --padding-color: #555555;
     --inverse-color: #555555;
-    --button-outline-color: #ffffff;
+    --button-outline-color: #ffffffe0;
     --link-color: #bdbaba;
 }
 
@@ -397,21 +399,23 @@ table {
 .card-fr {
     margin-bottom: 25px;
     margin-top: 25px;
-    padding: 1.5em .5em .5em;
+    padding: .33em .15em .15em;
     border-radius: .5em;
     box-shadow: 0 3px 5px rgba(104, 136, 150, 0.2);
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: .5rem;
+    margin-right: .5rem;
     /* border: 1em;
     border-style: solid;
     border-width: 1px 1px 1px 1px; 
     border-color: rgb(77, 144, 142); */
     background-color: rgba(143, 145, 146, 0.25);
+    border: 1px solid var(--outline-color);
 
 }
 
 .card-body {
-    background-color: transparent;
+    background-color: transparent !important;
+    padding: 1rem .5rem !important;
 }
 
 
@@ -792,7 +796,7 @@ a.right {
     width: 38px;
     height: 38px;
     border-radius: 7px;
-    border: .5px solid #6c757d59;
+    border: 1px solid var(--button-outline-color);
 }
 
 html {
@@ -1347,15 +1351,15 @@ a.dt-button {
 
 #power_leagues_ranks {
     position: absolute;
-    top: -4%;
+    top: -3%;
     left: -2%;
     z-index: 2;
 }
 
 #league_meta {
     position: absolute;
-    top: -4%;
-    right: -2%;
+    top: -10%;
+    right: -3%;
     z-index: 2;
 }
 
@@ -1366,7 +1370,84 @@ a.dt-button {
     z-index: 2;
 }
 
+.badge-spacing {
+    margin-right: 5px;
+    /* Adjust the value for desired spacing */
+}
+
 .big-badge {
     font-size: 1.2rem !important;
     padding: 0.25rem .5rem !important;
+}
+
+.custom-badge-league-type {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background-color: rgb(39, 125, 161);
+    /* Change the background color */
+    border: 1px solid var(--button-outline-color);
+    /* Change the border color, width, and style */
+    color: #fff;
+    /* Change the text color */
+}
+
+.custom-badge-teams {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background-color: rgb(249, 132, 74);
+    /* Change the background color */
+    border: 1px solid var(--button-outline-color);
+    /* Change the border color, width, and style */
+    color: #fff;
+    /* Change the text color */
+}
+
+.custom-badge-settings {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background-color: rgb(67, 170, 139);
+    /* Change the background color */
+    border: 1px solid var(--button-outline-color);
+    /* Change the border color, width, and style */
+    color: #fff;
+    /* Change the text color */
+}
+
+.custom-badge-cnt {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background-color: rgb(144, 190, 109);
+    /* Change the background color */
+    border: 1px solid var(--button-outline-color);
+    /* Change the border color, width, and style */
+    color: #fff;
+    /* Change the text color */
 }

@@ -1,41 +1,41 @@
 {% extends 'base.html' %} {% block header %} {% endblock %} {%block content%}
-<div class="col-md-6" style="padding-top: 20px;">
+<!-- <div class="col-md-6" style="padding-top: 20px;">
     <div class="card-body">
         <div class="row">
             {% if league_summary.dynasty > 0 %}
-            <h4><span class="badge alert-success">Dynasty {{league_summary.dynasty}}</span>
+            <h4><span class="custom-badge-league-type">Dynasty {{league_summary.dynasty}}</span>
                 {% endif %}
                 {% if league_summary.keeper > 0 %}
-                <span class="badge alert-light">Keeper {{league_summary.keeper}}</span>
+                <span class="custom-badge-league-type">Keeper {{league_summary.keeper}}</span>
                 {% endif %}
                 {% if league_summary.redraft > 0 %}
-                <span class="badge alert-dark">Redraft {{league_summary.redraft}}</span>
+                <span class="custom-badge-league-type">Redraft {{league_summary.redraft}}</span>
                 {% endif %}
                 {% if league_summary.eight_team > 0 %}
-                <span class="badge alert-success">8 Team {{league_summary.eight_team}}</span>
+                <span class="custom-badge-teams">8 Team {{league_summary.eight_team}}</span>
                 {% endif %}
                 {% if league_summary.ten_team > 0 %}
-                <span class="badge alert-success">10 Team {{league_summary.ten_team}}</span>
+                <span class="custom-badge-teams">10 Team {{league_summary.ten_team}}</span>
                 {% endif %}
                 {% if league_summary.twelve_team > 0 %}
-                <span class="badge alert-danger"> 12 Team {{league_summary.twelve_team}}</span>
+                <span class="custom-badge-teams"> 12 Team {{league_summary.twelve_team}}</span>
                 {% endif %}
                 {% if league_summary.sixteen_team > 0 %}
-                <span class="badge alert-light">16 Team {{league_summary.sixteen_team}}</span>
+                <span class="custom-badge-teams">16 Team {{league_summary.sixteen_team}}</span>
                 {% endif %}
                 {% if league_summary.thirtytwo_team > 0 %}
-                <span class="badge alert-light"> 32 Team {{league_summary.thirtytwo_team}}</span>
+                <span class="custom-badge-teams"> 32 Team {{league_summary.thirtytwo_team}}</span>
                 {% endif %}
                 {% if league_summary.superflex > 0 %}
-                <span class="badge alert-secondary">Superflex {{league_summary.superflex}}</span>
+                <span class="custom-badge-settings">Superflex {{league_summary.superflex}}</span>
                 {% endif %}
                 {% if league_summary.single_qb > 0 %}
-                <span class="badge alert-primary">Single QB {{league_summary.single_qb}}</span>
+                <span class="custom-badge-settings">Single QB {{league_summary.single_qb}}</span>
             </h4>
             {% endif %}
         </div>
     </div>
-</div>
+</div> -->
 
 <div class="row">
     {% for league in leagues[:leagues|length] %}
@@ -50,35 +50,15 @@
 
 
                 <div style="background-color: transparent;" id="league_meta">
-                    <h5>
-                        {% if league.league_cat == 0 %}
-                        <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>
-                        {% endif %}
-                        {% if league.league_cat == 1 %}
-                        <span class="badge alert-light">{{league.league_cat | league_cat}}</span>
-                        {% endif %}
-                        {% if league.league_cat == 2 %}
-                        <span class="badge alert-success">{{league.league_cat | league_cat}}</span>
-                        {% endif %}
-                        {% if league.total_rosters < 12 %} <span class="badge alert-success">{{league.total_rosters}}
-                            Team</span>
-                            {% endif %}
-                            {% if league.total_rosters == 12 %}
-                            <span class="badge alert-danger">{{league.total_rosters}} Team</span>
-                            {% endif %}
-                            {% if league.total_rosters > 12 %}
-                            <span class="badge alert-light">{{league.total_rosters}} Team</span>
-                            {% endif %}
-                            {% if league.qb_cnt + league.sf_cnt > 1 %}
-                            <span class="badge alert-secondary">Superflex</span>
-                            {% else %}
-                            <span class="badge alert-primary">Single QB</span>
-                            {% endif %}
-
-                            <span class="badge bg-warning">{{league.starter_cnt}} Starters</span>
-
-
-                    </h5>
+                    <span class="custom-badge-league-type badge-spacing">{{league.league_cat | league_cat}}</span>
+                    <span class="custom-badge-teams badge-spacing">{{league.total_rosters}}
+                        Team</span>
+                    {% if league.qb_cnt + league.sf_cnt > 1 %}
+                    <span class="custom-badge-settings badge-spacing">Superflex</span>
+                    {% else %}
+                    <span class="custom-badge-settings badge-spacing">Single QB</span>
+                    {% endif %}
+                    <span class="custom-badge-cnt">{{league.starter_cnt}} Starters</span>
                 </div>
                 <!-- <div id="contender_leagues_ranks">
                     <span class="badge bg-light d-inline-block mr-2 big-badge">Contender Ranks</span> <span
@@ -91,14 +71,14 @@
                     <span class="badge bg-light  d-inline-block big-badge"> FC {{league.fc_contender_rank |
                         select_league_ranks}}</span>
                 </div> -->
-                <form method="post" class="form-inline">
-                    <div class="btn-group flex-wrap" style="gap:10px;background-color: rgba(143, 145, 146, 0.25)">
+                <form method="post" class="form-inline" style="background-color:transparent">
+                    <div class="btn-group flex-wrap" style="gap:7px;background-color: transparent">
                         <div class="dropdown">
 
-                            <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 14px;"
+                            <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 12px;"
                                 type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                 aria-expanded="false">
-                                Power Rankings
+                                Dynasty Ranks
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                                 <button class="dropdown-item" type="submit" name="get_league"
@@ -122,10 +102,10 @@
                         </div>
                         <div class="dropdown">
 
-                            <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 14px;"
+                            <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 12px;"
                                 type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                 aria-expanded="false">
-                                Contender Rankings
+                                Contender Ranks
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                                 <button class="dropdown-item" type="submit" name="contender_rankings"
@@ -151,10 +131,10 @@
                         </div>
                         <div class="dropdown">
                             <form method="post" class="form-inline">
-                                <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 14px;"
+                                <button class="btn btn-outline-primary dropdown-toggle" style="font-size: 12px;"
                                     type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false">
-                                    Trade Tracker
+                                    Trades
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
                                     style="font-size: 14px;">
