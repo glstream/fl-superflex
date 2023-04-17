@@ -48,6 +48,31 @@
                 <h5 class="card-title" style="font-size: 18px;">{{league.league_name}} &bull; {{league.league_year}}
                 </h5>
 
+
+                <div id="power_leagues_ranks">
+                    <span class="badge bg-warning d-inline-block mr-2 big-badge">Power Ranks</span> <span
+                        class="badge bg-primary d-inline-block mr-2 big-badge">KTC {{league.ktc_power_rank |
+                        select_league_ranks}}</span>
+                    <span class="badge bg-primary d-inline-block mr-2 big-badge"> SF {{league.sf_power_rank |
+                        select_league_ranks}}</span>
+                    <span class="badge bg-primary  d-inline-block mr-5 big-badge"> FC {{league.fc_power_rank |
+                        select_league_ranks}}</span>
+                    <span class="badge bg-primary  d-inline-block mr-5 big-badge"> DP {{league.dp_power_rank |
+                        select_league_ranks}}</span>
+                </div>
+                <div id="contender_leagues_ranks">
+                    <span class="badge bg-warning d-inline-block mr-2 big-badge">Contender Ranks</span> <span
+                        class="badge bg-primary d-inline-block mr-2 big-badge">ESPN {{league.espn_contender_rank |
+                        select_league_ranks}}</span>
+                    <span class="badge bg-primary  d-inline-block big-badge"> NFL {{league.nfl_contender_rank |
+                        select_league_ranks}}</span>
+                    <span class="badge bg-primary  d-inline-block big-badge"> FP {{league.fp_contender_rank |
+                        select_league_ranks}}</span>
+                    <span class="badge bg-primary  d-inline-block big-badge"> FC {{league.fc_contender_rank |
+                        select_league_ranks}}</span>
+                </div>
+
+
                 <h5>
                     {% if league.league_cat == 0 %}
                     <span class="badge alert-dark">{{league.league_cat | league_cat}}</span>

@@ -1341,3 +1341,26 @@ a.dt-button {
     background-color: transparent !important;
     /* Replace #your-color with your desired color */
 }
+
+.card-fr {
+    position: relative;
+}
+
+#power_leagues_ranks {
+    position: absolute;
+    top: -4%;
+    left: -2%;
+    z-index: 2;
+}
+
+#contender_leagues_ranks {
+    position: absolute;
+    bottom: -3%;
+    left: -2%;
+    z-index: 2;
+}
+
+.big-badge {
+    font-size: 1.2rem !important;
+    padding: 0.25rem .5rem !important;
+}
