@@ -2,11 +2,11 @@
 fc_button='',sf_button='',
 espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_tt_button='', sf_tt_button='') %}
 <form method="post" class="form-inline">
-    <div class="btn-group flex-wrap" style="gap:10px">
+    <div class="btn-group flex-wrap" style="gap:5px">
         <div class="dropdown">
             <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
                 id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Power Rankings
+                Dynasty Ranks
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                 <button class="dropdown-item" type="submit" name="get_league" value="{{session_id, user_id, league_id}}"
@@ -25,9 +25,9 @@ espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_t
         <div class="dropdown">
             <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
                 id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Contender Rankings
+                Contender Ranks
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 12px;">
                 <button class="dropdown-item" type="submit" name="contender_rankings"
                     value="{{session_id, user_id, league_id}}" {{espn_button}}>ESPN Projections</button>
                 <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
@@ -43,7 +43,7 @@ espn_button='', nfl_button='',fp_c_button='', tt_button='', fc_c_button='', fc_t
             <form method="post" class="form-inline">
                 <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
                     id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Trade Tracker
+                    Trades
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
                     <button class="dropdown-item" type="submit" name="trade_tracker"
