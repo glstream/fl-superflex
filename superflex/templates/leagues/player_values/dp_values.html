@@ -17,7 +17,6 @@
 <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
 
 <script>
-
     $(document).ready(function () {
         var table = $('#player-values-table').DataTable({
             dom: 'Brtip',
@@ -31,16 +30,44 @@
         $('#player-values-table').DataTable().column(6).search('superflex_sf_value').draw();
 
 
-        $('#sf-toggle, #sf-toggle-mobile').on('click', function () {
-            applyFilters();
+        $('#sf-toggle').on('click', function () {
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                table.column(6).search('sf_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
+                        $(row).toggle(false);
+                    }
+                });
+            } else {
+                table.column(6).search('one_qb_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
+                        $(row).toggle(true);
+                    }
+                });
+            }
         });
-
+        $('#sf-toggle-mobile').on('click', function () {
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                table.column(6).search('sf_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
+                        $(row).toggle(false);
+                    }
+                });
+            } else {
+                table.column(6).search('one_qb_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
+                        $(row).toggle(true);
+                    }
+                });
+            }
+        });
         // Add event listener for positionFilter checkboxes
         $('input[name="positionFilter"]').on('change', function () {
-            applyFilters();
-        });
-        // Add event listener for positionFilter checkboxes
-        $('input[name="positionFilter"]').on('click', function () {
             var isChecked = $('#sf-toggle').prop('checked') || $('#sf-toggle-mobile').prop('checked');
             var selectedPositions = [];
             $('input[name="positionFilter"]:checked').each(function () {
