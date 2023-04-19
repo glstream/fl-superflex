@@ -485,10 +485,12 @@ def select_league():
 
             startup_cursor = db.cursor()
             startup_cursor.execute(
-                f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+                f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
             )
             try:
-                startup = startup_cursor.fetchone()[0]
+                startup_pull = startup_cursor.fetchone()
+                startup = startup_pull[0]
+                year_entered = startup_pull[1]
             except:
                 startup = True
             startup_cursor.close()
@@ -595,10 +597,12 @@ def get_league():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
 
@@ -621,8 +625,9 @@ def get_league():
             refresh_epoch = round(
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
-
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -883,10 +888,12 @@ def get_league_sf():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -910,7 +917,9 @@ def get_league_sf():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -1182,10 +1191,12 @@ def get_league_fc():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -1209,7 +1220,9 @@ def get_league_fc():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -1472,10 +1485,12 @@ def get_league_dp():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -1499,7 +1514,9 @@ def get_league_dp():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -1757,10 +1774,12 @@ def get_league_fp():
         refresh_btn = league_data[-1]
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -1784,7 +1803,9 @@ def get_league_fp():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -1983,10 +2004,12 @@ def trade_tracker():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -2010,7 +2033,9 @@ def trade_tracker():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -2154,10 +2179,12 @@ def trade_tracker_fc():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -2181,7 +2208,9 @@ def trade_tracker_fc():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -2324,10 +2353,12 @@ def trade_tracker_sf():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -2351,7 +2382,9 @@ def trade_tracker_sf():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -2498,10 +2531,12 @@ def contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -2525,7 +2560,9 @@ def contender_rankings():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -2780,10 +2817,12 @@ def fc_contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -2807,7 +2846,9 @@ def fc_contender_rankings():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
 
         return redirect(
             url_for(
@@ -3070,10 +3111,12 @@ def nfl_contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -3097,7 +3140,9 @@ def nfl_contender_rankings():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
         return redirect(
             url_for(
                 f"leagues.{button}",
@@ -3353,10 +3398,12 @@ def fp_contender_rankings():
 
         startup_cursor = db.cursor()
         startup_cursor.execute(
-            f"select previous_league_id from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
         )
         try:
-            startup = startup_cursor.fetchone()[0]
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
         except:
             startup = True
         startup_cursor.close()
@@ -3380,7 +3427,9 @@ def fp_contender_rankings():
                 (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
 
-            player_manager_upates(db, button, session_id, user_id, league_id, startup)
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
         return redirect(
             url_for(
                 f"leagues.{button}",
