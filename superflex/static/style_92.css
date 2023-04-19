@@ -925,6 +925,10 @@ table.dataTable {
     margin-left: 0 !important;
 }
 
+table.dataTable tbody tr {
+    background-color: var(--background-color) !important;
+}
+
 .styled-table {
     font-size: 0.9em;
     font-family: sans-serif;

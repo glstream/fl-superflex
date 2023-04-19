@@ -3,31 +3,6 @@
 {% endblock %} {% block content %}
 
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script>toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "progressBar": true,
-        "positionClass": "toast-top-full-width",
-        "preventDuplicates": true,
-        "onclick": null,
-        "showDuration": "1000",
-        "hideDuration": "0",
-        "timeOut": "0",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-
-    var toast = toastr.info('Discover the new SuperFlex Rankings! Try them out in Power Rankings drop down.');
-
-    // Add a click event listener to the toast
-    toast.click(function () {
-        toastr.clear(toast); // Close the toast on click
-    });
-</script>
 <section style="background-color: #577590;border-radius: 1rem;">
     <div class="container py-5 h-100" style="background-color: #577590;">
         <div class="row d-flex justify-content-center align-items-center h-100">
