@@ -140,7 +140,7 @@ def get_sleeper_state() -> str:
     return state
 
 
-def get_trades(league_id: str, nfl_state: dict) -> list:
+def get_trades(league_id: str, nfl_state: dict, year_entered: str) -> list:
     leg = nfl_state["leg"] if nfl_state["leg"] > 0 else 1
     all_trades = []
     if nfl_state["season_type"] != "off":
@@ -152,7 +152,7 @@ def get_trades(league_id: str, nfl_state: dict) -> list:
             all_trades.extend(transactions)
             # week += 1
         trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
-    else:
+    elif year_entered != nfl_state["season"]:
         for week in range(1, 18):
             transactions = make_api_call(
                 f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}"
@@ -162,6 +162,12 @@ def get_trades(league_id: str, nfl_state: dict) -> list:
             trades_payload = [
                 p for p in [i for i in all_trades] if p["type"] == "trade"
             ]
+    else:
+        transactions = make_api_call(
+            f"https://api.sleeper.app/v1/league/{league_id}/transactions/1"
+        )
+        all_trades.extend(transactions)
+        trades_payload = [p for p in [i for i in all_trades] if p["type"] == "trade"]
 
     return trades_payload
 
@@ -369,6 +375,7 @@ def player_manager_upates(
     user_id: str,
     league_id: str,
     startup,
+    year_entered,
     refresh=False,
 ):
     try:
@@ -388,7 +395,7 @@ def player_manager_upates(
         clean_player_trades(db, league_id)
         clean_draft_trades(db, league_id)
         # get trades
-        trades = get_trades(league_id, get_sleeper_state())
+        trades = get_trades(league_id, get_sleeper_state(), year_entered)
         # insert trades draft Positions
         insert_trades(db, trades, league_id)
     except:
