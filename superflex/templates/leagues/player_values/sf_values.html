@@ -70,6 +70,7 @@
         });
         // Add event listener for positionFilter checkboxes
         $('input[name="positionFilter"]').on('change', function () {
+            var isChecked = $('#sf-toggle').prop('checked') || $('#sf-toggle-mobile').prop('checked');
             var selectedPositions = [];
             $('input[name="positionFilter"]:checked').each(function () {
                 selectedPositions.push($(this).val());
@@ -81,11 +82,24 @@
 
             // Build regex pattern for selected positions
             var regexPattern = "^(" + selectedPositions.join("|") + ")$";
-
-            // Apply regex pattern to "Position" column search filter
-            table.column(5).search(regexPattern, true, false).draw();
-
-
+            if (isChecked) {
+                // Apply regex pattern to "Position" column search filter
+                table.column(5).search(regexPattern, true, false).draw();
+                table.column(6).search('sf_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
+                        $(row).toggle(false);
+                    }
+                });
+            } else {
+                table.column(5).search(regexPattern, true, false).draw();
+                table.column(6).search('one_qb_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
+                        $(row).toggle(true);
+                    }
+                });
+            }
         });
     });
 </script>
