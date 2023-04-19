@@ -470,64 +470,68 @@ def select_league():
 
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
-    session_id = session.get("session_id", str(uuid.uuid4()))
-    user_id = session["user_id"]
-    session_year = session["league_year"]
+    try:
+        session_id = session.get("session_id", str(uuid.uuid4()))
+        user_id = session["user_id"]
+        session_year = session["league_year"]
 
-    if request.method == "POST":
-        button = list(request.form)[0]
-        league_data = eval(request.form[button])
-        session_id = league_data[0]
-        user_id = league_data[1]
-        league_id = league_data[2]
-        session_league_id = session["session_league_id"] = league_id
+        if request.method == "POST":
+            button = list(request.form)[0]
+            league_data = eval(request.form[button])
+            session_id = league_data[0]
+            user_id = league_data[1]
+            league_id = league_data[2]
+            session_league_id = session["session_league_id"] = league_id
 
-        startup_cursor = db.cursor()
-        startup_cursor.execute(
-            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
-        )
-        try:
-            startup_pull = startup_cursor.fetchone()
-            startup = startup_pull[0]
-            year_entered = startup_pull[1]
-        except:
-            startup = True
-            year_entered = "2001"
-            year_entered = "2001"
-        startup_cursor.close()
-
-        refresh_cursor = db.cursor()
-        refresh_cursor.execute(
-            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
-        )
-        refresh = refresh_cursor.fetchone()
-        refresh_cursor.close()
-
-        if refresh is not None:
-            print("HAS PLAYERS")
-            refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
-            refresh_epoch = round(
-                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            startup_cursor = db.cursor()
+            startup_cursor.execute(
+                f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
             )
-        else:
-            refresh_epoch = round(
-                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-            )
+            try:
+                startup_pull = startup_cursor.fetchone()
+                startup = startup_pull[0]
+                year_entered = startup_pull[1]
+            except:
+                startup = True
+                year_entered = "2001"
+                year_entered = "2001"
+            startup_cursor.close()
 
-            player_manager_upates(
-                db, button, session_id, user_id, league_id, startup, year_entered
+            refresh_cursor = db.cursor()
+            refresh_cursor.execute(
+                f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
             )
-        return redirect(
-            url_for(
-                f"leagues.{button}",
-                session_id=session_id,
-                league_id=league_id,
-                user_id=user_id,
-                session_league_id=session_league_id,
-                rdm=refresh_epoch,
+            refresh = refresh_cursor.fetchone()
+            refresh_cursor.close()
+
+            if refresh is not None:
+                print("HAS PLAYERS")
+                refresh_date = refresh[-1]
+                refresh_datetime = datetime.strptime(
+                    refresh_date, "%Y-%m-%dT%H:%M:%S.%f"
+                )
+                refresh_epoch = round(
+                    (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+                )
+            else:
+                refresh_epoch = round(
+                    (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+                )
+
+                player_manager_upates(
+                    db, button, session_id, user_id, league_id, startup, year_entered
+                )
+            return redirect(
+                url_for(
+                    f"leagues.{button}",
+                    session_id=session_id,
+                    league_id=league_id,
+                    user_id=user_id,
+                    session_league_id=session_league_id,
+                    rdm=refresh_epoch,
+                )
             )
-        )
+    except:
         return redirect(url_for("leagues.index"))
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
