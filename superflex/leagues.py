@@ -517,7 +517,7 @@ def select_league():
                 )
 
                 player_manager_upates(
-                    db, button, session_id, user_id, league_id, startup
+                    db, button, session_id, user_id, league_id, startup, year_entered
                 )
             return redirect(
                 url_for(
