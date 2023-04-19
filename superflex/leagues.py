@@ -494,7 +494,6 @@ def select_league():
             except:
                 startup = True
                 year_entered = "2001"
-                year_entered = "2001"
             startup_cursor.close()
 
             refresh_cursor = db.cursor()
