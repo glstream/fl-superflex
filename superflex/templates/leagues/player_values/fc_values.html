@@ -31,19 +31,45 @@
         $('#player-values-table').DataTable().column(6).search('superflex_sf_value').draw();
 
 
-        $('#sf-toggle, #sf-toggle-mobile').on('click', function () {
-            applyFilters();
+        $('#sf-toggle').on('click', function () {
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                table.column(6).search('sf_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
+                        $(row).toggle(false);
+                    }
+                });
+            } else {
+                table.column(6).search('one_qb_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
+                        $(row).toggle(true);
+                    }
+                });
+            }
         });
-
+        $('#sf-toggle-mobile').on('click', function () {
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                table.column(6).search('sf_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
+                        $(row).toggle(false);
+                    }
+                });
+            } else {
+                table.column(6).search('one_qb_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
+                        $(row).toggle(true);
+                    }
+                });
+            }
+        });
         // Add event listener for positionFilter checkboxes
         $('input[name="positionFilter"]').on('change', function () {
-            applyFilters();
-        });
-        function applyFilters() {
             var isChecked = $('#sf-toggle').prop('checked') || $('#sf-toggle-mobile').prop('checked');
-            var valueColumnIndex = isChecked ? 6 : 7; // Change index to match your data
-            var searchValue = isChecked ? 'sf_value' : 'one_qb_value';
-
             var selectedPositions = [];
             $('input[name="positionFilter"]:checked').each(function () {
                 selectedPositions.push($(this).val());
@@ -51,23 +77,29 @@
             if (selectedPositions.length === 0) {
                 // If no positions are selected, show all rows in the table
                 table.search('').columns().search('').draw();
-            } else {
-                // Build regex pattern for selected positions
-                var regexPattern = "^(" + selectedPositions.join("|") + ")$";
-
-                // Apply regex pattern to "Position" column search filter
-                table.column(5).search(regexPattern, true, false).draw();
             }
 
-            table.column(valueColumnIndex).search(searchValue).draw();
-            table.rows().nodes().each(function (row) {
-                if ($(row).find('td:eq(' + valueColumnIndex + ')').text() != searchValue) {
-                    $(row).toggle(false);
-                } else {
-                    $(row).toggle(true);
-                }
-            });
-        }
+            // Build regex pattern for selected positions
+            var regexPattern = "^(" + selectedPositions.join("|") + ")$";
+            if (isChecked) {
+                // Apply regex pattern to "Position" column search filter
+                table.column(5).search(regexPattern, true, false).draw();
+                table.column(6).search('sf_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() != 'superflex_sf_value') {
+                        $(row).toggle(false);
+                    }
+                });
+            } else {
+                table.column(5).search(regexPattern, true, false).draw();
+                table.column(6).search('one_qb_value').draw(); // Change index to match your data
+                table.rows().nodes().each(function (row) {
+                    if ($(row).find('td:eq(6)').text() == 'superflex_one_qb_value') {
+                        $(row).toggle(true);
+                    }
+                });
+            }
+        });
     });
 </script>
 
