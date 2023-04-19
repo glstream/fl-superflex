@@ -493,6 +493,7 @@ def select_league():
                 year_entered = startup_pull[1]
             except:
                 startup = True
+                year_entered = "2001"
             startup_cursor.close()
 
             refresh_cursor = db.cursor()
@@ -605,6 +606,7 @@ def get_league():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
 
         startup_cursor.close()
 
@@ -896,6 +898,7 @@ def get_league_sf():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1199,6 +1202,7 @@ def get_league_fc():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1493,6 +1497,7 @@ def get_league_dp():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -1782,6 +1787,7 @@ def get_league_fp():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2012,6 +2018,7 @@ def trade_tracker():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2187,6 +2194,7 @@ def trade_tracker_fc():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2361,6 +2369,7 @@ def trade_tracker_sf():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2539,6 +2548,7 @@ def contender_rankings():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -2825,6 +2835,7 @@ def fc_contender_rankings():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -3119,6 +3130,7 @@ def nfl_contender_rankings():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
@@ -3406,6 +3418,7 @@ def fp_contender_rankings():
             year_entered = startup_pull[1]
         except:
             startup = True
+            year_entered = "2001"
         startup_cursor.close()
 
         refresh_cursor = db.cursor()
