@@ -45,7 +45,7 @@ SELECT *
                                     , a1.transaction_type
                                     , a1.asset as asset
                                     , a1.asset as player_name
-                                    , fc.league_type as value
+                                    , coalesce(fc.sf_value,0) as value
                                     , m.display_name
                                     , null as player_id
                                     ,'' as _position
@@ -76,9 +76,8 @@ SELECT *
                                                 and transaction_type = 'add'
                                                 
                                                 )  a1
-                                    inner join dynastr.fc_player_ranks fc on a1.player_name = fc.player_full_name
+                                    left join (select * from dynastr.fc_player_ranks fc where fc.rank_type = 'dynasty') fc on a1.player_name = fc.player_full_name
                                     inner join dynastr.managers m on cast(a1.user_id as varchar) = cast(m.user_id as varchar)
-                                    where fc.rank_type = 'dynasty'
                                     ) t1                              
                                     order by 
                                     status_updated desc

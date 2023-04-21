@@ -113,6 +113,10 @@ def create_app(test_config=None):
             output = f"{rank}{ith}"
         return output
 
+    @app.template_filter("zero_val")
+    def zero_val(asset_val: str) -> str:
+        return asset_val if int(asset_val.replace(",", "")) > 0 else "-"
+
     @app.route("/ads.txt")
     def ads_txt():
         return send_from_directory(os.path.join(app.root_path, "static"), "ads.txt")

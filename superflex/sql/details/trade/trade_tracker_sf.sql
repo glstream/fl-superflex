@@ -44,7 +44,7 @@ SELECT *
                                     , a1.transaction_type
                                     , asset
                                     , player_name
-                                    , sf.league_type as value
+                                    , coalesce(sf.league_type,0) as value
                                     , m.display_name
                                     , null as player_id
                                     ,'' as _position
@@ -80,7 +80,7 @@ SELECT *
                                                 --and dpt.transaction_id IN ('832101872931274752')
                                                 
                                                 )  a1
-                                    inner join dynastr.sf_player_ranks sf on a1.player_name = sf.player_full_name
+                                    left join dynastr.sf_player_ranks sf on a1.player_name = sf.player_full_name
                                     inner join dynastr.managers m on cast(a1.user_id as varchar) = cast(m.user_id as varchar)
                                     
                                     ) t1                              
