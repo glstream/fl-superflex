@@ -58,8 +58,8 @@
 </h5>
 <br>
 <div class="container">
-    {{buttons_large(session_id, user_id, league_id,fc_tt_button='disabled')}}
 
+    {{buttons_large(session_id, user_id, league_id,fc_tt_button='disabled')}}
     <div class="table-responsive">
         <table class="table rounded table-hover" style="width:75%;font-size: 14px;" id="trade_tracker_fc">
             <thead class="" style="text-align:center">
@@ -174,7 +174,8 @@
                             {{ asset.asset }}
                             {%endif%}
                         </div>
-                        <span class="b-transparent" class="text-lg-right">{{"{:,}".format(asset.value)}}</span>
+                        <span class="b-transparent" class="text-lg-right">{{"{:,}".format(asset.value) |
+                            zero_val }}</span>
                     </li>
                     {% endfor %}
                 </ul>
