@@ -931,6 +931,11 @@ table.dataTable {
     background-color: transparent !important;
 }
 
+.dt-button span {
+    background-color: transparent !important;
+    color: #000000 !important;
+}
+
 
 .styled-table {
     font-size: 0.9em;
