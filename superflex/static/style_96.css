@@ -925,7 +925,6 @@ table.dataTable {
     max-width: 1000px !important;
     border-collapse: collapse !important;
     margin-left: 0 !important;
-    background-color: transparent !important;
 }
 
 #power_ranks_table.table.dataTable tbody tr {
