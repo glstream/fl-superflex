@@ -927,6 +927,10 @@ table.dataTable {
     margin-left: 0 !important;
 }
 
+#power_ranks_table.table.dataTable tbody tr {
+    background-color: transparent !important;
+}
+
 
 .styled-table {
     font-size: 0.9em;
