@@ -43,7 +43,7 @@ def team_view(user_id, league_id, session_id, view_source):
             (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
         )
 
-        player_manager_upates(db, button, session_id, user_id, league_id, startup=False)
+        # player_manager_upates(db, button, session_id, user_id, league_id, startup=False, year_entered='2023')
         return redirect(
             url_for(
                 f"leagues.{button}",
