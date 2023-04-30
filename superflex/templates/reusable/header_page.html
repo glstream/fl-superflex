@@ -1,5 +1,5 @@
 {% macro league_header(league_name, user_name, refresh_time, league_year, league_cat, total_rosters,
-starter_cnt,qb_cnt, sf_cnt, session_id, user_id, league_id, avatar=[''],source='') %}
+starter_cnt,qb_cnt, sf_cnt, session_id, user_id, league_id, avatar=[''], page_type='', source='') %}
 <div class="card-pr">
     <div class="header-sub">
         <div style="background-color: rgb(39, 125, 161);">
@@ -30,7 +30,7 @@ starter_cnt,qb_cnt, sf_cnt, session_id, user_id, league_id, avatar=[''],source='
             <form method="post" class="form-inline">
                 <div
                     style="display: flex; flex-direction: column; align-items: flex-start;background-color: rgb(39, 125, 161);">
-                    <button class="btn btn-outline-light float-right btn-sm" type="submit" name="get_league"
+                    <button class="btn btn-outline-light float-right btn-sm" type="submit" name="{{page_type}}"
                         value="{{session_id, user_id, league_id, True}}"><i class="fa fa-refresh"
                             aria-hidden="true"></i>
                         | refresh league</button>
