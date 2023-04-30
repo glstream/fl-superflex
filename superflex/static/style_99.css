@@ -1501,11 +1501,11 @@ a.dt-button {
 @media (max-width: 1000px) {
     .refresh-button-container {
         display: block;
-        margin-left: 15px;
     }
         .header-sub {
             display: flex;
             flex-wrap: wrap;
+            margin-left: 15px;
             justify-content: space-between;
             background-color: rgb(39, 125, 161);
         }
@@ -1515,12 +1515,11 @@ a.dt-button {
     .refresh-button-container {
         display: flex;
         align-items: center;
-        margin-left: 15px;
-        margin-right: 200px;
+        margin-right: 250px;
         
     }
         .header-sub {
-            margin-left: 150px;
+            margin-left: 100px;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
