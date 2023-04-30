@@ -4,44 +4,80 @@
 {% from 'reusable/buttons.html' import buttons_large %}
 <div class="row justify-content-center">
 
-    <h3><small class="text-muted">Team Views</small></h3> {{league_header(league_name, avatar)}}
-    <br>
-    <h5>
-        <span class="badge bg-dark-1">{{cur_league.league_year}}</span>
-        {% if cur_league.league_cat == 0 %}
-        <span class="badge alert-dark">{{cur_league.league_cat | league_cat}}</span>
-        {% endif %}
-        {% if cur_league.league_cat == 1 %}
-        <span class="badge alert-light">{{cur_league.league_cat | league_cat}}</span>
-        {% endif %}
-        {% if cur_league.league_cat == 2 %}
-        <span class="badge alert-success">{{cur_league.league_cat | league_cat}}</span>
-        {% endif %}
-        {% if cur_league.total_rosters < 12 %} <span class="badge alert-success">{{cur_league.total_rosters}}
-            Team
-            </span>
-            {% endif %}
-            {% if cur_league.total_rosters == 12 %}
-            <span class="badge alert-danger">{{cur_league.total_rosters}} Team</span>
-            {% endif %}
-            {% if cur_league.total_rosters > 12 %}
-            <span class="badge alert-light">{{cur_league.total_rosters}} Team</span>
-            {% endif %}
-            {% if cur_league.qb_cnt + cur_league.sf_cnt > 1 %}
-            <span class="badge alert-secondary">Superflex</span>
-            {% else %}
-            <span class="badge alert-primary">Single QB</span>
-            {% endif %}
-
-            <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
-
-    </h5>
-    <div style="display: inline-block;">
-        <h3>User &bull; {{user_name}} &bull; <small class="text-muted">{{rankings_source}}</small>
-        </h3>
+<div class="card-pr">
+    <div class="header-sub">
+        <div style="background-color: rgb(39, 125, 161);">
+            <div
+                style="display: flex; align-items: center;margin-bottom: 10px;margin-top: 10px; background-color: rgb(39, 125, 161);">
+                <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
+                    onError="this.onerror=null;this.src='static/logos/logo_sf_small.jpg';" />
+                <span
+                    style="margin-left:10px;font-size: 28px;background-color: rgb(39, 125, 161);color: white;">{{league_name}}</span>
+            </div>
+            <div style="display: inline-block;background-color: rgb(39, 125, 161);">
+                <span style="font-size:18px;background-color: rgb(39, 125, 161);color: white;">User &bull; {{user_name}}
+                    &bull; Source &bull; {{source}}</span>
+            </div>
+        </div>
     </div>
+</div>
 
-    {{buttons_large(session_id, user_id, league_id,ktc_button='')}}
+
+<form method="post" class="form-inline">
+    <div class="btn-group flex-wrap" style="gap:5px;margin-left: 10px;">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
+                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dynasty Ranks
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
+                <button class="dropdown-item" type="submit" name="get_league" value="{{session_id, user_id, league_id}}"
+                    >KeepTradeCut</button>
+                <button class="dropdown-item" type="submit" name="get_league_sf"
+                    value="{{session_id, user_id, league_id}}">SuperFlex</button>
+                <!-- <button class="dropdown-item" type="submit" name="get_league_fp"
+                    value="{{session_id, user_id, league_id}}" {{fp_button}}>Fantasy Pros</button> -->
+                <button class="dropdown-item" type="submit" name="get_league_dp"
+                    value="{{session_id, user_id, league_id}}">Dynasty Process</button>
+                <button class="dropdown-item" type="submit" name="get_league_fc"
+                    value="{{session_id, user_id, league_id}}">FantasyCalc</button>
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
+                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Contender Ranks
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 12px;">
+                <button class="dropdown-item" type="submit" name="contender_rankings"
+                    value="{{session_id, user_id, league_id}}">-2023- ESPN Projections</button>
+                <button class="dropdown-item" type="submit" name="nfl_contender_rankings"
+                    value="{{session_id, user_id, league_id}}">-2022- NFL Projections</button>
+                <button class="dropdown-item" type="submit" name="fp_contender_rankings"
+                    value="{{session_id, user_id, league_id}}">-2022- Fantasy Pros
+                    Projections</button>
+                <button class="dropdown-item" type="submit" name="fc_contender_rankings"
+                    value="{{session_id, user_id, league_id}}">FantasyCalc</button>
+            </div>
+        </div>
+        <div class="dropdown">
+            <form method="post" class="form-inline">
+                <button class="btn btn-outline-primary btn-lg dropdown-toggle" style="font-size: 14px;" type="button"
+                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Trades
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size: 14px;">
+                    <button class="dropdown-item" type="submit" name="trade_tracker"
+                        value="{{session_id, user_id, league_id}}">KeepTradeCut</button>
+                    <button class="dropdown-item" type="submit" name="trade_tracker_fc"
+                        value="{{session_id, user_id, league_id}}" >FantasyCalc</button>
+                    <button class="dropdown-item" type="submit" name="trade_tracker_sf"
+                        value="{{session_id, user_id, league_id}}" >SuperFlex</button>
+                </div>
+        </div>
+    </div>
+</form>
 </div>
 <div class="row justify-content-center">
     <canvas id="myChart" width="400" height="350"></canvas>
