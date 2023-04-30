@@ -1,13 +1,47 @@
-{% macro league_header(league_name, avatar=[''], source='') %}
-<div class="">
-    <div style="display: flex;margin-right: 50px;">
-        <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
-            onError="this.onerror=null;this.src='static/logos/logo_sf_small.jpg';" />
+{% macro league_header(league_name, user_name, refresh_time, league_year, league_cat, total_rosters,
+starter_cnt,qb_cnt, sf_cnt, session_id, user_id, league_id, avatar=[''],source='') %}
+<div class="card-pr">
+    <div class="header-sub">
+        <div style="background-color: rgb(39, 125, 161);">
+            <div style="display: flex; align-items: center;margin-bottom: 10px; background-color: rgb(39, 125, 161);">
+                <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
+                    onError="this.onerror=null;this.src='static/logos/logo_sf_small.jpg';" />
+                <span
+                    style="margin-left:10px;font-size: 28px;background-color: rgb(39, 125, 161);color: white;">{{league_name}}</span>
+            </div>
 
-        <span><b>
-                <h1 style="margin-left:10px;">{{league_name}}</h1>
-            </b></span>
-
+            <h5 style="background-color: rgb(39, 125, 161);color: white;">
+                <span class="badge bg-light">{{league_year}}</span>
+                <span class="badge bg-light">{{league_cat | league_cat}}</span>
+                <span class="badge bg-light">{{total_rosters}} Team</span>
+                {% if qb_cnt + sf_cnt > 1 %}
+                <span class="badge bg-light">Superflex</span>
+                {% else %}
+                <span class="badge bg-light">Single QB</span>
+                {% endif %}
+                <span class="badge bg-light">{{starter_cnt}} Starters</span>
+            </h5>
+            <div style="display: inline-block;background-color: rgb(39, 125, 161);">
+                <span style="font-size:18px;background-color: rgb(39, 125, 161);color: white;">User &bull; {{user_name}}
+                    &bull; Source &bull; {{source}}</span>
+            </div>
+        </div>
+        <div class="refresh-button-container" style="margin-top: 5px;background-color: rgb(39, 125, 161);">
+            <form method="post" class="form-inline">
+                <div
+                    style="display: flex; flex-direction: column; align-items: flex-start;background-color: rgb(39, 125, 161);">
+                    <button class="btn btn-outline-light float-right btn-sm" type="submit" name="get_league"
+                        value="{{session_id, user_id, league_id, True}}"><i class="fa fa-refresh"
+                            aria-hidden="true"></i>
+                        | refresh league</button>
+                    <span
+                        style="margin-right: 10px;right: 0;font-size: 12px;background-color: rgb(39, 125, 161);color: white;">Refreshed
+                        {{
+                        refresh_time }} ago</span>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
 {% endmacro %}

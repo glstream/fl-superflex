@@ -10,52 +10,9 @@
         $('#trade_tracker').DataTable({ order: [[1, 'asc']], searching: false, paging: false, info: false });
     });
 </script>
-{{league_header(league_name, avatar)}}
-<div style="display: inline-block;">
-    <h3>User &bull; {{user_name}} &bull; Source &bull; <small class="text-muted"
-            style="margin-left: 1px;">SuperFlex</small> &bull; Trade Tracker
-    </h3>
-    <h7 style="margin-right: 10px;right: 0;">League refreshed {{ refresh_time }} ago</h7>
-</div>
-<div style="display: flex; gap:8px; margin-top: 5px;">
-    <form method="post" class="form-inline">
-        <button class="btn btn-outline-secondary float-right btn-sm" type="submit" name="trade_tracker"
-            value="{{session_id, user_id, league_id, True}}"><i class="fa fa-refresh" aria-hidden="true"></i>
-            | refresh league</button>
-    </form>
-</div>
-<br>
-<h5>
-    <span class="badge bg-dark-1">{{cur_league.league_year}}</span>
-    {% if cur_league.league_cat == 0 %}
-    <span class="badge alert-dark">{{cur_league.league_cat | league_cat}}</span>
-    {% endif %}
-    {% if cur_league.league_cat == 1 %}
-    <span class="badge alert-light">{{cur_league.league_cat | league_cat}}</span>
-    {% endif %}
-    {% if cur_league.league_cat == 2 %}
-    <span class="badge alert-success">{{cur_league.league_cat | league_cat}}</span>
-    {% endif %}
-    {% if cur_league.total_rosters < 12 %} <span class="badge alert-success">{{cur_league.total_rosters}}
-        Team
-        </span>
-        {% endif %}
-        {% if cur_league.total_rosters == 12 %}
-        <span class="badge alert-danger">{{cur_league.total_rosters}} Team</span>
-        {% endif %}
-        {% if cur_league.total_rosters > 12 %}
-        <span class="badge alert-light">{{cur_league.total_rosters}} Team</span>
-        {% endif %}
-        {% if cur_league.qb_cnt + cur_league.sf_cnt > 1 %}
-        <span class="badge alert-secondary">Superflex</span>
-        {% else %}
-        <span class="badge alert-primary">Single QB</span>
-        {% endif %}
-
-        <span class="badge bg-warning">{{cur_league.starter_cnt}} Starters</span>
-
-</h5>
-<br>
+{{league_header(league_name, user_name, refresh_time, cur_league.league_year,cur_league.league_cat | league_cat,
+cur_league.total_rosters, cur_league.starter_cnt,cur_league.qb_cnt, cur_league.sf_cnt, session_id, user_id, league_id,
+avatar, source='SuperFlex')}}
 <div class="container">
     {{buttons_large(session_id, user_id, league_id,sf_tt_button='disabled')}}
 

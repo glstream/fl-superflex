@@ -24,13 +24,13 @@ def seconds_text(refresh_time: int, nowtime: datetime.utcnow()) -> str:
         hours = (secs - days * 86400) // 3600
         minutes = (secs - days * 86400 - hours * 3600) // 60
         result = (
-            ("{} days, ".format(days) if days else "")
-            + ("{} hours, ".format(hours) if hours else "")
-            + ("{} minutes, ".format(minutes) if minutes else "")
+            ("{}d, ".format(days) if days else "")
+            + ("{}h, ".format(hours) if hours else "")
+            + ("{}m, ".format(minutes) if minutes else "")
         )
         return result[0:-2]
     else:
-        return "0 minutes"
+        return "0m"
 
 
 def render_players(players: list, rank_type: str):
