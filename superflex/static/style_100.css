@@ -121,6 +121,10 @@ h4 {
     color: var(--lighter-text-color) !important;
 }
 
+.navbar-light .navbar-nav .nav-link:hover {
+    color: rgb(67, 170, 139) !important;
+}
+
 a:link {
     background-color: transparent;
 }
