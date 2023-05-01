@@ -26,6 +26,8 @@ players = []
 current_year = datetime.now().strftime("%Y")
 
 # START ROUTES
+
+
 @bp.route(
     "/team_view/<string:view_source>/<string:session_id>/<string:league_id>/<string:user_id>/",
     methods=["GET", "POST"],
@@ -127,7 +129,8 @@ def team_view(user_id, league_id, session_id, view_source):
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     with open(
-        Path.cwd() / "superflex" / "sql" / "team_views" / f"{sql_view_table}.sql", "r"
+        Path.cwd() / "superflex" / "sql" / "team_views" /
+        f"{sql_view_table}.sql", "r"
     ) as sql_file:
         sql = (
             sql_file.read()
@@ -196,19 +199,23 @@ def team_view(user_id, league_id, session_id, view_source):
 
     for i in qbs:
         qb_scatter.append(
-            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+            {"x": i["age"], "y": i["player_value"],
+                "player_name": i["full_name"]}
         )
     for i in rbs:
         rb_scatter.append(
-            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+            {"x": i["age"], "y": i["player_value"],
+                "player_name": i["full_name"]}
         )
     for i in wrs:
         wr_scatter.append(
-            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+            {"x": i["age"], "y": i["player_value"],
+                "player_name": i["full_name"]}
         )
     for i in tes:
         te_scatter.append(
-            {"x": i["age"], "y": i["player_value"], "player_name": i["full_name"]}
+            {"x": i["age"], "y": i["player_value"],
+                "player_name": i["full_name"]}
         )
 
     league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -256,7 +263,8 @@ def team_view(user_id, league_id, session_id, view_source):
 @bp.route("/live_draft", methods=["GET"])
 def live_draft():
     db = pg_db()
-    live_draft_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    live_draft_cursor = db.cursor(
+        cursor_factory=psycopg2.extras.RealDictCursor)
 
     live_draft_query = """with ktc_players as (select player_full_name
 ,  case when team = 'KCC' then 'KC' else team end as team
@@ -429,7 +437,8 @@ def index():
         leagues = user_leagues(str(user_id), str(year_))
         entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
-        insert_current_leagues(db, session_id, user_id, user_name, entry_time, leagues)
+        insert_current_leagues(db, session_id, user_id,
+                               user_name, entry_time, leagues)
         return redirect(url_for("leagues.select_league", year=year_))
 
     if request.method == "POST":
@@ -619,7 +628,8 @@ def get_league():
 
         if refresh is not None and refresh_btn is not True:
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -655,7 +665,8 @@ def get_league():
         league_pos_col = (
             "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
         )
-        player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        player_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd() / "superflex" / "sql" / "details" / "power" / "get_league.sql",
@@ -711,24 +722,37 @@ def get_league():
             ),
         )
         cursor.close()
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "picks_rank": i["picks_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
@@ -738,7 +762,8 @@ def get_league():
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
+
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -771,7 +796,8 @@ def get_league():
                     for row in owners
                 ],
                 "picks_total": [
-                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    (((int(row["picks_sum"]) - total_value) /
+                     total_value) + 1) * 100
                     for row in owners
                 ],
             }
@@ -779,7 +805,8 @@ def get_league():
             pct_values = []
             pct_values_dict = {}
 
-        ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        ktc_ba_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -806,25 +833,30 @@ def get_league():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.ktc_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.ktc_player_ranks")
         _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        ktc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' limit 1"
         )
@@ -911,7 +943,8 @@ def get_league_sf():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -956,7 +989,8 @@ def get_league_sf():
             else "superflex_one_qb_value"
         )
 
-        player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        player_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -1022,24 +1056,37 @@ def get_league_sf():
             ),
         )
         cursor.close()
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "picks_rank": i["picks_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
@@ -1049,7 +1096,7 @@ def get_league_sf():
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
 
         try:
             labels = [row["display_name"] for row in owners]
@@ -1083,14 +1130,16 @@ def get_league_sf():
                     for row in owners
                 ],
                 "picks_total": [
-                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    (((int(row["picks_sum"]) - total_value) /
+                     total_value) + 1) * 100
                     for row in owners
                 ],
             }
         except:
             pct_values = []
 
-        ktc_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        ktc_ba_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd() / "superflex" / "sql" / "best_available" / "power" / "sf_ba.sql",
             "r",
@@ -1112,23 +1161,29 @@ def get_league_sf():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.sf_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.sf_player_ranks")
         _date = date_cursor.fetchall()
-        sf_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        sf_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
-        update_diff_minutes = round((current_time - sf_max_time).total_seconds() / 60.0)
+        update_diff_minutes = round(
+            (current_time - sf_max_time).total_seconds() / 60.0)
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -1215,7 +1270,8 @@ def get_league_fc():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -1251,7 +1307,8 @@ def get_league_fc():
             "sf_position_rank" if league_type == "sf_value" else "one_qb_position_rank"
         )
 
-        player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        player_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -1317,24 +1374,37 @@ def get_league_fc():
             ),
         )
         cursor.close()
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "picks_rank": i["picks_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
@@ -1344,8 +1414,7 @@ def get_league_fc():
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
-
+            )
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1378,7 +1447,8 @@ def get_league_fc():
                     for row in owners
                 ],
                 "picks_total": [
-                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    (((int(row["picks_sum"]) - total_value) /
+                     total_value) + 1) * 100
                     for row in owners
                 ],
             }
@@ -1407,23 +1477,29 @@ def get_league_fc():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.fc_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.fc_player_ranks")
         _date = date_cursor.fetchall()
-        fc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        fc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
-        update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
+        update_diff_minutes = round(
+            (current_time - fc_max_time).total_seconds() / 60.0)
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -1510,7 +1586,8 @@ def get_league_dp():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -1544,7 +1621,8 @@ def get_league_dp():
             print(f"An error occurred: {e} on get_league_type")
             return redirect(url_for("leagues.index"))
 
-        player_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        player_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -1613,24 +1691,37 @@ def get_league_dp():
             ),
         )
         cursor.close()
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "picks_rank": i["picks_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
@@ -1640,7 +1731,7 @@ def get_league_dp():
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
         try:
             labels = [row["display_name"] for row in owners]
             values = [row["total_value"] for row in owners]
@@ -1673,7 +1764,8 @@ def get_league_dp():
                     for row in owners
                 ],
                 "picks_total": [
-                    (((int(row["picks_sum"]) - total_value) / total_value) + 1) * 100
+                    (((int(row["picks_sum"]) - total_value) /
+                     total_value) + 1) * 100
                     for row in owners
                 ],
             }
@@ -1702,25 +1794,30 @@ def get_league_dp():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.dp_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.dp_player_ranks")
         _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        ktc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -1800,7 +1897,8 @@ def get_league_fp():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -1859,7 +1957,8 @@ def get_league_fp():
 
         fp_team_spots = render_players(fp_players, "contender")
 
-        fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_owners_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -1894,7 +1993,8 @@ def get_league_fp():
         try:
             labels = [row["display_name"] for row in fp_owners]
             values = [row["total_avg"] for row in fp_owners]
-            total_value = [int(row["total_avg"]) for row in fp_owners][0] * 0.95
+            total_value = [int(row["total_avg"])
+                           for row in fp_owners][0] * 0.95
 
             pct_values = [
                 100 - abs((total_value / int(row["total_avg"])) - 1) * 100
@@ -1916,10 +2016,14 @@ def get_league_fp():
             )
         fp_ba_cursor.execute(ba_sql)
         fp_ba = fp_ba_cursor.fetchall()
-        fp_ba_qb = [player for player in fp_ba if player["player_position"] == "QB"]
-        fp_ba_rb = [player for player in fp_ba if player["player_position"] == "RB"]
-        fp_ba_wr = [player for player in fp_ba if player["player_position"] == "WR"]
-        fp_ba_te = [player for player in fp_ba if player["player_position"] == "TE"]
+        fp_ba_qb = [
+            player for player in fp_ba if player["player_position"] == "QB"]
+        fp_ba_rb = [
+            player for player in fp_ba if player["player_position"] == "RB"]
+        fp_ba_wr = [
+            player for player in fp_ba if player["player_position"] == "WR"]
+        fp_ba_te = [
+            player for player in fp_ba if player["player_position"] == "TE"]
         fp_best_available = {
             "QB": fp_ba_qb,
             "RB": fp_ba_rb,
@@ -1933,23 +2037,27 @@ def get_league_fp():
             "select max(insert_date) from dynastr.espn_player_projections"
         )
         _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        ktc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -1958,7 +2066,8 @@ def get_league_fp():
         users = get_users_data(league_id)
 
         total_rosters = get_league_rosters_size(league_id)
-        page_user = page_user if len(page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
+        page_user = page_user if len(
+            page_user) > 0 else ([0, 0, 0, 0, 0, 0, 0, 0])
 
         fp_owners_cursor.close()
         fp_cursor.close()
@@ -2031,7 +2140,8 @@ def trade_tracker():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -2065,7 +2175,8 @@ def trade_tracker():
             print(f"An error occurred: {e} on get_league_type")
             return redirect(url_for("leagues.index"))
 
-        trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        trades_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -2085,7 +2196,8 @@ def trade_tracker():
 
         trades_cursor.execute(trade_tracker_details_sql)
 
-        analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        analytics_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -2128,24 +2240,29 @@ def trade_tracker():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.ktc_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.ktc_player_ranks")
         _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        ktc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -2207,7 +2324,8 @@ def trade_tracker_fc():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -2240,7 +2358,8 @@ def trade_tracker_fc():
         except Exception as e:
             print(f"An error occurred: {e} on get_league_type")
             return redirect(url_for("leagues.index"))
-        trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        trades_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -2260,7 +2379,8 @@ def trade_tracker_fc():
 
         trades_cursor.execute(trade_tracker_fc_details_sql)
 
-        analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        analytics_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -2303,24 +2423,30 @@ def trade_tracker_fc():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.fc_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.fc_player_ranks")
         _date = date_cursor.fetchall()
-        fc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        fc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
-        update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
+        update_diff_minutes = round(
+            (current_time - fc_max_time).total_seconds() / 60.0)
 
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -2382,7 +2508,8 @@ def trade_tracker_sf():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -2420,7 +2547,8 @@ def trade_tracker_sf():
             if sf_league_type == "sf_value"
             else "superflex_one_qb_value"
         )
-        trades_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        trades_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -2440,7 +2568,8 @@ def trade_tracker_sf():
 
         trades_cursor.execute(trade_tracker_sf_details_sql)
 
-        analytics_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        analytics_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
 
         with open(
             Path.cwd()
@@ -2483,23 +2612,29 @@ def trade_tracker_sf():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.sf_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.sf_player_ranks")
         _date = date_cursor.fetchall()
-        fc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        fc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
-        update_diff_minutes = round((current_time - fc_max_time).total_seconds() / 60.0)
+        update_diff_minutes = round(
+            (current_time - fc_max_time).total_seconds() / 60.0)
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -2561,7 +2696,8 @@ def contender_rankings():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -2590,7 +2726,8 @@ def contender_rankings():
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
 
-        contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        contenders_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -2612,7 +2749,8 @@ def contender_rankings():
 
         c_aps = render_players(contenders, "contender")
 
-        c_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        c_owners_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -2653,32 +2791,47 @@ def contender_rankings():
             ),
         )
         cursor.close()
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in c_owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in c_owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
+                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
         try:
             labels = [row["display_name"] for row in c_owners]
             values = [row["total_value"] for row in c_owners]
@@ -2715,7 +2868,8 @@ def contender_rankings():
             pct_values = []
             pct_values_dict = {}
 
-        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        con_ba_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -2733,10 +2887,14 @@ def contender_rankings():
         con_ba_cursor.execute(con_espn_sql)
         con_ba = con_ba_cursor.fetchall()
 
-        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
-        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
-        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
-        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_ba_qb = [
+            player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [
+            player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [
+            player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [
+            player for player in con_ba if player["player_position"] == "TE"]
         con_best_available = {
             "QB": con_ba_qb,
             "RB": con_ba_rb,
@@ -2750,23 +2908,27 @@ def contender_rankings():
             "select max(insert_date) from dynastr.espn_player_projections"
         )
         _date = date_cursor.fetchall()
-        ktc_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        ktc_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - ktc_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -2848,7 +3010,8 @@ def fc_contender_rankings():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -2881,7 +3044,8 @@ def fc_contender_rankings():
         except Exception as e:
             print(f"An error occurred: {e} on get_league_type")
             return redirect(url_for("leagues.index"))
-        fc_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fc_contenders_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -2904,7 +3068,8 @@ def fc_contender_rankings():
 
         fc_aps = render_players(contenders, "contender")
 
-        fc_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fc_owners_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -2949,32 +3114,47 @@ def fc_contender_rankings():
         )
         cursor.close()
 
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in fc_owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in fc_owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
+                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
         try:
             labels = [row["display_name"] for row in fc_owners]
             values = [row["total_value"] for row in fc_owners]
@@ -3010,7 +3190,8 @@ def fc_contender_rankings():
         except:
             pct_values = []
 
-        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        con_ba_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3029,10 +3210,14 @@ def fc_contender_rankings():
         con_ba_cursor.execute(con_fc_sql)
         con_ba = con_ba_cursor.fetchall()
 
-        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
-        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
-        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
-        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_ba_qb = [
+            player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [
+            player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [
+            player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [
+            player for player in con_ba if player["player_position"] == "TE"]
         con_best_available = {
             "QB": con_ba_qb,
             "RB": con_ba_rb,
@@ -3042,25 +3227,30 @@ def fc_contender_rankings():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.fp_player_ranks")
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.fp_player_ranks")
         _date = date_cursor.fetchall()
-        nfl_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        nfl_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -3143,7 +3333,8 @@ def nfl_contender_rankings():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -3170,7 +3361,8 @@ def nfl_contender_rankings():
         league_id = request.args.get("league_id")
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
-        nfl_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        nfl_contenders_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3192,7 +3384,8 @@ def nfl_contender_rankings():
 
         nfl_aps = render_players(contenders, "contender")
 
-        nfl_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        nfl_owners_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3235,32 +3428,47 @@ def nfl_contender_rankings():
         )
         cursor.close()
 
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in nfl_owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in nfl_owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
+                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
         try:
             labels = [row["display_name"] for row in nfl_owners]
             values = [row["total_value"] for row in nfl_owners]
@@ -3297,7 +3505,8 @@ def nfl_contender_rankings():
             pct_values = []
             pct_values_dict = {}
 
-        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        con_ba_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3315,10 +3524,14 @@ def nfl_contender_rankings():
         con_ba_cursor.execute(con_nfl_sql)
         con_ba = con_ba_cursor.fetchall()
 
-        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
-        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
-        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
-        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_ba_qb = [
+            player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [
+            player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [
+            player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [
+            player for player in con_ba if player["player_position"] == "TE"]
         con_best_available = {
             "QB": con_ba_qb,
             "RB": con_ba_rb,
@@ -3332,23 +3545,27 @@ def nfl_contender_rankings():
             "select max(insert_date) from dynastr.nfl_player_projections"
         )
         _date = date_cursor.fetchall()
-        nfl_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        nfl_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
         update_diff_minutes = round(
             (current_time - nfl_max_time).total_seconds() / 60.0
         )
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
@@ -3431,7 +3648,8 @@ def fp_contender_rankings():
         if refresh is not None and refresh_btn is not True:
             print("HAS PLAYERS")
             refresh_date = refresh[-1]
-            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_datetime = datetime.strptime(
+                refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
             refresh_epoch = round(
                 (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
@@ -3459,7 +3677,8 @@ def fp_contender_rankings():
         user_id = request.args.get("user_id")
         refresh_epoch_time = request.args.get("rdm")
 
-        fp_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_contenders_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3482,7 +3701,8 @@ def fp_contender_rankings():
 
         fp_aps = render_players(contenders, "contender")
 
-        fp_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        fp_owners_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3526,32 +3746,47 @@ def fp_contender_rankings():
         )
         cursor.close()
 
-        radar_chart_data = [
-            {
-                "display_name": i["display_name"],
-                "qb_rank": i["qb_rank"],
-                "rb_rank": i["rb_rank"],
-                "wr_rank": i["wr_rank"],
-                "te_rank": i["te_rank"],
-                "starters_rank": i["starters_rank"],
-                "bench_rank": i["bench_rank"],
-            }
-            for i in fp_owners
-            if i["user_id"] == user_id
-        ][0]
-        radar_chart_data = (
-            radar_chart_data
-            if len(radar_chart_data) > 0
-            else {
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "picks_rank": i["picks_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in fp_owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "picks_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = ({
                 "display_name": 0,
                 "qb_rank": 0,
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
+                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
-        )
+            )
 
         try:
             labels = [row["display_name"] for row in fp_owners]
@@ -3589,7 +3824,8 @@ def fp_contender_rankings():
             pct_values = []
             pct_values_dict = {}
 
-        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        con_ba_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         with open(
             Path.cwd()
             / "superflex"
@@ -3607,10 +3843,14 @@ def fp_contender_rankings():
         con_ba_cursor.execute(con_fp_sql)
         con_ba = con_ba_cursor.fetchall()
 
-        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
-        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
-        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
-        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_ba_qb = [
+            player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [
+            player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [
+            player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [
+            player for player in con_ba if player["player_position"] == "TE"]
         con_best_available = {
             "QB": con_ba_qb,
             "RB": con_ba_rb,
@@ -3624,21 +3864,26 @@ def fp_contender_rankings():
             "select max(insert_date) from dynastr.fp_player_projections"
         )
         _date = date_cursor.fetchall()
-        fp_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        fp_max_time = datetime.strptime(
+            _date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
-        update_diff_minutes = round((current_time - fp_max_time).total_seconds() / 60.0)
+        update_diff_minutes = round(
+            (current_time - fp_max_time).total_seconds() / 60.0)
         try:
-            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+            refresh_time = seconds_text(
+                int(refresh_epoch_time), datetime.utcnow())
         except:
             refresh_time = -1
 
-        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         avatar_cursor.execute(
             f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
         )
         avatar = avatar_cursor.fetchall()
 
-        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor = db.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor)
         league_cursor.execute(
             f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
         )
