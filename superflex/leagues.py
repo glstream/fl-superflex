@@ -2799,7 +2799,6 @@ def contender_rankings():
                     "rb_rank": i["rb_rank"],
                     "wr_rank": i["wr_rank"],
                     "te_rank": i["te_rank"],
-                    "picks_rank": i["picks_rank"],
                     "starters_rank": i["starters_rank"],
                     "bench_rank": i["bench_rank"],
                 }
@@ -2815,7 +2814,6 @@ def contender_rankings():
                     "rb_rank": 0,
                     "wr_rank": 0,
                     "te_rank": 0,
-                    "picks_rank": 0,
                     "starters_rank": 0,
                     "bench_rank": 0,
                 }
@@ -2827,7 +2825,6 @@ def contender_rankings():
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
-                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
@@ -3122,7 +3119,6 @@ def fc_contender_rankings():
                     "rb_rank": i["rb_rank"],
                     "wr_rank": i["wr_rank"],
                     "te_rank": i["te_rank"],
-                    "picks_rank": i["picks_rank"],
                     "starters_rank": i["starters_rank"],
                     "bench_rank": i["bench_rank"],
                 }
@@ -3138,7 +3134,6 @@ def fc_contender_rankings():
                     "rb_rank": 0,
                     "wr_rank": 0,
                     "te_rank": 0,
-                    "picks_rank": 0,
                     "starters_rank": 0,
                     "bench_rank": 0,
                 }
@@ -3150,7 +3145,6 @@ def fc_contender_rankings():
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
-                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
@@ -3436,7 +3430,6 @@ def nfl_contender_rankings():
                     "rb_rank": i["rb_rank"],
                     "wr_rank": i["wr_rank"],
                     "te_rank": i["te_rank"],
-                    "picks_rank": i["picks_rank"],
                     "starters_rank": i["starters_rank"],
                     "bench_rank": i["bench_rank"],
                 }
@@ -3452,7 +3445,6 @@ def nfl_contender_rankings():
                     "rb_rank": 0,
                     "wr_rank": 0,
                     "te_rank": 0,
-                    "picks_rank": 0,
                     "starters_rank": 0,
                     "bench_rank": 0,
                 }
@@ -3464,7 +3456,6 @@ def nfl_contender_rankings():
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
-                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
@@ -3754,7 +3745,6 @@ def fp_contender_rankings():
                     "rb_rank": i["rb_rank"],
                     "wr_rank": i["wr_rank"],
                     "te_rank": i["te_rank"],
-                    "picks_rank": i["picks_rank"],
                     "starters_rank": i["starters_rank"],
                     "bench_rank": i["bench_rank"],
                 }
@@ -3770,7 +3760,6 @@ def fp_contender_rankings():
                     "rb_rank": 0,
                     "wr_rank": 0,
                     "te_rank": 0,
-                    "picks_rank": 0,
                     "starters_rank": 0,
                     "bench_rank": 0,
                 }
@@ -3782,7 +3771,6 @@ def fp_contender_rankings():
                 "rb_rank": 0,
                 "wr_rank": 0,
                 "te_rank": 0,
-                "picks_rank": 0,
                 "starters_rank": 0,
                 "bench_rank": 0,
             }
