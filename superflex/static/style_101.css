@@ -404,25 +404,26 @@ table {
 }
 
 .card-fr {
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     margin-top: 25px;
     padding: .33em .15em .15em;
     border-radius: .5em;
     box-shadow: 0 3px 5px rgba(104, 136, 150, 0.2);
     margin-left: .5rem;
-    margin-right: .5rem;
+    margin-right: 1rem;
     /* border: 1em;
     border-style: solid;
     border-width: 1px 1px 1px 1px; 
     border-color: rgb(77, 144, 142); */
     background-color: rgba(143, 145, 146, 0.25);
     border: 1px solid var(--outline-color);
+    position: relative;
 
 }
 
 .card-body {
     background-color: transparent !important;
-    padding: 1rem .5rem !important;
+    /* padding: 1rem .5rem !important; */
 }
 
 
@@ -1362,10 +1363,6 @@ a.dt-button {
     /* Replace #your-color with your desired color */
 }
 
-.card-fr {
-    position: relative;
-}
-
 #power_leagues_ranks {
     position: absolute;
     top: -3%;
@@ -1459,6 +1456,7 @@ a.dt-button {
     line-height: 1;
     text-align: center;
     white-space: nowrap;
+    margin-right: 0.5rem;
     vertical-align: baseline;
     border-radius: 0.25rem;
     background-color: rgb(144, 190, 109);
