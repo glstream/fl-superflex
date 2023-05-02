@@ -29,7 +29,6 @@ try {
                 r: {
                     reverse: true,
                     max: totalRosters,
-                    max: 12,
                     min: 1,
                     beginAtZero: false,
 
