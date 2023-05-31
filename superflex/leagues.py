@@ -28,7 +28,7 @@ current_year = datetime.now().strftime("%Y")
 
 
 # START API
-@bp.route("/superflex_rankings/", methods=["GET"])
+@bp.route("/superflex/rankings/", methods=["GET"])
 def superflex_rankings():
     db = pg_db()
     sf_api_cursor = db.cursor()
