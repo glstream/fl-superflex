@@ -347,7 +347,6 @@ table {
 .badge.bg-dark {
     outline-color: rgb(249, 199, 79) !important;
     color: rgb(252, loc 252, 252) !important;
-    color: rgba(41, 41, 41, 0.7) !important;
     background-color: rgba(143, 145, 146, 0.20) !important;
 }
 
@@ -744,29 +743,6 @@ a.right {
     background-color: transparent;
     border: 2px solid rgb(249, 132, 74);
 }
-
-.avatar-player-FLEX {
-    width: 38px;
-    height: 32px;
-    flex: 0 0 38px;
-    /* float: left; */
-    /* background: center center / cover rgb(239, 239, 239); */
-    /* border-radius: 50%; */
-    border-radius: 50%;
-    background-color: transparent;
-}
-
-.avatar-player-SUPER_FLEX {
-    width: 38px;
-    height: 32px;
-    flex: 0 0 38px;
-    /* float: left; */
-    /* background: center center / cover rgb(239, 239, 239); */
-    /* border-radius: 50%; */
-    border-radius: 50%;
-    background-color: transparent;
-}
-
 .avatar-traded-asset-qb {
     width: 38px;
     height: 32px;
