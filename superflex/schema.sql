@@ -76,6 +76,8 @@ ALTER TABLE dynastr.current_leagues ADD league_cat integer;
 ALTER TABLE dynastr.current_leagues ADD league_year VARCHAR(75);
 ALTER TABLE dynastr.current_leagues ADD previous_league_id VARCHAR(75);
 ALTER TABLE dynastr.current_leagues ADD league_status VARCHAR(75);
+ALTER TABLE dynastr.current_leagues ADD league_status VARCHAR(75);
+ALTER TABLE dynastr.current_leagues ALTER COLUMN league_name TYPE varchar(175);
 
 
 CREATE TABLE IF NOT EXISTS dynastr.ktc_player_ranks (
