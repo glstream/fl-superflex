@@ -575,7 +575,7 @@ def select_league():
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     cursor.execute(
-        f"select session_id, cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank from dynastr.current_leagues cl left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  where session_id = '{str(session_id)}' and cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
+        f"select session_id, cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.cbs_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank from dynastr.current_leagues cl left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  where session_id = '{str(session_id)}' and cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
     )
 
     leagues = cursor.fetchall()
@@ -3492,6 +3492,305 @@ def nfl_contender_rankings():
             league_name=get_league_name(league_id),
             user_name=get_user_name(user_id)[1],
             aps=nfl_aps,
+            league_id=league_id,
+            session_id=session_id,
+            user_id=user_id,
+            update_diff_minutes=update_diff_minutes,
+            labels=labels,
+            values=values,
+            pct_values=pct_values,
+            pct_values_dict=pct_values_dict,
+            best_available=con_best_available,
+            avatar=avatar,
+            cur_league=cur_league,
+            session_league_id=session_league_id,
+            refresh_time=refresh_time,
+            radar_chart_data=radar_chart_data,
+        )
+    else:
+        return redirect(url_for("leagues.index"))
+
+
+@bp.route("/contender_rankings_cbs", methods=["GET", "POST"])
+def cbs_contender_rankings():
+    db = pg_db()
+    session_league_id = session.get("session_league_id", None)
+
+    if request.method == "POST":
+
+        button = list(request.form)[0]
+        league_data = eval(request.form[button])
+        session_id = league_data[0]
+        user_id = league_data[1]
+        league_id = league_data[2]
+        refresh_btn = league_data[-1]
+
+        entry_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+        insert_league(db, session_id, user_id, entry_time, league_id)
+
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+        )
+        try:
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
+        except:
+            startup = True
+            year_entered = "2001"
+        startup_cursor.close()
+
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None and refresh_btn is not True:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
+            )
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            )
+
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
+            )
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+                rdm=refresh_epoch,
+            )
+        )
+
+    if request.method == "GET":
+        session_id = request.args.get("session_id")
+        league_id = request.args.get("league_id")
+        user_id = request.args.get("user_id")
+        refresh_epoch_time = request.args.get("rdm")
+        cbs_contenders_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "details"
+            / "contender"
+            / "contender_rankings_cbs.sql",
+            "r",
+        ) as contender_rankings_cbs_details_file:
+            contender_rankings_cbs_details_sql = (
+                contender_rankings_cbs_details_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+            )
+        cbs_contenders_cursor.execute(contender_rankings_cbs_details_sql)
+        contenders = cbs_contenders_cursor.fetchall()
+        if len(contenders) < 1:
+            return redirect(url_for("leagues.index"))
+
+        cbs_aps = render_players(contenders, "contender")
+
+        cbs_owners_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "summary"
+            / "contender"
+            / "contender_rankings_cbs.sql",  ###< ---
+            "r",
+        ) as contender_rankings_cbs_summary_file:
+            contender_rankings_cbs_summary_sql = (
+                contender_rankings_cbs_summary_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+            )
+        cbs_owners_cursor.execute(contender_rankings_cbs_summary_sql)
+
+        cbs_owners = cbs_owners_cursor.fetchall()
+        # INSERT SUMMARY OWNERS HERRE
+        cursor = db.cursor()
+        execute_batch(
+            cursor,
+            """
+            INSERT INTO dynastr.ranks_summary (user_id, display_name, league_id, cbs_contender_rank)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, league_id)
+            DO UPDATE SET display_name = EXCLUDED.display_name
+            , cbs_contender_rank = EXCLUDED.cbs_contender_rank
+            """,
+            tuple(
+                [
+                    (
+                        owner["user_id"],
+                        owner["display_name"],
+                        league_id,
+                        owner["total_rank"],
+                    )
+                    for owner in cbs_owners
+                ]
+            ),
+        )
+        cursor.close()
+
+        try:
+            radar_chart_data = [
+                {
+                    "display_name": i["display_name"],
+                    "qb_rank": i["qb_rank"],
+                    "rb_rank": i["rb_rank"],
+                    "wr_rank": i["wr_rank"],
+                    "te_rank": i["te_rank"],
+                    "starters_rank": i["starters_rank"],
+                    "bench_rank": i["bench_rank"],
+                }
+                for i in cbs_owners
+                if i["user_id"] == user_id
+            ][0]
+            radar_chart_data = (
+                radar_chart_data
+                if len(radar_chart_data) > 0
+                else {
+                    "display_name": 0,
+                    "qb_rank": 0,
+                    "rb_rank": 0,
+                    "wr_rank": 0,
+                    "te_rank": 0,
+                    "starters_rank": 0,
+                    "bench_rank": 0,
+                }
+            )
+        except:
+            radar_chart_data = {
+                "display_name": 0,
+                "qb_rank": 0,
+                "rb_rank": 0,
+                "wr_rank": 0,
+                "te_rank": 0,
+                "starters_rank": 0,
+                "bench_rank": 0,
+            }
+        try:
+            labels = [row["display_name"] for row in cbs_owners]
+            values = [row["total_value"] for row in cbs_owners]
+            calc_value = [row["total_value"] for row in cbs_owners][0]
+            total_value = calc_value * 1.05
+
+            pct_values = [
+                (((row["total_value"] - total_value) / total_value) + 1) * 100
+                for row in cbs_owners
+            ]
+            pct_values_dict = {
+                "total": [
+                    (((row["total_value"] - total_value) / total_value) + 1) * 100
+                    for row in cbs_owners
+                ],
+                "qb_total": [
+                    (((int(row["qb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in cbs_owners
+                ],
+                "rb_total": [
+                    (((int(row["rb_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in cbs_owners
+                ],
+                "wr_total": [
+                    (((int(row["wr_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in cbs_owners
+                ],
+                "te_total": [
+                    (((int(row["te_sum"]) - total_value) / total_value) + 1) * 100
+                    for row in cbs_owners
+                ],
+            }
+        except:
+            pct_values = []
+            pct_values_dict = {}
+
+        con_ba_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        with open(
+            Path.cwd()
+            / "superflex"
+            / "sql"
+            / "best_available"
+            / "contender"
+            / "con_cbs_ba.sql",
+            "r",
+        ) as sql_file:
+            con_cbs_sql = (
+                sql_file.read()
+                .replace("'session_id'", f"'{session_id}'")
+                .replace("'league_id'", f"'{league_id}'")
+            )
+        con_ba_cursor.execute(con_cbs_sql)
+        con_ba = con_ba_cursor.fetchall()
+
+        con_ba_qb = [player for player in con_ba if player["player_position"] == "QB"]
+        con_ba_rb = [player for player in con_ba if player["player_position"] == "RB"]
+        con_ba_wr = [player for player in con_ba if player["player_position"] == "WR"]
+        con_ba_te = [player for player in con_ba if player["player_position"] == "TE"]
+        con_best_available = {
+            "QB": con_ba_qb,
+            "RB": con_ba_rb,
+            "WR": con_ba_wr,
+            "TE": con_ba_te,
+        }
+
+        # Find difference in laod time and max update time in the ktc player ranks
+        date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        date_cursor.execute(
+            "select max(insert_date) from dynastr.cbs_player_projections"
+        )
+        _date = date_cursor.fetchall()
+        cbs_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
+        current_time = datetime.utcnow()
+        update_diff_minutes = round(
+            (current_time - cbs_max_time).total_seconds() / 60.0
+        )
+        try:
+            refresh_time = seconds_text(int(refresh_epoch_time), datetime.utcnow())
+        except:
+            refresh_time = -1
+
+        avatar_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        avatar_cursor.execute(
+            f"select avatar from dynastr.current_leagues where league_id='{str(league_id)}' limit 1"
+        )
+        avatar = avatar_cursor.fetchall()
+
+        league_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        league_cursor.execute(
+            f"select session_id, user_id, league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, previous_league_id  from dynastr.current_leagues where session_id = '{str(session_id)}' and league_id = '{str(league_id)}'"
+        )
+        cur_league = league_cursor.fetchone()
+
+        users = get_users_data(league_id)
+        total_rosters = get_league_rosters_size(league_id)
+
+        cbs_contenders_cursor.close()
+        cbs_owners_cursor.close()
+        date_cursor.close()
+        con_ba_cursor.close()
+        avatar_cursor.close()
+        league_cursor.close()
+
+        return render_template(
+            "leagues/contender_ranks/contender_rankings_cbs.html",
+            owners=cbs_owners,
+            total_rosters=total_rosters,
+            users=users,
+            league_name=get_league_name(league_id),
+            user_name=get_user_name(user_id)[1],
+            aps=cbs_aps,
             league_id=league_id,
             session_id=session_id,
             user_id=user_id,
