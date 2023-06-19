@@ -78,6 +78,7 @@ ALTER TABLE dynastr.current_leagues ADD previous_league_id VARCHAR(75);
 ALTER TABLE dynastr.current_leagues ADD league_status VARCHAR(75);
 ALTER TABLE dynastr.current_leagues ADD league_status VARCHAR(75);
 ALTER TABLE dynastr.current_leagues ALTER COLUMN league_name TYPE varchar(175);
+ALTER TABLE dynastr.ranks_summary ADD cbs_contender_rank INTEGER;
 
 
 CREATE TABLE IF NOT EXISTS dynastr.ktc_player_ranks (
@@ -311,6 +312,15 @@ CREATE TABLE IF NOT EXISTS dynastr.fp_player_projections (
   player_last_name VARCHAR(150),
   player_full_name VARCHAR(150),
   total_projection INTEGER,
+  insert_date VARCHAR(75),
+  PRIMARY KEY (player_full_name)
+);
+
+CREATE TABLE IF NOT EXISTS dynastr.cbs_player_projections (
+  player_first_name VARCHAR(150),
+  player_last_name VARCHAR(150),
+  player_full_name VARCHAR(200),
+  total_projection FLOAT,
   insert_date VARCHAR(75),
   PRIMARY KEY (player_full_name)
 );

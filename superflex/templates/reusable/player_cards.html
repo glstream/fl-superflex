@@ -113,6 +113,16 @@
                         </a>
                         <a class="b-link" href="https://fantasycalc.com/players/{{c.full_name}}-{{c.hyper_link}}"
                             target="_blank">{{c.full_name}}</a>
+                        {% elif source == 'cbs' %}
+                        <a href="https://www.cbssports.com/nfl/players/2142052/{{c.first_name}}-{{c.last_name}}/fantasy/"
+                            target="_blank">
+                            <img class="avatar-player-{{c.player_position}}"
+                                src="https://sleepercdn.com/content/nfl/players/thumb/{{c.sleeper_id}}.jpg"
+                                onError="this.onerror=null;this.src='static/logos/player_default.png';" />
+                        </a>
+                        <a class="b-link"
+                            href="https://www.cbssports.com/nfl/players/2142052/{{c.first_name}}-{{c.last_name}}/fantasy/"
+                            target="_blank">{{c.full_name}}</a>
                         {% elif source == 'espn' %}
                         <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
                             <img class="avatar-player-{{c.player_position}}"
@@ -269,6 +279,16 @@
                                 onError="this.onerror=null;this.src='static/logos/player_default.png';" />
                         </a>
                         <a class="b-link" href="https://fantasycalc.com/players/{{c.full_name}}-{{c.hyper_link}}"
+                            target="_blank">{{c.full_name}}</a>
+                        {% elif source == 'cbs' %}
+                        <a href="https://www.cbssports.com/nfl/players/2142052/{{c.first_name}}-{{c.last_name}}/fantasy/"
+                            target="_blank">
+                            <img class="avatar-player-{{c.player_position}}"
+                                src="https://sleepercdn.com/content/nfl/players/thumb/{{c.sleeper_id}}.jpg"
+                                onError="this.onerror=null;this.src='static/logos/player_default.png';" />
+                        </a>
+                        <a class="b-link"
+                            href="https://www.cbssports.com/nfl/players/2142052/{{c.first_name}}-{{c.last_name}}/fantasy/"
                             target="_blank">{{c.full_name}}</a>
                         {% elif source == 'espn' %}
                         <a href="https://www.espn.com/nfl/player/_/id/{{c.espn_player_id}}" target="_blank">
