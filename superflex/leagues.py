@@ -3151,7 +3151,7 @@ def fc_contender_rankings():
 
         # Find difference in laod time and max update time in the ktc player ranks
         date_cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        date_cursor.execute("select max(insert_date) from dynastr.fp_player_ranks")
+        date_cursor.execute("select max(insert_date) from dynastr.fc_player_ranks")
         _date = date_cursor.fetchall()
         nfl_max_time = datetime.strptime(_date[0]["max"], "%Y-%m-%dT%H:%M:%S.%f")
         current_time = datetime.utcnow()
