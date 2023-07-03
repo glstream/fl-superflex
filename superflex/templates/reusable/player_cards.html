@@ -243,10 +243,12 @@
                     <h4 class="text-left margin-left: 20px;"><span class="badge bg-danger">{{c.fantasy_position}}</span>
                     </h4>
                     {% elif c.fantasy_position =="FLEX" %}
-                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position}}</span>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-info">{{c.fantasy_position |
+                            init_cap_format}}</span>
                     </h4>
                     {% elif c.fantasy_position =="SUPER_FLEX" %}
-                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position}}</span>
+                    <h4 class="text-left margin-left: 20px;"><span class="badge bg-dark">{{c.fantasy_position |
+                            init_cap_format }}</span>
                     </h4>
                     {%endif%}
 
