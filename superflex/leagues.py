@@ -509,73 +509,80 @@ def select_league():
 
     if request.method == "GET" and session.get("session_id", "No_user") == "No_user":
         return redirect(url_for("leagues.index"))
-    try:
-        session_id = session.get("session_id", str(uuid.uuid4()))
-        user_id = session["user_id"]
-        session_year = session["league_year"]
 
-        if request.method == "POST":
-            button = list(request.form)[0]
-            league_data = eval(request.form[button])
-            session_id = league_data[0]
-            user_id = league_data[1]
-            league_id = league_data[2]
-            session_league_id = session["session_league_id"] = league_id
+    session_id = session.get("session_id", str(uuid.uuid4()))
+    user_id = session["user_id"]
+    session_year = session["league_year"]
 
-            startup_cursor = db.cursor()
-            startup_cursor.execute(
-                f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+    if request.method == "POST":
+        button = list(request.form)[0]
+        print(list(request.form))
+        print(button)
+        print([request.form[button]])
+        league_data = eval(request.form[button])
+        session_id = league_data[0] if league_data[0] != None else str(uuid.uuid4())
+        user_id = league_data[1]
+        league_id = league_data[2]
+        session_league_id = session["session_league_id"] = league_id
+
+        startup_cursor = db.cursor()
+        startup_cursor.execute(
+            f"select previous_league_id, league_year from dynastr.current_leagues where session_id = '{str(session_id)}' and user_id ='{str(user_id)}' and league_id = '{str(league_id)}' and league_status != 'in_season'"
+        )
+        try:
+            startup_pull = startup_cursor.fetchone()
+            startup = startup_pull[0]
+            year_entered = startup_pull[1]
+        except:
+            startup = True
+            year_entered = "2001"
+        startup_cursor.close()
+
+        refresh_cursor = db.cursor()
+        refresh_cursor.execute(
+            f"select session_id, league_id, insert_date from dynastr.league_players where owner_user_id = '{str(user_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        )
+        refresh = refresh_cursor.fetchone()
+        refresh_cursor.close()
+
+        if refresh is not None:
+            print("HAS PLAYERS")
+            refresh_date = refresh[-1]
+            refresh_datetime = datetime.strptime(refresh_date, "%Y-%m-%dT%H:%M:%S.%f")
+            refresh_epoch = round(
+                (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
             )
-            try:
-                startup_pull = startup_cursor.fetchone()
-                startup = startup_pull[0]
-                year_entered = startup_pull[1]
-            except:
-                startup = True
-                year_entered = "2001"
-            startup_cursor.close()
-
-            refresh_cursor = db.cursor()
-            refresh_cursor.execute(
-                f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+        else:
+            refresh_epoch = round(
+                (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             )
-            refresh = refresh_cursor.fetchone()
-            refresh_cursor.close()
 
-            if refresh is not None:
-                print("HAS PLAYERS")
-                refresh_date = refresh[-1]
-                refresh_datetime = datetime.strptime(
-                    refresh_date, "%Y-%m-%dT%H:%M:%S.%f"
-                )
-                refresh_epoch = round(
-                    (refresh_datetime - datetime(1970, 1, 1)).total_seconds()
-                )
-            else:
-                refresh_epoch = round(
-                    (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-                )
-
-                player_manager_upates(
-                    db, button, session_id, user_id, league_id, startup, year_entered
-                )
-            return redirect(
-                url_for(
-                    f"leagues.{button}",
-                    session_id=session_id,
-                    league_id=league_id,
-                    user_id=user_id,
-                    session_league_id=session_league_id,
-                    rdm=refresh_epoch,
-                )
+            player_manager_upates(
+                db, button, session_id, user_id, league_id, startup, year_entered
             )
-    except:
-        return redirect(url_for("leagues.index"))
+        return redirect(
+            url_for(
+                f"leagues.{button}",
+                session_id=session_id,
+                league_id=league_id,
+                user_id=user_id,
+                session_league_id=session_league_id,
+                rdm=refresh_epoch,
+            )
+        )
 
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     cursor.execute(
-        f"select session_id, cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.cbs_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank from dynastr.current_leagues cl left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  where session_id = '{str(session_id)}' and cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
+        f"""WITH t1 as (select max(insert_date) md from dynastr.current_leagues cl 
+            left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  
+            where cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}')
+
+            select cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.cbs_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank 
+            from dynastr.current_leagues cl 
+            inner join t1 on t1.md = cl.insert_date
+            left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  
+            where cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}' """
     )
 
     leagues = cursor.fetchall()
@@ -651,7 +658,7 @@ def get_league():
 
         refresh_cursor = db.cursor()
         refresh_cursor.execute(
-            f"select session_id, league_id, insert_date from dynastr.league_players where session_id = '{str(session_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
+            f"select session_id, league_id, insert_date from dynastr.league_players where owner_user_id = '{str(user_id)}' and league_id = '{str(league_id)}' order by TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z') desc limit 1"
         )
         refresh = refresh_cursor.fetchone()
         refresh_cursor.close()
@@ -2879,6 +2886,7 @@ def contender_rankings():
         con_ba_cursor.close()
         avatar_cursor.close()
         league_cursor.close()
+        print("OWNERS", c_owners)
 
         return render_template(
             "leagues/contender_ranks/contender_rankings.html",
