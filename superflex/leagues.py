@@ -472,9 +472,9 @@ def index():
         return redirect(url_for("leagues.select_league", year=year_))
 
     if request.method == "POST":
-        if is_user(request.form["username"]):
+        if is_user(request.form["username"].strip()):
             session_id = session.get("session_id", str(uuid.uuid4()))
-            user_name = request.form["username"]
+            user_name = request.form["username"].strip()
             year_ = request.form.get("league_year", "2023")
             session["league_year"] = year_
             user_id = session["user_id"] = get_user_id(user_name)
