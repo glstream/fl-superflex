@@ -780,7 +780,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
                             draft_picks_[4],  # season of pick
                             draft_picks_[5],  # draft_round
                             suffix,
-                            draft_picks_[1],  # original owner
+                            draft_picks_[2],  # original owner
                             league_id,
                         ]
                     )
@@ -793,7 +793,7 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
                             draft_picks_[4],  # season of pick
                             draft_picks_[5],  # draft_round
                             suffix,
-                            draft_picks_[1],  # original owner
+                            draft_picks_[2],  # original owner
                             league_id,
                         ]
                     )
