@@ -770,17 +770,17 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
                 draft_picks_ = [v for k, v in pick.items()]
 
                 if draft_picks_:
-                    suffix = round_suffix(draft_picks_[1])
+                    suffix = round_suffix(draft_picks_[5])
                     draft_adds_db.append(
                         [
                             trade["transaction_id"],
                             trade["status_updated"],
-                            draft_picks_[4],
+                            draft_picks_[1],  # new owner
                             "add",
-                            draft_picks_[0],
-                            draft_picks_[1],
+                            draft_picks_[4],  # season of pick
+                            draft_picks_[5],  # draft_round
                             suffix,
-                            draft_picks_[2],
+                            draft_picks_[1],  # original owner
                             league_id,
                         ]
                     )
@@ -788,12 +788,12 @@ def insert_trades(db, trades: dict, league_id: str) -> None:
                         [
                             trade["transaction_id"],
                             trade["status_updated"],
-                            draft_picks_[3],
+                            draft_picks_[0],  # previous owner
                             "drop",
-                            draft_picks_[0],
-                            draft_picks_[1],
+                            draft_picks_[4],  # season of pick
+                            draft_picks_[5],  # draft_round
                             suffix,
-                            draft_picks_[2],
+                            draft_picks_[1],  # original owner
                             league_id,
                         ]
                     )
