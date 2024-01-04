@@ -33,8 +33,10 @@ WITH base_players as (SELECT
                                     al.user_id
                                     , al.season
                                     , al.year 
-                                    , CASE WHEN (dname.position::integer) < 13 and al.draft_set_flg = 'Y' and al.year = dname.season
+                                     , CASE WHEN (dname.position::integer) < 13 and al.draft_set_flg = 'Y' and al.year = dname.season and (select player_full_name from dynastr.ktc_player_ranks where player_full_name like '%Round%' and al.year = SUBSTRING(player_full_name FROM '\d{4}') limit 1) IS NOT NULL
                                                 THEN al.year || ' Round ' || al.round || ' Pick ' || dname.position
+											WHEN (dname.position::integer) < 13 and al.draft_set_flg = 'Y' and al.year = dname.season and (select player_full_name from dynastr.ktc_player_ranks where player_full_name like '%Round%' and al.year = SUBSTRING(player_full_name FROM '\d{4}') limit 1) IS NULL
+                                                THEN al.year || ' ' || dname.position_name || ' ' || al.round_name 
                                             WHEN (dname.position::integer) > 12 and al.draft_set_flg = 'Y' and al.year = dname.season
                                                 THEN al.year || ' ' || dname.position_name || ' ' || al.round_name 
                                             ELSE al.year|| ' Mid ' || al.round_name 
