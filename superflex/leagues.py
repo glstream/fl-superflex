@@ -575,7 +575,7 @@ def select_league():
     cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     cursor.execute(
-        f"select session_id, cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.cbs_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank from dynastr.current_leagues cl left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  where session_id = '{str(session_id)}' and cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}'"
+        f"select session_id, cl.user_id, cl.league_id, league_name, avatar, total_rosters, qb_cnt, sf_cnt, starter_cnt, total_roster_cnt, sport, insert_date, rf_cnt, league_cat, league_year, rs.ktc_power_rank, rs.sf_power_rank, rs.fc_power_rank, rs.dp_power_rank, rs.espn_contender_rank, rs.nfl_contender_rank, rs.cbs_contender_rank, rs.fp_contender_rank, rs.fc_contender_rank from dynastr.current_leagues cl left join dynastr.ranks_summary rs on cl.league_id = rs.league_id and cl.user_id = rs.user_id  where session_id = '{str(session_id)}' and cl.user_id ='{str(user_id)}' and league_year = '{str(session_year)}' order by league_cat desc"
     )
 
     leagues = cursor.fetchall()
