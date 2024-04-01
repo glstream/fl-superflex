@@ -21,7 +21,8 @@ WITH base_players as (SELECT
                     INNER JOIN dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'session_id' 
                     WHERE lp.session_id = 'session_id'
                     and lp.league_id = 'league_id'
-                    and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))
+                    and ktc.rank_type ='dynasty'
+                    )
 
                     , base_picks as (SELECT t1.user_id
                                 , t1.season
@@ -33,7 +34,7 @@ WITH base_players as (SELECT
                                     al.user_id
                                     , al.season
                                     , al.year 
-                                     , CASE WHEN (dname.position::integer) < 13 and al.draft_set_flg = 'Y' and al.year = dname.season and (select player_full_name from dynastr.ktc_player_ranks where player_full_name like '%Round%' and al.year = SUBSTRING(player_full_name FROM '\d{4}') limit 1) IS NOT NULL
+                                    , CASE WHEN (dname.position::integer) < 13 and al.draft_set_flg = 'Y' and al.year = dname.season and (select player_full_name from dynastr.ktc_player_ranks where player_full_name like '%Round%' and al.year = SUBSTRING(player_full_name FROM '\d{4}') limit 1) IS NOT NULL
                                                 THEN al.year || ' Round ' || al.round || ' Pick ' || dname.position
 											WHEN (dname.position::integer) < 13 and al.draft_set_flg = 'Y' and al.year = dname.season and (select player_full_name from dynastr.ktc_player_ranks where player_full_name like '%Round%' and al.year = SUBSTRING(player_full_name FROM '\d{4}') limit 1) IS NULL
                                                 THEN al.year || ' ' || dname.position_name || ' ' || al.round_name 
