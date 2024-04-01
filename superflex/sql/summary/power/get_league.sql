@@ -149,6 +149,8 @@ SELECT
                                     inner join dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
                                 LEFT join dynastr.ktc_player_ranks ktc on t1.player_full_name = ktc.player_full_name
+                                where 1=1
+                                and ktc.rank_type ='dynasty'
                                     )						   
                     , starters as (SELECT  
                     qb.user_id
@@ -325,6 +327,8 @@ SELECT
                     left join dynastr.players p on tp.player_id = p.player_id
                     inner JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
                     inner join dynastr.managers m on tp.user_id = m.user_id 
+                    where 1=1
+                    and ktc.rank_type ='dynasty'
                     order by m.display_name, player_value desc
                     ) asset  
                             ) t2
