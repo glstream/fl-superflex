@@ -60,6 +60,7 @@ WITH base_players as (SELECT
                                     INNER JOIN dynastr.draft_positions dname on  dname.roster_id = al.roster_id and al.league_id = dname.league_id
                                 ) t1
                                 LEFT JOIN dynastr.ktc_player_ranks ktc on t1.player_full_name = ktc.player_full_name
+                                where ktc.rank_type = 'dynasty'
                                     )						   
                     , starters as (SELECT  
                     qb.user_id
@@ -243,4 +244,6 @@ WITH base_players as (SELECT
                     left join dynastr.players p on tp.player_id = p.player_id
                     LEFT JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
                     inner join dynastr.managers m on tp.user_id = m.user_id 
+                    where 1=1
+                     and ktc.rank_type ='dynasty'
                     order by draft_year asc, player_value desc
