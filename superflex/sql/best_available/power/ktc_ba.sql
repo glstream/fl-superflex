@@ -19,6 +19,7 @@ and pl.player_id NOT IN (SELECT
                 where lp.session_id = 'session_id'
                 and lp.league_id = 'league_id'
             )
+and ktc.rank_type ='dynasty'
 and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
 and pl.team is not null
 order by player_value desc) ba_t1

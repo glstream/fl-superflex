@@ -9,6 +9,8 @@ with ktc_players as (select player_full_name
 , 'sf_value' as _rank_type 
 ,insert_date
 from dynastr.ktc_player_ranks 
+where 1=1
+and ktc.rank_type ='dynasty'
 UNION ALL
 select player_full_name
 ,  case when team = 'KCC' then 'KC' else team end as team
@@ -20,7 +22,9 @@ select player_full_name
 		ELSE position END as _position
 , 'one_qb_value' as _rank_type
 ,insert_date
-from dynastr.ktc_player_ranks )
+from dynastr.ktc_player_ranks
+where 1=1
+and ktc.rank_type ='dynasty' )
 															   
 select player_full_name
 ,CONCAT(_position, ' ', rank() OVER (partition by _rank_type, _position ORDER BY value DESC)) as pos_rank

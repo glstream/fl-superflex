@@ -109,7 +109,9 @@ SELECT
                     inner join dynastr.current_leagues cl on lp.league_id = cl.league_id and cl.session_id = 'session_id' 
                     where lp.session_id = 'session_id'
                     and lp.league_id = 'league_id'
-                    and pl.player_position IN ('QB', 'RB', 'WR', 'TE' ))
+                    and pl.player_position IN ('QB', 'RB', 'WR', 'TE' )
+                    and ktc.rank_type ='dynasty'
+                    )
 
                     , base_picks as (select t1.user_id
                                 , t1.season
