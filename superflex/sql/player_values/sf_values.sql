@@ -35,5 +35,7 @@ select player_full_name
 , _rank_type
 , TO_DATE(insert_date, 'YYYY-mm-DDTH:M:SS.z')-1 as _insert_date
 from sf_players
+where 1=1
+and sf.rank_type = 'dynasty'
 order by value desc
 									 

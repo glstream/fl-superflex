@@ -42,7 +42,10 @@ def superflex_rankings():
                     , superflex_one_qb_rank
                     , superflex_one_qb_pos_rank
                     , insert_date
-                    from dynastr.sf_player_ranks order by superflex_sf_value desc"""
+                    from dynastr.sf_player_ranks sf
+                    where 1=1
+                    and sf.rank_type ='dynasty'
+                    order by superflex_sf_value desc"""
     sf_api_cursor.execute(api_query)
     api_players = sf_api_cursor.fetchall()
     sf_api_cursor.close()
