@@ -328,7 +328,7 @@ SELECT
                     inner JOIN dynastr.ktc_player_ranks ktc on tp.ktc_player_id = ktc.ktc_player_id
                     inner join dynastr.managers m on tp.user_id = m.user_id 
                     where 1=1
-                    and ktc.rank_type ='dynasty'
+                    and  and ktc.rank_type ='dynasty'
                     order by m.display_name, player_value desc
                     ) asset  
                             ) t2
