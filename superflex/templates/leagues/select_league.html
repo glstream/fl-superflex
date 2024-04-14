@@ -3,7 +3,14 @@
 {% endblock %}
 {% block content %}
 <div class="row">
+    <div class="alert alert-info mb-4" role="alert">
+        DynastySuperFlex is moving to a new platform at <a href="https://www.fantasynavigator.com"
+            target="_blank">FantasyNavigator.com</a>! Check out the new site with its
+        exciting new features. Including a new trade calculator and detailed league
+        analytics.
+    </div>
     {% for league in leagues[:leagues|length] %}
+
     <div class="col-sm-3">
         <div class="card-fr" style="background-color:
             {% if league.league_cat == 2 %}
