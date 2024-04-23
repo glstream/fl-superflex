@@ -3,7 +3,8 @@ starter_cnt,qb_cnt, sf_cnt, session_id, user_id, league_id, avatar=[''], page_ty
 <div class="card-pr">
     <div class="header-sub">
         <div style="background-color: rgb(39, 125, 161);">
-            <div style="display: flex; align-items: center;margin-bottom: 10px;margin-top: 10px; background-color: rgb(39, 125, 161);">
+            <div
+                style="display: flex; align-items: center;margin-bottom: 10px;margin-top: 10px; background-color: rgb(39, 125, 161);">
                 <img class="avatar-manager" src="https://sleepercdn.com/avatars/thumbs/{{avatar[0].avatar}}"
                     onError="this.onerror=null;this.src='static/logos/logo_sf_small.jpg';" />
                 <span
@@ -43,5 +44,10 @@ starter_cnt,qb_cnt, sf_cnt, session_id, user_id, league_id, avatar=[''], page_ty
         </div>
     </div>
 </div>
-
+<div class="alert alert-info mb-4" role="alert">
+    DynastySuperFlex is moving to a new platform at <a href="https://www.fantasynavigator.com"
+        target="_blank">FantasyNavigator.com</a>! Check out the new site with its
+    exciting new features. Including a new trade calculator and detailed league
+    analytics.
+</div>
 {% endmacro %}
