@@ -15,6 +15,38 @@ DROP TABLE IF EXISTS dynastr.player_trades;
 DROP TABLE IF EXISTS dynastr.draft_pick_trades;
 DROP TABLE IF EXISTS dynastr.managers;
 
+CREATE TABLE IF NOT EXISTS dynastr.dd_player_ranks (
+    name_id VARCHAR(255),
+    rank_type VARCHAR(50),
+    trade_value INT,
+    sf_trade_value INT,
+    sf_position_rank INT,
+    position_rank INT,
+    all_time_high_sf INT,
+    all_time_low_sf INT,
+    all_time_high INT,
+    all_time_low INT,
+    three_month_high_sf INT,
+    three_month_high INT,
+    three_month_low_sf INT,
+    three_month_low INT,
+    last_month_value INT,
+    last_month_value_sf INT,
+    all_time_best_rank_sf INT,
+    all_time_best_rank INT,
+    all_time_worst_rank_sf INT,
+    all_time_worst_rank INT,
+    three_month_best_rank_sf INT,
+    three_month_best_rank INT,
+    three_month_worst_rank_sf INT,
+    three_month_worst_rank INT,
+    last_month_rank INT,
+    last_month_rank_sf INT,
+    sf_overall_rank INT,
+    overall_rank INT,
+    PRIMARY KEY (name_id, rank_type));
+
+
 CREATE TABLE IF NOT EXISTS dynastr.players (
   player_id VARCHAR(150) PRIMARY KEY,
   first_name VARCHAR(150),
