@@ -4115,3 +4115,14 @@ def fp_contender_rankings():
         )
     else:
         return redirect(url_for("leagues.index"))
+
+
+@bp.route("/privacy-policy", methods=["GET"])
+def privacy_policy():
+    """Render the privacy policy page."""
+    return render_template("privacy_policy.html")
+
+@bp.route("/about", methods=["GET"])
+def about():
+    """Render the about page."""
+    return render_template("about.html")

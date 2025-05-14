@@ -1,0 +1,82 @@
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}About DynastySuperFlex{% endblock %}</h1>
+{% endblock %} {% block content %}
+
+<div class="container mt-5">
+  <h1>About DynastySuperFlex</h1>
+
+  <div class="row mt-4">
+    <div class="col-md-8">
+      <p class="lead">
+        Helping fantasy football managers make better decisions since 2021.
+      </p>
+
+      <h3>Our Mission</h3>
+      <p>
+        DynastySuperFlex is the ultimate resource for fantasy football managers.
+        Our mission is to provide comprehensive, data-driven insights that help
+        you make informed decisions about your fantasy teams. By combining data
+        from multiple trusted sources with your league information, we offer a
+        unique perspective that can give you the edge in your fantasy leagues.
+      </p>
+
+      <h3>What We Offer</h3>
+      <p>Our platform integrates with your Sleeper leagues to deliver:</p>
+      <ul>
+        <li>Dynasty power rankings based on multiple data sources</li>
+        <li>Contender rankings to assess your team's competitive position</li>
+        <li>Trade analysis tools</li>
+        <li>Player value assessments</li>
+        <li>League analytics and insights</li>
+      </ul>
+
+      <h3>Our Data Sources</h3>
+      <p>
+        We aggregate data from several trusted fantasy football sources
+        including:
+      </p>
+      <ul>
+        <li>KeepTradeCut</li>
+        <li>FantasyPros</li>
+        <li>FantasyCalc</li>
+        <li>Dynasty Process</li>
+        <li>ESPN Projections</li>
+        <li>NFL Projections</li>
+      </ul>
+
+      <h3>Moving Forward</h3>
+      <p>
+        DynastySuperFlex is moving to a new platform at
+        <a href="https://www.fantasynavigator.com" target="_blank"
+          >FantasyNavigator.com</a
+        >. The new site includes exciting features like an enhanced trade
+        calculator and detailed league analytics.
+      </p>
+
+      <h3>Contact Us</h3>
+      <p>
+        Have questions, suggestions, or feedback? Reach out to us on Twitter at
+        <a href="https://twitter.com/superflex_app" target="_blank"
+          >@superflex_app</a
+        >.
+      </p>
+
+      <h3>Support the Site</h3>
+      <p>
+        If you find our tools valuable, consider supporting us on
+        <a href="https://www.buymeacoffee.com/superflex" target="_blank"
+          >Buy Me a Coffee</a
+        >.
+      </p>
+    </div>
+    <div class="col-md-4">
+      <img
+        src="{{url_for('static', filename='logos/logo.png')}}"
+        class="img-fluid"
+        alt="DynastySuperFlex Logo"
+      />
+    </div>
+  </div>
+</div>
+
+{% endblock %}
