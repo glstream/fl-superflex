@@ -4119,8 +4119,8 @@ def fp_contender_rankings():
 
 @bp.route("/privacy-policy", methods=["GET"])
 def privacy_policy():
-    """Render the privacy policy page."""
-    return render_template("privacy_policy.html")
+    last_updated = datetime.now().strftime('%B %d, %Y')  # Format like "January 1, 2023"
+    return render_template("privacy_policy.html", last_updated=last_updated)
 
 @bp.route("/about", methods=["GET"])
 def about():
